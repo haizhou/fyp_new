@@ -1,0 +1,248 @@
+{
+  "naturalized": {
+    "subset": "naturalized",
+    "target": 20,
+    "accepted": 20,
+    "rejected": 17,
+    "skipped_resume": 0,
+    "validation_passed": 20,
+    "validation_failed": 0,
+    "failure_reason": {
+      "factoid_anchor_not_unique": 2,
+      "oracle_or_evidence_mismatch": 15
+    },
+    "answer_type": {
+      "count": 13,
+      "factoid": 6,
+      "sum": 1
+    },
+    "expected_status": {
+      "answerable": 20
+    },
+    "executor_support": {
+      "supported": 20
+    },
+    "surface_style": {
+      "natural": 11,
+      "realistic_user": 4,
+      "indirect": 3,
+      "terse": 2
+    },
+    "difficulty": {
+      "medium": 14,
+      "hard": 6
+    },
+    "template_family": {
+      "naturalized_count": 13,
+      "naturalized_factoid": 6,
+      "naturalized_sum": 1
+    },
+    "verification_reason": {},
+    "evidence_kind": {
+      "concrete_evidence": 20
+    },
+    "concrete_evidence_coverage": "20/20",
+    "aggregate_recomputable": 0,
+    "duplicate_ids": 0,
+    "duplicate_questions": 0
+  },
+  "coverage_fixed": {
+    "subset": "coverage_fixed",
+    "target": 20,
+    "accepted": 20,
+    "rejected": 0,
+    "skipped_resume": 0,
+    "validation_passed": 20,
+    "validation_failed": 0,
+    "failure_reason": {},
+    "answer_type": {
+      "count": 20
+    },
+    "expected_status": {
+      "answerable": 20
+    },
+    "executor_support": {
+      "supported": 20
+    },
+    "surface_style": {
+      "natural": 11,
+      "indirect": 3,
+      "realistic_user": 3,
+      "terse": 3
+    },
+    "difficulty": {
+      "medium": 20
+    },
+    "template_family": {
+      "coverage_fixed_natural": 11,
+      "coverage_fixed_indirect": 3,
+      "coverage_fixed_realistic_user": 3,
+      "coverage_fixed_terse": 3
+    },
+    "verification_reason": {},
+    "evidence_kind": {
+      "concrete_evidence": 20
+    },
+    "concrete_evidence_coverage": "20/20",
+    "aggregate_recomputable": 0,
+    "duplicate_ids": 0,
+    "duplicate_questions": 0
+  },
+  "unanswerable": {
+    "subset": "unanswerable",
+    "target": 20,
+    "accepted": 20,
+    "rejected": 0,
+    "skipped_resume": 0,
+    "validation_passed": 20,
+    "validation_failed": 0,
+    "failure_reason": {},
+    "answer_type": {
+      "unsupported": 8,
+      "factoid": 6,
+      "ambiguous": 6
+    },
+    "expected_status": {
+      "unsupported": 8,
+      "no_results": 6,
+      "ambiguous": 6
+    },
+    "executor_support": {
+      "n/a": 14,
+      "supported": 6
+    },
+    "surface_style": {
+      "realistic_user": 14,
+      "natural": 2,
+      "indirect": 2,
+      "terse": 2
+    },
+    "difficulty": {
+      "hard": 14,
+      "medium": 6
+    },
+    "template_family": {
+      "unsupported_field_not_in_schema": 5,
+      "unsupported_unsupported_judgement": 3,
+      "buyer_cpv_not_found": 6,
+      "buyer_only": 6
+    },
+    "verification_reason": {
+      "field_not_in_schema": 5,
+      "unsupported_judgement": 3,
+      "zero_matches": 6,
+      "ambiguous_distinct_answers": 6
+    },
+    "evidence_kind": {
+      "none": 20
+    },
+    "concrete_evidence_coverage": "0/0",
+    "aggregate_recomputable": 0,
+    "duplicate_ids": 0,
+    "duplicate_questions": 0
+  },
+  "extended_ops": {
+    "subset": "extended_ops",
+    "target": 20,
+    "accepted": 20,
+    "rejected": 1,
+    "skipped_resume": 0,
+    "validation_passed": 20,
+    "validation_failed": 0,
+    "failure_reason": {
+      "oracle_or_evidence_mismatch": 1
+    },
+    "answer_type": {
+      "boolean": 12,
+      "min_max": 2,
+      "top_k": 2,
+      "set_list": 2,
+      "comparison": 2
+    },
+    "expected_status": {
+      "answerable": 20
+    },
+    "executor_support": {
+      "supported": 3,
+      "needs_op:compare": 11,
+      "needs_op:argmin": 2,
+      "needs_op:top_k": 2,
+      "needs_op:distinct_set": 2
+    },
+    "surface_style": {
+      "natural": 16,
+      "realistic_user": 2,
+      "indirect": 2
+    },
+    "difficulty": {
+      "easy": 3,
+      "medium": 9,
+      "frontier": 8
+    },
+    "template_family": {
+      "boolean_exists": 3,
+      "boolean_field_equality": 3,
+      "numeric_threshold": 3,
+      "date_relation": 3,
+      "min_max": 2,
+      "top_k": 2,
+      "set_list": 2,
+      "comparison": 2
+    },
+    "verification_reason": {},
+    "evidence_kind": {
+      "concrete_evidence": 13,
+      "aggregate_recomputable": 5,
+      "two_subcounts_recomputable": 2
+    },
+    "concrete_evidence_coverage": "13/13",
+    "aggregate_recomputable": 7,
+    "duplicate_ids": 0,
+    "duplicate_questions": 0
+  },
+  "bridge_join": {
+    "subset": "bridge_join",
+    "target": 20,
+    "accepted": 20,
+    "rejected": 0,
+    "skipped_resume": 0,
+    "validation_passed": 20,
+    "validation_failed": 0,
+    "failure_reason": {},
+    "answer_type": {
+      "sum": 4,
+      "count": 15,
+      "comparison": 1
+    },
+    "expected_status": {
+      "answerable": 20
+    },
+    "executor_support": {
+      "needs_op:in_subquery": 20
+    },
+    "surface_style": {
+      "natural": 11,
+      "indirect": 9
+    },
+    "difficulty": {
+      "frontier": 20
+    },
+    "template_family": {
+      "buyer_suppliers_sum": 4,
+      "supplier_buyers_count": 3,
+      "cpv_suppliers_other_cpv": 3,
+      "buyer_cpv_set_count": 3,
+      "year_suppliers_next_year": 3,
+      "category_buyers_count": 3,
+      "supplier_set_compare": 1
+    },
+    "verification_reason": {},
+    "evidence_kind": {
+      "concrete_evidence": 20
+    },
+    "concrete_evidence_coverage": "20/20",
+    "aggregate_recomputable": 0,
+    "duplicate_ids": 0,
+    "duplicate_questions": 0
+  }
+}

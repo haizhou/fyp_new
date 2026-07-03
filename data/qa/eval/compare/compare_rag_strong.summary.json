@@ -1,0 +1,65 @@
+{
+  "overall": {
+    "total": 220,
+    "correct": 56,
+    "accuracy": 0.2545
+  },
+  "by_category": {
+    "v1:additive_sum": {
+      "total": 20,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "v1:conjunction": {
+      "total": 20,
+      "correct": 2,
+      "accuracy": 0.1
+    },
+    "v1:contract_factoid": {
+      "total": 20,
+      "correct": 18,
+      "accuracy": 0.9
+    },
+    "v1:cpv_slice": {
+      "total": 20,
+      "correct": 3,
+      "accuracy": 0.15
+    },
+    "v1:filtered_count": {
+      "total": 20,
+      "correct": 2,
+      "accuracy": 0.1
+    },
+    "v1:temporal_count": {
+      "total": 20,
+      "correct": 4,
+      "accuracy": 0.2
+    },
+    "v2:bridge_join": {
+      "total": 20,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "v2:coverage_fixed": {
+      "total": 20,
+      "correct": 1,
+      "accuracy": 0.05
+    },
+    "v2:extended_ops": {
+      "total": 20,
+      "correct": 5,
+      "accuracy": 0.25
+    },
+    "v2:naturalized": {
+      "total": 20,
+      "correct": 6,
+      "accuracy": 0.3
+    },
+    "v2:unanswerable": {
+      "total": 20,
+      "correct": 15,
+      "accuracy": 0.75
+    }
+  },
+  "label": "rag_strong"
+}

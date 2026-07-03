@@ -1,0 +1,455 @@
+{
+  "dataset_id": "qav2_v0.2_full2k",
+  "status": "frozen_with_known_unanswerable_underfill",
+  "created_at_utc": "2026-07-01T20:09:02+00:00",
+  "run_tag": "full2k",
+  "seed": 42,
+  "llm_mode": "off",
+  "command": "python -B scripts\\build_targeted_v2.py --subset all --limit 2000 --llm off --out-dir data\\qa\\targeted_v2\\full2k --run-tag full2k --seed 42",
+  "root": "data/qa/targeted_v2/full2k",
+  "summary_path": "data/qa/targeted_v2/full2k/validation_summary.full2k.json",
+  "known_deviations": [
+    "Accepted rows total 9990 rather than nominal 10000.",
+    "unanswerable accepted 1990/2000 because duplicate id/question guard rejected 10 rows.",
+    "bridge_join family balance is uneven at full scale, though all accepted rows validate."
+  ],
+  "totals": {
+    "target_rows": 10000,
+    "accepted_rows": 9990,
+    "rejected_rows": 1194,
+    "validation_rows": 9990,
+    "validation_failed": 0,
+    "duplicate_ids": 0,
+    "duplicate_questions": 0,
+    "json_errors": 0
+  },
+  "subsets": {
+    "naturalized": {
+      "target": 2000,
+      "accepted": 2000,
+      "rejected": 1124,
+      "validation_rows": 2000,
+      "validation_failed": 0,
+      "duplicate_ids": 0,
+      "duplicate_questions": 0,
+      "json_errors": 0,
+      "summary": {
+        "subset": "naturalized",
+        "target": 2000,
+        "accepted": 2000,
+        "rejected": 1124,
+        "skipped_resume": 0,
+        "validation_passed": 2000,
+        "validation_failed": 0,
+        "failure_reason": {
+          "factoid_anchor_not_unique": 157,
+          "oracle_or_evidence_mismatch": 946,
+          "duplicate_id_or_question": 21
+        },
+        "answer_type": {
+          "count": 745,
+          "factoid": 928,
+          "sum": 327
+        },
+        "expected_status": {
+          "answerable": 2000
+        },
+        "executor_support": {
+          "supported": 2000
+        },
+        "surface_style": {
+          "natural": 996,
+          "realistic_user": 408,
+          "indirect": 395,
+          "terse": 201
+        },
+        "difficulty": {
+          "medium": 1072,
+          "hard": 928
+        },
+        "template_family": {
+          "naturalized_count": 745,
+          "naturalized_factoid": 928,
+          "naturalized_sum": 327
+        },
+        "verification_reason": {},
+        "evidence_kind": {
+          "concrete_evidence": 2000
+        },
+        "concrete_evidence_coverage": "2000/2000",
+        "aggregate_recomputable": 0,
+        "duplicate_ids": 0,
+        "duplicate_questions": 0
+      },
+      "files": {
+        "accepted": {
+          "path": "data/qa/targeted_v2/full2k/naturalized.full2k.accepted.jsonl",
+          "bytes": 3970241,
+          "sha256": "c94c66e104effab2f8bf549fff7f7258bcceb347757a32002a58a8e74b54bca1",
+          "rows": 2000,
+          "json_errors": 0
+        },
+        "rejected": {
+          "path": "data/qa/targeted_v2/full2k/naturalized.full2k.rejected.jsonl",
+          "bytes": 597119,
+          "sha256": "84607e6b236053a63371592ae64b28df61fbf1e54f304b11104d4abe74377a8d",
+          "rows": 1124,
+          "json_errors": 0
+        },
+        "validation": {
+          "path": "data/qa/targeted_v2/full2k/naturalized.full2k.validation.jsonl",
+          "bytes": 451282,
+          "sha256": "740067fa4fffd1d3add709b8a90f22294f1e17e6a9e6148f68ccdfcf4231ca49",
+          "rows": 2000,
+          "json_errors": 0
+        }
+      }
+    },
+    "coverage_fixed": {
+      "target": 2000,
+      "accepted": 2000,
+      "rejected": 0,
+      "validation_rows": 2000,
+      "validation_failed": 0,
+      "duplicate_ids": 0,
+      "duplicate_questions": 0,
+      "json_errors": 0,
+      "summary": {
+        "subset": "coverage_fixed",
+        "target": 2000,
+        "accepted": 2000,
+        "rejected": 0,
+        "skipped_resume": 0,
+        "validation_passed": 2000,
+        "validation_failed": 0,
+        "failure_reason": {},
+        "answer_type": {
+          "count": 2000
+        },
+        "expected_status": {
+          "answerable": 2000
+        },
+        "executor_support": {
+          "supported": 2000
+        },
+        "surface_style": {
+          "natural": 1001,
+          "indirect": 333,
+          "realistic_user": 333,
+          "terse": 333
+        },
+        "difficulty": {
+          "medium": 2000
+        },
+        "template_family": {
+          "coverage_fixed_natural": 1001,
+          "coverage_fixed_indirect": 333,
+          "coverage_fixed_realistic_user": 333,
+          "coverage_fixed_terse": 333
+        },
+        "verification_reason": {},
+        "evidence_kind": {
+          "concrete_evidence": 2000
+        },
+        "concrete_evidence_coverage": "2000/2000",
+        "aggregate_recomputable": 0,
+        "duplicate_ids": 0,
+        "duplicate_questions": 0
+      },
+      "files": {
+        "accepted": {
+          "path": "data/qa/targeted_v2/full2k/coverage_fixed.full2k.accepted.jsonl",
+          "bytes": 4276043,
+          "sha256": "53327ccde257a0301cc2a599fc89f46c053aa3c6fe6fc7b961fc83fab2f2220f",
+          "rows": 2000,
+          "json_errors": 0
+        },
+        "rejected": {
+          "path": "data/qa/targeted_v2/full2k/coverage_fixed.full2k.rejected.jsonl",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": 0,
+          "json_errors": 0
+        },
+        "validation": {
+          "path": "data/qa/targeted_v2/full2k/coverage_fixed.full2k.validation.jsonl",
+          "bytes": 438969,
+          "sha256": "1d41b701156a96d710090cde91b14b66fbd043f26a100070b0539bc15bd644d7",
+          "rows": 2000,
+          "json_errors": 0
+        }
+      }
+    },
+    "unanswerable": {
+      "target": 2000,
+      "accepted": 1990,
+      "rejected": 10,
+      "validation_rows": 1990,
+      "validation_failed": 0,
+      "duplicate_ids": 0,
+      "duplicate_questions": 0,
+      "json_errors": 0,
+      "summary": {
+        "subset": "unanswerable",
+        "target": 2000,
+        "accepted": 1990,
+        "rejected": 10,
+        "skipped_resume": 0,
+        "validation_passed": 1990,
+        "validation_failed": 0,
+        "failure_reason": {
+          "duplicate_id_or_question": 10
+        },
+        "answer_type": {
+          "unsupported": 792,
+          "factoid": 599,
+          "ambiguous": 599
+        },
+        "expected_status": {
+          "unsupported": 792,
+          "no_results": 599,
+          "ambiguous": 599
+        },
+        "executor_support": {
+          "n/a": 1391,
+          "supported": 599
+        },
+        "surface_style": {
+          "realistic_user": 1391,
+          "natural": 200,
+          "indirect": 200,
+          "terse": 199
+        },
+        "difficulty": {
+          "hard": 1391,
+          "medium": 599
+        },
+        "template_family": {
+          "unsupported_field_not_in_schema": 494,
+          "unsupported_unsupported_judgement": 298,
+          "buyer_cpv_not_found": 299,
+          "supplier_year_category_not_found": 300,
+          "buyer_only": 399,
+          "supplier_only": 200
+        },
+        "verification_reason": {
+          "field_not_in_schema": 494,
+          "unsupported_judgement": 298,
+          "zero_matches": 599,
+          "ambiguous_distinct_answers": 599
+        },
+        "evidence_kind": {
+          "none": 1990
+        },
+        "concrete_evidence_coverage": "0/0",
+        "aggregate_recomputable": 0,
+        "duplicate_ids": 0,
+        "duplicate_questions": 0
+      },
+      "files": {
+        "accepted": {
+          "path": "data/qa/targeted_v2/full2k/unanswerable.full2k.accepted.jsonl",
+          "bytes": 2314537,
+          "sha256": "be96c154146517363c83a6b2602c2e3692933d9efe0a5997c79d93a54ca411ea",
+          "rows": 1990,
+          "json_errors": 0
+        },
+        "rejected": {
+          "path": "data/qa/targeted_v2/full2k/unanswerable.full2k.rejected.jsonl",
+          "bytes": 4611,
+          "sha256": "4f290fc01607852cd3b74856a705500b537582a01c3d329d7ff3860e58840694",
+          "rows": 10,
+          "json_errors": 0
+        },
+        "validation": {
+          "path": "data/qa/targeted_v2/full2k/unanswerable.full2k.validation.jsonl",
+          "bytes": 594332,
+          "sha256": "97324396bb35888a57622e3dded6bc2c0da7ef3af3be964134c7fc9804a658d1",
+          "rows": 1990,
+          "json_errors": 0
+        }
+      }
+    },
+    "extended_ops": {
+      "target": 2000,
+      "accepted": 2000,
+      "rejected": 39,
+      "validation_rows": 2000,
+      "validation_failed": 0,
+      "duplicate_ids": 0,
+      "duplicate_questions": 0,
+      "json_errors": 0,
+      "summary": {
+        "subset": "extended_ops",
+        "target": 2000,
+        "accepted": 2000,
+        "rejected": 39,
+        "skipped_resume": 0,
+        "validation_passed": 2000,
+        "validation_failed": 0,
+        "failure_reason": {
+          "oracle_or_evidence_mismatch": 34,
+          "duplicate_id_or_question": 5
+        },
+        "answer_type": {
+          "boolean": 1007,
+          "min_max": 331,
+          "top_k": 15,
+          "set_list": 316,
+          "comparison": 331
+        },
+        "expected_status": {
+          "answerable": 2000
+        },
+        "executor_support": {
+          "supported": 330,
+          "needs_op:compare": 1008,
+          "needs_op:argmin": 167,
+          "needs_op:top_k": 15,
+          "needs_op:distinct_set": 316,
+          "needs_op:argmax": 164
+        },
+        "surface_style": {
+          "natural": 1573,
+          "realistic_user": 214,
+          "indirect": 213
+        },
+        "difficulty": {
+          "easy": 330,
+          "medium": 677,
+          "frontier": 993
+        },
+        "template_family": {
+          "boolean_exists": 330,
+          "boolean_field_equality": 331,
+          "numeric_threshold": 15,
+          "date_relation": 331,
+          "min_max": 331,
+          "top_k": 15,
+          "set_list": 316,
+          "comparison": 331
+        },
+        "verification_reason": {},
+        "evidence_kind": {
+          "concrete_evidence": 1639,
+          "aggregate_recomputable": 30,
+          "two_subcounts_recomputable": 331
+        },
+        "concrete_evidence_coverage": "1639/1639",
+        "aggregate_recomputable": 361,
+        "duplicate_ids": 0,
+        "duplicate_questions": 0
+      },
+      "files": {
+        "accepted": {
+          "path": "data/qa/targeted_v2/full2k/extended_ops.full2k.accepted.jsonl",
+          "bytes": 3376567,
+          "sha256": "b8071e95298f721baa45f42b52f3c6248e2a6ed7073aa260043c388b784ec2b1",
+          "rows": 2000,
+          "json_errors": 0
+        },
+        "rejected": {
+          "path": "data/qa/targeted_v2/full2k/extended_ops.full2k.rejected.jsonl",
+          "bytes": 38126,
+          "sha256": "8c43e44e396145333e849325ae37f5ffb065f3a8adca380470ad0dedb14c5902",
+          "rows": 39,
+          "json_errors": 0
+        },
+        "validation": {
+          "path": "data/qa/targeted_v2/full2k/extended_ops.full2k.validation.jsonl",
+          "bytes": 540337,
+          "sha256": "2379b2d81b763646338df24ecd78c6916e7fdc8160887b3b9a05e1d19f00dc2f",
+          "rows": 2000,
+          "json_errors": 0
+        }
+      }
+    },
+    "bridge_join": {
+      "target": 2000,
+      "accepted": 2000,
+      "rejected": 21,
+      "validation_rows": 2000,
+      "validation_failed": 0,
+      "duplicate_ids": 0,
+      "duplicate_questions": 0,
+      "json_errors": 0,
+      "summary": {
+        "subset": "bridge_join",
+        "target": 2000,
+        "accepted": 2000,
+        "rejected": 21,
+        "skipped_resume": 0,
+        "validation_passed": 2000,
+        "validation_failed": 0,
+        "failure_reason": {
+          "duplicate_id_or_question": 21
+        },
+        "answer_type": {
+          "sum": 664,
+          "count": 1335,
+          "comparison": 1
+        },
+        "expected_status": {
+          "answerable": 2000
+        },
+        "executor_support": {
+          "needs_op:in_subquery": 2000
+        },
+        "surface_style": {
+          "indirect": 1003,
+          "natural": 997
+        },
+        "difficulty": {
+          "frontier": 2000
+        },
+        "template_family": {
+          "buyer_suppliers_sum": 664,
+          "supplier_buyers_count": 661,
+          "cpv_suppliers_other_cpv": 2,
+          "buyer_cpv_set_count": 666,
+          "year_suppliers_next_year": 3,
+          "category_buyers_count": 3,
+          "supplier_set_compare": 1
+        },
+        "verification_reason": {},
+        "evidence_kind": {
+          "concrete_evidence": 2000
+        },
+        "concrete_evidence_coverage": "2000/2000",
+        "aggregate_recomputable": 0,
+        "duplicate_ids": 0,
+        "duplicate_questions": 0
+      },
+      "files": {
+        "accepted": {
+          "path": "data/qa/targeted_v2/full2k/bridge_join.full2k.accepted.jsonl",
+          "bytes": 7423233,
+          "sha256": "4376f638c2196387394bb35a71d016cbb81af5e3caff4212309d26bb547e4760",
+          "rows": 2000,
+          "json_errors": 0
+        },
+        "rejected": {
+          "path": "data/qa/targeted_v2/full2k/bridge_join.full2k.rejected.jsonl",
+          "bytes": 9099,
+          "sha256": "0ceec70123787c53f0519613a11a0f8a81feb383d324f5c114c52c1c145c79d5",
+          "rows": 21,
+          "json_errors": 0
+        },
+        "validation": {
+          "path": "data/qa/targeted_v2/full2k/bridge_join.full2k.validation.jsonl",
+          "bytes": 441417,
+          "sha256": "6d9a3b72d92595c88c10ca1efab1a018d70c547e64acc10c1ce818e7c123180a",
+          "rows": 2000,
+          "json_errors": 0
+        }
+      }
+    }
+  },
+  "files": {
+    "summary": {
+      "path": "data/qa/targeted_v2/full2k/validation_summary.full2k.json",
+      "bytes": 6244,
+      "sha256": "831930d917bcd78b2675195a032f74601baaf160bb89244fb554e60374f6a0d3"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "extended_ops": {
+    "subset": "extended_ops",
+    "mode": "pipeline",
+    "scored": 500,
+    "matched": 291,
+    "accuracy": 0.582,
+    "answerable_scored": 500,
+    "answerable_matched": 291,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 28,
+    "planner_or_exec_gap": 181,
+    "reason": {
+      "no_repair_needed": 319,
+      "ask_clarifying_question": 179,
+      "mark_unsupported": 2
+    }
+  }
+}

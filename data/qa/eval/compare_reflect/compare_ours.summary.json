@@ -1,0 +1,65 @@
+{
+  "overall": {
+    "total": 220,
+    "correct": 202,
+    "accuracy": 0.9182
+  },
+  "by_category": {
+    "v1:additive_sum": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v1:conjunction": {
+      "total": 20,
+      "correct": 11,
+      "accuracy": 0.55
+    },
+    "v1:contract_factoid": {
+      "total": 20,
+      "correct": 11,
+      "accuracy": 0.55
+    },
+    "v1:cpv_slice": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v1:filtered_count": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v1:temporal_count": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v2:bridge_join": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v2:coverage_fixed": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v2:extended_ops": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v2:naturalized": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    },
+    "v2:unanswerable": {
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1.0
+    }
+  },
+  "label": "ours"
+}

@@ -1,0 +1,81 @@
+{
+  "naturalized": {
+    "subset": "naturalized",
+    "mode": "executor",
+    "scored": 400,
+    "matched": 400,
+    "accuracy": 1.0,
+    "answerable_scored": 400,
+    "answerable_matched": 400,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "passed": 400
+    }
+  },
+  "coverage_fixed": {
+    "subset": "coverage_fixed",
+    "mode": "executor",
+    "scored": 400,
+    "matched": 400,
+    "accuracy": 1.0,
+    "answerable_scored": 400,
+    "answerable_matched": 400,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "passed": 400
+    }
+  },
+  "unanswerable": {
+    "subset": "unanswerable",
+    "mode": "executor",
+    "scored": 0,
+    "matched": 0,
+    "accuracy": 0.0,
+    "answerable_scored": 0,
+    "answerable_matched": 0,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {}
+  },
+  "extended_ops": {
+    "subset": "extended_ops",
+    "mode": "executor",
+    "scored": 400,
+    "matched": 200,
+    "accuracy": 0.5,
+    "answerable_scored": 400,
+    "answerable_matched": 200,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 200,
+    "reason": {
+      "passed": 200,
+      "needs_decomposition": 200
+    }
+  },
+  "bridge_join": {
+    "subset": "bridge_join",
+    "mode": "executor",
+    "scored": 400,
+    "matched": 0,
+    "accuracy": 0.0,
+    "answerable_scored": 400,
+    "answerable_matched": 0,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 400,
+    "reason": {
+      "needs_decomposition": 400
+    }
+  }
+}

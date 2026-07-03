@@ -1,0 +1,52 @@
+{
+  "total": 20,
+  "answered": 10,
+  "matched": 4,
+  "accuracy": 0.2,
+  "by_category": {
+    "bounded_decomposition": "0/4",
+    "buyer_supplier_alias": "0/4",
+    "factoid_title_anchor": "0/5",
+    "omitted_field_natural_cpv": "0/3",
+    "unanswerable_or_ambiguous": "4/4"
+  },
+  "confidence_counts": {
+    "not_answered": 10,
+    "high": 10
+  },
+  "expected_answerable": 16,
+  "expected_abstention": 4,
+  "correct_abstentions": 4,
+  "boundary_total": 0,
+  "boundary_sanity_flagged": 0,
+  "planner_sources": {
+    "rule": 20
+  },
+  "fallback_used": 0,
+  "fallback_reasons": {},
+  "not_answered_ids": [
+    "nlu_factoid_01_buyer",
+    "nlu_factoid_02_supplier",
+    "nlu_factoid_03_signed_date",
+    "nlu_factoid_04_value_source",
+    "nlu_factoid_05_category",
+    "nlu_omitted_02_social_work_total",
+    "nlu_unanswerable_01_carbon",
+    "nlu_unanswerable_02_best_value",
+    "nlu_unanswerable_03_average",
+    "nlu_ambiguous_01_the_care_contract"
+  ],
+  "mismatched_ids": [
+    "nlu_alias_01_mod_count",
+    "nlu_alias_02_nss_count",
+    "nlu_alias_03_powys_count",
+    "nlu_alias_04_lockheed_supplier",
+    "nlu_omitted_01_road_transport",
+    "nlu_omitted_03_signed_reagents",
+    "nlu_decomp_01_buyer_services",
+    "nlu_decomp_02_supplier_services",
+    "nlu_decomp_03_buyer_goods_total",
+    "nlu_decomp_04_supplier_signed"
+  ],
+  "errors": {}
+}

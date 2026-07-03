@@ -1,0 +1,41 @@
+{
+  "plans": 500,
+  "L1": {
+    "accepted": 500
+  },
+  "per_subset": {
+    "naturalized": 100,
+    "coverage_fixed": 100,
+    "unanswerable": 100,
+    "extended_ops": 100,
+    "bridge_join": 100
+  },
+  "L2": {
+    "accepted": 414,
+    "rejected": 351,
+    "top_reject_reasons": {
+      "exhausted_retries": 86,
+      "not_actually_rewritten": 34,
+      "new_org_mention:NHS Shared Business Services Limited": 6,
+      "not_a_single_question": 6,
+      "new_org_mention:EDS Ltd": 3,
+      "new_org_mention:Hull City Council": 3,
+      "new_org_mention:Oxfordshire County Council": 3,
+      "new_org_mention:AES Sustainability Consultants Limited": 3
+    }
+  },
+  "L3": {
+    "accepted": 416,
+    "rejected": 336,
+    "top_reject_reasons": {
+      "exhausted_retries": 84,
+      "new_org_mention:NHS Shared Business Services Limited": 6,
+      "new_org_mention:EDS Ltd": 3,
+      "missing_text:London Borough of Lewisham": 3,
+      "new_org_mention:Hull City Council": 3,
+      "new_org_mention:Oxfordshire County Council": 3,
+      "new_org_mention:AES Sustainability Consultants Limited": 3,
+      "new_org_mention:West Northamptonshire Council": 3
+    }
+  }
+}

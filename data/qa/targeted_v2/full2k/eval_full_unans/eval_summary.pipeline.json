@@ -1,0 +1,41 @@
+{
+  "unanswerable": {
+    "subset": "unanswerable",
+    "mode": "pipeline",
+    "scored": 1990,
+    "matched": 1990,
+    "accuracy": 1.0,
+    "answerable_scored": 0,
+    "answerable_matched": 0,
+    "abstention_cases": 1990,
+    "abstained_safely": 1990,
+    "abstained_right_reason": 1391,
+    "hallucinated": 0,
+    "abstention_by_status": {
+      "unsupported": {
+        "cases": 792,
+        "abstained_safely": 792,
+        "abstained_right_reason": 792,
+        "hallucinated": 0
+      },
+      "ambiguous": {
+        "cases": 599,
+        "abstained_safely": 599,
+        "abstained_right_reason": 599,
+        "hallucinated": 0
+      },
+      "no_results": {
+        "cases": 599,
+        "abstained_safely": 599,
+        "abstained_right_reason": 0,
+        "hallucinated": 0
+      }
+    },
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "mark_unsupported": 792,
+      "ask_clarifying_question": 1198
+    }
+  }
+}

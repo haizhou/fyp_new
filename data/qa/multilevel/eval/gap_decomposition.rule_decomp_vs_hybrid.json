@@ -1,0 +1,51 @@
+{
+  "L1": {
+    "items": 500,
+    "taxonomy": {
+      "both_correct": 493,
+      "escalated_llm_failed": 5,
+      "rule_misfire_unescalated": 2
+    },
+    "llm_net_contribution": 0,
+    "escalation_blind_spot": 2,
+    "both_wrong_by_subset": {
+      "naturalized": 3,
+      "extended_ops": 3,
+      "bridge_join": 1
+    }
+  },
+  "L2": {
+    "items": 414,
+    "taxonomy": {
+      "both_correct": 329,
+      "llm_recovered": 14,
+      "escalated_llm_failed": 44,
+      "hybrid_regressed": 2,
+      "rule_misfire_unescalated": 25
+    },
+    "llm_net_contribution": 12,
+    "escalation_blind_spot": 25,
+    "both_wrong_by_subset": {
+      "naturalized": 10,
+      "unanswerable": 2,
+      "extended_ops": 41,
+      "bridge_join": 16
+    }
+  },
+  "L3": {
+    "items": 416,
+    "taxonomy": {
+      "both_correct": 368,
+      "llm_recovered": 10,
+      "escalated_llm_failed": 19,
+      "rule_misfire_unescalated": 19
+    },
+    "llm_net_contribution": 10,
+    "escalation_blind_spot": 19,
+    "both_wrong_by_subset": {
+      "naturalized": 2,
+      "extended_ops": 12,
+      "bridge_join": 24
+    }
+  }
+}

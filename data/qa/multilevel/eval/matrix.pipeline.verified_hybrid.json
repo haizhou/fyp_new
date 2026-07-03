@@ -1,0 +1,98 @@
+{
+  "L1": {
+    "subset": "L1",
+    "mode": "pipeline",
+    "scored": 100,
+    "matched": 100,
+    "accuracy": 1.0,
+    "answerable_scored": 71,
+    "answerable_matched": 71,
+    "abstention_cases": 29,
+    "abstained_safely": 29,
+    "abstained_right_reason": 27,
+    "hallucinated": 0,
+    "abstention_by_status": {
+      "unsupported": {
+        "cases": 9,
+        "abstained_safely": 9,
+        "abstained_right_reason": 9,
+        "hallucinated": 0
+      },
+      "ambiguous": {
+        "cases": 15,
+        "abstained_safely": 15,
+        "abstained_right_reason": 15,
+        "hallucinated": 0
+      },
+      "no_results": {
+        "cases": 5,
+        "abstained_safely": 5,
+        "abstained_right_reason": 3,
+        "hallucinated": 0
+      }
+    },
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "no_repair_needed": 71,
+      "mark_unsupported": 9,
+      "ask_clarifying_question": 17,
+      "report_insufficient_evidence": 3
+    },
+    "by_subset_accuracy": {
+      "bridge_join": 1.0,
+      "coverage_fixed": 1.0,
+      "extended_ops": 1.0,
+      "naturalized": 1.0,
+      "unanswerable": 1.0
+    }
+  },
+  "L2": {
+    "subset": "L2",
+    "mode": "pipeline",
+    "scored": 100,
+    "matched": 81,
+    "accuracy": 0.81,
+    "answerable_scored": 85,
+    "answerable_matched": 67,
+    "abstention_cases": 15,
+    "abstained_safely": 14,
+    "abstained_right_reason": 8,
+    "hallucinated": 1,
+    "abstention_by_status": {
+      "unsupported": {
+        "cases": 2,
+        "abstained_safely": 2,
+        "abstained_right_reason": 2,
+        "hallucinated": 0
+      },
+      "ambiguous": {
+        "cases": 6,
+        "abstained_safely": 6,
+        "abstained_right_reason": 6,
+        "hallucinated": 0
+      },
+      "no_results": {
+        "cases": 7,
+        "abstained_safely": 6,
+        "abstained_right_reason": 0,
+        "hallucinated": 1
+      }
+    },
+    "answered_not_matched": 9,
+    "planner_or_exec_gap": 9,
+    "reason": {
+      "no_repair_needed": 77,
+      "escalate_for_manual_review": 7,
+      "ask_clarifying_question": 14,
+      "mark_unsupported": 2
+    },
+    "by_subset_accuracy": {
+      "bridge_join": 1.0,
+      "coverage_fixed": 1.0,
+      "extended_ops": 0.483,
+      "naturalized": 0.885,
+      "unanswerable": 0.933
+    }
+  }
+}

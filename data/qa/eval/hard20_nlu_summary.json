@@ -1,0 +1,12 @@
+{
+  "total": 20,
+  "expected_answerable": 16,
+  "expected_abstention": 4,
+  "by_category": {
+    "factoid_title_anchor": 5,
+    "buyer_supplier_alias": 4,
+    "omitted_field_natural_cpv": 3,
+    "unanswerable_or_ambiguous": 4,
+    "bounded_decomposition": 4
+  }
+}

@@ -75,7 +75,16 @@ venv.bak/
 Thumbs.db
 
 # Data and outputs
-data/
+data/*
+!data/kg/
+!data/kg/**
+!data/qa/
+!data/qa/**
+!data/entities/
+data/entities/*
+!data/entities/alias_map.parquet
+!data/entities/canonical_orgs.parquet
+!data/entities/er_audit.csv
 logs/
 tmp/
 reports/

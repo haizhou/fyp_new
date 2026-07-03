@@ -1,0 +1,27 @@
+{
+  "plans": 100,
+  "L1": {
+    "accepted": 100
+  },
+  "per_subset": {
+    "naturalized": 20,
+    "coverage_fixed": 20,
+    "unanswerable": 20,
+    "extended_ops": 20,
+    "bridge_join": 20
+  },
+  "L2": {
+    "accepted": 59,
+    "rejected": 85,
+    "top_reject_reasons": {
+      "exhausted_retries": 21,
+      "checker_mismatch:intended_answer_field is unspecified in question (refers to 'the asked-for field' without naming it), while reference plan implies a specific field via select_unique.": 3,
+      "checker_mismatch:The question does not specify the particular field to retrieve (asks for 'the asked-for field'), whereas the reference plan implies a specific intended field via select_unique operation.": 3,
+      "checker_mismatch:The question does not specify the asked-for field, while the reference plan implies a specific field via select_unique operation.": 3,
+      "checker_mismatch:The question does not specify the 'requested field' (i.e., answer_type or field for distinct values), while the reference plan expects a specific asked-for field. The plan has answer_type 'set_list' but no explicit field name.": 3,
+      "checker_mismatch:The question does not specify the 'asked-for field' (e.g., a concrete field like 'title' or 'id'), whereas the reference plan implies a specific answer field is targeted for the distinct_set operation.": 3,
+      "new_org_mention:Kent County Council": 3,
+      "checker_mismatch:Reference plan performs a comparison but does not specify the organisations to compare or the answer field (which organisation has more); it lacks detail on identifying and comparing specific named organisations' notice counts.": 3
+    }
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "per_subset": {
+    "naturalized": {
+      "file": "naturalized_50.jsonl",
+      "rows": 50,
+      "answer_type": {
+        "count": 17,
+        "sum": 17,
+        "factoid": 16
+      },
+      "expected_status": {
+        "answerable": 50
+      },
+      "executor_support": {
+        "supported": 50
+      },
+      "requires_decomposition": 0,
+      "answerable_with_evidence": "50/50"
+    },
+    "unanswerable": {
+      "file": "unanswerable_50.jsonl",
+      "rows": 50,
+      "answer_type": {
+        "unsupported": 17,
+        "ambiguous": 17,
+        "factoid": 16
+      },
+      "expected_status": {
+        "unsupported": 17,
+        "ambiguous": 17,
+        "no_results": 16
+      },
+      "executor_support": {
+        "n/a": 34,
+        "supported": 16
+      },
+      "requires_decomposition": 0,
+      "answerable_with_evidence": "0/0"
+    },
+    "coverage_fixed": {
+      "file": "coverage_fixed_50.jsonl",
+      "rows": 50,
+      "answer_type": {
+        "count": 50
+      },
+      "expected_status": {
+        "answerable": 50
+      },
+      "executor_support": {
+        "supported": 50
+      },
+      "requires_decomposition": 0,
+      "answerable_with_evidence": "50/50"
+    },
+    "extended_ops": {
+      "file": "extended_ops_pilot.jsonl",
+      "rows": 33,
+      "answer_type": {
+        "min_max": 14,
+        "top_k": 3,
+        "set_list": 10,
+        "comparison": 6
+      },
+      "expected_status": {
+        "answerable": 33
+      },
+      "executor_support": {
+        "needs_op:argmax": 14,
+        "needs_op:top_k": 3,
+        "needs_op:distinct_set": 10,
+        "needs_op:compare": 6
+      },
+      "requires_decomposition": 0,
+      "answerable_with_evidence": "33/33"
+    },
+    "bridge_join": {
+      "file": "bridge_join_pilot.jsonl",
+      "rows": 32,
+      "answer_type": {
+        "sum": 20,
+        "count": 12
+      },
+      "expected_status": {
+        "answerable": 32
+      },
+      "executor_support": {
+        "needs_op:in_subquery": 32
+      },
+      "requires_decomposition": 32,
+      "answerable_with_evidence": "32/32"
+    }
+  }
+}

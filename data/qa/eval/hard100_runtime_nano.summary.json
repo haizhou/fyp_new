@@ -1,0 +1,76 @@
+{
+  "total": 100,
+  "answered": 98,
+  "matched": 81,
+  "accuracy": 0.81,
+  "by_category": {
+    "boundary": "8/8",
+    "conjunction": "1/18",
+    "count": "16/16",
+    "cpv_count": "8/8",
+    "factoid": "16/18",
+    "sum": "20/20",
+    "temporal_count": "12/12"
+  },
+  "confidence_counts": {
+    "high": 96,
+    "low": 2,
+    "not_answered": 2
+  },
+  "expected_answerable": 100,
+  "expected_abstention": 0,
+  "correct_abstentions": 0,
+  "boundary_total": 8,
+  "boundary_sanity_flagged": 2,
+  "planner_sources": {
+    "llm": 100
+  },
+  "fallback_used": 0,
+  "fallback_reasons": {},
+  "not_answered_ids": [
+    "factoid_0017_tender_category",
+    "factoid_0021_supplier_name"
+  ],
+  "mismatched_ids": [
+    "conjunction_count_2248",
+    "conjunction_count_2105",
+    "conjunction_count_1296",
+    "conjunction_count_1578",
+    "conjunction_count_0367",
+    "conjunction_count_1328",
+    "conjunction_count_0931",
+    "conjunction_count_1815",
+    "conjunction_count_0457",
+    "conjunction_count_0563",
+    "conjunction_count_0432",
+    "conjunction_count_0399",
+    "conjunction_count_1529",
+    "conjunction_count_1832",
+    "conjunction_count_2031",
+    "conjunction_count_1339",
+    "conjunction_count_1342"
+  ],
+  "gap_diagnoses": {
+    "golden_over_constrained: oracle applies hidden coverage guards ['buyer_count', 'supplier_count'] not in the question (runtime count is faithful)": 17
+  },
+  "benchmark_artifact_ids": [
+    "conjunction_count_2248",
+    "conjunction_count_2105",
+    "conjunction_count_1296",
+    "conjunction_count_1578",
+    "conjunction_count_0367",
+    "conjunction_count_1328",
+    "conjunction_count_0931",
+    "conjunction_count_1815",
+    "conjunction_count_0457",
+    "conjunction_count_0563",
+    "conjunction_count_0432",
+    "conjunction_count_0399",
+    "conjunction_count_1529",
+    "conjunction_count_1832",
+    "conjunction_count_2031",
+    "conjunction_count_1339",
+    "conjunction_count_1342"
+  ],
+  "errors": {}
+}

@@ -1,0 +1,2 @@
+data/kg/**/*.parquet filter=lfs diff=lfs merge=lfs -text
+data/entities/*.parquet filter=lfs diff=lfs merge=lfs -text

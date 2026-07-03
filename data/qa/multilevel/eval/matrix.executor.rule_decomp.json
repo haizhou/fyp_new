@@ -1,0 +1,28 @@
+{
+  "L0": {
+    "subset": "L0",
+    "mode": "executor",
+    "scored": 225,
+    "matched": 225,
+    "accuracy": 1.0,
+    "answerable_scored": 225,
+    "answerable_matched": 225,
+    "abstention_cases": 0,
+    "abstained_safely": 0,
+    "abstained_right_reason": 0,
+    "hallucinated": 0,
+    "abstention_by_status": {},
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "passed": 225
+    },
+    "excluded_decomposition_plans": 175,
+    "by_subset_accuracy": {
+      "coverage_fixed": 1.0,
+      "extended_ops": 1.0,
+      "naturalized": 1.0,
+      "unanswerable": 0.0
+    }
+  }
+}

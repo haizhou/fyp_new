@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-07-02T00:10:50.448426+00:00",
+  "seed": 42,
+  "purpose": "nano runtime planner smoke: v1 question_type sample20 + v2 subset sample20",
+  "v1": {
+    "questions": "data\\qa\\eval\\nano_smoke\\v1\\v1_sample20_questions.jsonl",
+    "answer_key": "data\\qa\\eval\\nano_smoke\\v1\\v1_sample20_answer_key.jsonl",
+    "counts_by_question_type": {
+      "factoid": 20,
+      "aggregation_count": 20,
+      "aggregation_sum": 20,
+      "conjunction_constraint": 20,
+      "temporal": 20,
+      "categorical_cpv": 20
+    },
+    "total": 120
+  },
+  "v2": {
+    "dir": "data\\qa\\eval\\nano_smoke\\v2",
+    "tag": "sample20",
+    "counts_by_subset": {
+      "naturalized": 20,
+      "coverage_fixed": 20,
+      "unanswerable": 20,
+      "extended_ops": 20,
+      "bridge_join": 20
+    },
+    "total": 100
+  }
+}

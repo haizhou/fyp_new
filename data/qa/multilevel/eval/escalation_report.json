@@ -1,0 +1,107 @@
+{
+  "L1": {
+    "outcome": {
+      "llm_called": 88,
+      "failed_repair": 8,
+      "recovered_vs_hybrid": 2,
+      "regressed_vs_hybrid": 4
+    },
+    "triggers": {
+      "probe_multiple_answers": 24,
+      "rule_ambiguous": 23,
+      "probe_degenerate_zero": 23,
+      "probe_no_results": 18
+    },
+    "regressions": [
+      {
+        "id": "extended_ops_0200#L1",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "I am checking the procurement data: was the award for \"Health and Resilience Training, Consultancy and Supervi",
+        "oracle": false
+      },
+      {
+        "id": "extended_ops_0884#L1",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "Looking only at the matching procurement records, was the award for \"Meningococcal group B vaccine (2022)\" sig",
+        "oracle": false
+      },
+      {
+        "id": "extended_ops_1412#L1",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "Looking only at the matching procurement records, was the award for \"Sports Pitch Drainage and Renovation\" sig",
+        "oracle": false
+      },
+      {
+        "id": "extended_ops_1856#L1",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "Looking only at the matching procurement records, was the award for \"Survey, design, supply and delivery of UP",
+        "oracle": false
+      }
+    ],
+    "failed_repair_sample": []
+  },
+  "L2": {
+    "outcome": {
+      "llm_called": 123,
+      "failed_repair": 47,
+      "recovered_vs_hybrid": 7,
+      "regressed_vs_hybrid": 6
+    },
+    "triggers": {
+      "rule_ambiguous": 72,
+      "probe_multiple_answers": 40,
+      "probe_degenerate_zero": 7,
+      "probe_no_results": 3,
+      "type_mismatch:boolean!=count": 1
+    },
+    "regressions": [
+      {
+        "id": "unanswerable_1262#L2a",
+        "trigger": "rule_ambiguous",
+        "subset": "unanswerable",
+        "question": "For K.A.T. Transport Limited’s goods contract in 2031, which organisation acted as the buyer?",
+        "oracle": null
+      },
+      {
+        "id": "unanswerable_1322#L2a",
+        "trigger": "rule_ambiguous",
+        "subset": "unanswerable",
+        "question": "For the procurement data, who acted as the buyer for First Essex Buses Ltd’s goods contract in 2031?",
+        "oracle": null
+      },
+      {
+        "id": "extended_ops_0884#L2a",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "Considering only the procurement records that match, can it be confirmed whether the award for \"Meningococcal ",
+        "oracle": false
+      },
+      {
+        "id": "extended_ops_1412#L2a",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "Considering only the procurement records that match, can it be confirmed whether the award for \"Sports Pitch D",
+        "oracle": false
+      },
+      {
+        "id": "extended_ops_1472#L2a",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "In relation to \"Agriculture, Land-use, Climate and Nature Evidence Programme\", was the award signed after 1 Ma",
+        "oracle": false
+      },
+      {
+        "id": "extended_ops_1976#L2a",
+        "trigger": "probe_degenerate_zero",
+        "subset": "extended_ops",
+        "question": "In the procurement for \"Provision of Isles Haulage Services\", was the award signed after 1 May 2025?",
+        "oracle": false
+      }
+    ],
+    "failed_repair_sample": []
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "L1": {
+    "subset": "L1",
+    "mode": "pipeline",
+    "scored": 100,
+    "matched": 100,
+    "accuracy": 1.0,
+    "answerable_scored": 80,
+    "answerable_matched": 80,
+    "abstention_cases": 20,
+    "abstained_safely": 20,
+    "abstained_right_reason": 17,
+    "hallucinated": 0,
+    "abstention_by_status": {
+      "unsupported": {
+        "cases": 8,
+        "abstained_safely": 8,
+        "abstained_right_reason": 8,
+        "hallucinated": 0
+      },
+      "ambiguous": {
+        "cases": 6,
+        "abstained_safely": 6,
+        "abstained_right_reason": 6,
+        "hallucinated": 0
+      },
+      "no_results": {
+        "cases": 6,
+        "abstained_safely": 6,
+        "abstained_right_reason": 3,
+        "hallucinated": 0
+      }
+    },
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "no_repair_needed": 80,
+      "mark_unsupported": 8,
+      "ask_clarifying_question": 9,
+      "report_insufficient_evidence": 3
+    },
+    "by_subset_accuracy": {
+      "bridge_join": 1.0,
+      "coverage_fixed": 1.0,
+      "extended_ops": 1.0,
+      "naturalized": 1.0,
+      "unanswerable": 1.0
+    }
+  },
+  "L2": {
+    "subset": "L2",
+    "mode": "pipeline",
+    "scored": 59,
+    "matched": 37,
+    "accuracy": 0.6271,
+    "answerable_scored": 59,
+    "answerable_matched": 37,
+    "abstention_cases": 0,
+    "abstained_safely": 0,
+    "abstained_right_reason": 0,
+    "hallucinated": 0,
+    "abstention_by_status": {},
+    "answered_not_matched": 9,
+    "planner_or_exec_gap": 13,
+    "reason": {
+      "no_repair_needed": 46,
+      "ask_clarifying_question": 13
+    },
+    "by_subset_accuracy": {
+      "bridge_join": 0.0,
+      "coverage_fixed": 1.0,
+      "extended_ops": 0.214,
+      "naturalized": 0.875
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "bridge_join": {
+    "subset": "bridge_join",
+    "mode": "pipeline",
+    "scored": 40,
+    "matched": 30,
+    "accuracy": 0.75,
+    "answerable_scored": 40,
+    "answerable_matched": 30,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 9,
+    "planner_or_exec_gap": 1,
+    "reason": {
+      "no_repair_needed": 39,
+      "ask_clarifying_question": 1
+    }
+  }
+}

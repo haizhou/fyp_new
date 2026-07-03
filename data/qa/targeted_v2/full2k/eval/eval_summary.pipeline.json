@@ -1,0 +1,89 @@
+{
+  "naturalized": {
+    "subset": "naturalized",
+    "mode": "pipeline",
+    "scored": 300,
+    "matched": 142,
+    "accuracy": 0.4733,
+    "answerable_scored": 300,
+    "answerable_matched": 142,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 158,
+    "reason": {
+      "no_repair_needed": 142,
+      "ask_clarifying_question": 157,
+      "mark_unsupported": 1
+    }
+  },
+  "coverage_fixed": {
+    "subset": "coverage_fixed",
+    "mode": "pipeline",
+    "scored": 300,
+    "matched": 300,
+    "accuracy": 1.0,
+    "answerable_scored": 300,
+    "answerable_matched": 300,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "no_repair_needed": 300
+    }
+  },
+  "unanswerable": {
+    "subset": "unanswerable",
+    "mode": "pipeline",
+    "scored": 300,
+    "matched": 263,
+    "accuracy": 0.8767,
+    "answerable_scored": 0,
+    "answerable_matched": 0,
+    "abstention_cases": 300,
+    "correct_abstentions": 263,
+    "answered_not_matched": 0,
+    "planner_or_exec_gap": 0,
+    "reason": {
+      "mark_unsupported": 39,
+      "no_repair_needed": 37,
+      "ask_clarifying_question": 224
+    }
+  },
+  "extended_ops": {
+    "subset": "extended_ops",
+    "mode": "pipeline",
+    "scored": 300,
+    "matched": 0,
+    "accuracy": 0.0,
+    "answerable_scored": 300,
+    "answerable_matched": 0,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 30,
+    "planner_or_exec_gap": 270,
+    "reason": {
+      "ask_clarifying_question": 269,
+      "no_repair_needed": 30,
+      "mark_unsupported": 1
+    }
+  },
+  "bridge_join": {
+    "subset": "bridge_join",
+    "mode": "pipeline",
+    "scored": 300,
+    "matched": 2,
+    "accuracy": 0.0067,
+    "answerable_scored": 300,
+    "answerable_matched": 2,
+    "abstention_cases": 0,
+    "correct_abstentions": 0,
+    "answered_not_matched": 297,
+    "planner_or_exec_gap": 1,
+    "reason": {
+      "no_repair_needed": 299,
+      "ask_clarifying_question": 1
+    }
+  }
+}

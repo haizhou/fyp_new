@@ -1,0 +1,50 @@
+{
+  "total": 20,
+  "answered": 16,
+  "matched": 12,
+  "accuracy": 0.6,
+  "by_category": {
+    "boundary": "2/2",
+    "count": "1/5",
+    "exhaustive": "3/3",
+    "factoid": "0/4",
+    "sum": "6/6"
+  },
+  "confidence_counts": {
+    "high": 15,
+    "low": 1,
+    "not_answered": 4
+  },
+  "expected_answerable": 20,
+  "expected_abstention": 0,
+  "correct_abstentions": 0,
+  "boundary_total": 2,
+  "boundary_sanity_flagged": 1,
+  "planner_sources": {
+    "rule": 20
+  },
+  "fallback_used": 0,
+  "fallback_reasons": {},
+  "not_answered_ids": [
+    "factoid_0002_tender_category",
+    "factoid_0003_value_source",
+    "factoid_0004_award_date_signed",
+    "factoid_0005_buyer_name"
+  ],
+  "mismatched_ids": [
+    "conjunction_count_1958",
+    "conjunction_count_0456",
+    "conjunction_count_1099",
+    "conjunction_count_0249"
+  ],
+  "gap_diagnoses": {
+    "golden_over_constrained: oracle applies hidden coverage guards ['buyer_count', 'supplier_count'] not in the question (runtime count is faithful)": 4
+  },
+  "benchmark_artifact_ids": [
+    "conjunction_count_1958",
+    "conjunction_count_0456",
+    "conjunction_count_1099",
+    "conjunction_count_0249"
+  ],
+  "errors": {}
+}
