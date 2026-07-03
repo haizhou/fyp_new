@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import sys
 import unittest
+import uuid
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -172,6 +173,51 @@ class TestRejectionSampling(unittest.TestCase):
         self.assertEqual(accepted[0]["level"], 2)
         self.assertTrue(rejected and rejected[0]["reasons"])
         self.assertEqual(chat.calls, 2)
+
+    def test_checkpoint_resume_skips_completed_plan(self):
+        from build_multilevel_qa import rewrite_surfaces
+
+        class _GoodChat:
+            def __init__(self):
+                self.calls = 0
+
+            def complete_json(self, *, model, system, user):
+                self.calls += 1
+
+                class _R:
+                    parsed = {"variants": [
+                        "Looking at 2022, did MIDLANDS AND LANCASHIRE COMMISSIONING SUPPORT UNIT "
+                        "put out any services contract notices?"
+                    ]}
+                return _R()
+
+        class _NoCallChat:
+            def complete_json(self, *, model, system, user):  # pragma: no cover - should not run
+                raise AssertionError("resume should skip completed plans")
+
+        tmp_root = Path(__file__).parent.parent / "tmp" / "qa_multilevel_checkpoint_test"
+        tmp_root.mkdir(parents=True, exist_ok=True)
+        run_id = uuid.uuid4().hex
+        accepted_path = tmp_root / f"{run_id}.surfaces.L2.jsonl"
+        rejected_path = tmp_root / f"{run_id}.surfaces.L2.rejected.jsonl"
+
+        chat = _GoodChat()
+        accepted, _ = rewrite_surfaces(
+            [ROW], level=2, chat=chat, model="stub", retries=0, variants=1,
+            org_resolver=None, known_orgs=None, accepted_path=accepted_path,
+            rejected_path=rejected_path, resume=False, workers=2, rpm=0,
+        )
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(chat.calls, 1)
+        self.assertEqual(len(accepted_path.read_text(encoding="utf-8").splitlines()), 1)
+
+        accepted, rejected = rewrite_surfaces(
+            [ROW], level=2, chat=_NoCallChat(), model="stub", retries=0, variants=1,
+            org_resolver=None, known_orgs=None, accepted_path=accepted_path,
+            rejected_path=rejected_path, resume=True, workers=2, rpm=0,
+        )
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(rejected, [])
 
 
 if __name__ == "__main__":
