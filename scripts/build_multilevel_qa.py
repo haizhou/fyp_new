@@ -34,7 +34,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from procurement_graph.qa.multilevel import (  # noqa: E402
-    check_surface, checker_accepts, checker_messages, l2_plan_ready, l2_rewrite_messages,
+    bridge_drift_reasons, check_surface, checker_accepts, checker_messages, l2_plan_ready, l2_rewrite_messages,
     persona_for, plan_bank_row, required_atoms, rewrite_messages, surface_row,
 )
 from procurement_graph.qa.benchmark.concurrency import run_concurrent  # noqa: E402
@@ -124,6 +124,11 @@ def _rewrite_one(row: dict[str, Any], *, level: int, chat: Any, model: str, retr
             if not verdict.ok:
                 rejected.append({"plan_id": row["id"], "level": level,
                                  "candidate": text[:200], "reasons": list(verdict.reasons)})
+                continue
+            bridge_reasons = bridge_drift_reasons(text, row) if level == 2 else ()
+            if bridge_reasons:
+                rejected.append({"plan_id": row["id"], "level": level,
+                                 "candidate": text[:200], "reasons": list(bridge_reasons)})
                 continue
             checker_verdict = None
             if level == 2 and checker_model:

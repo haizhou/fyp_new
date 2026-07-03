@@ -37,6 +37,11 @@ _NUM_RE = re.compile(r"(?<![A-Za-z0-9])\d+(?:\.\d+)?(?![A-Za-z0-9])")
 _ORG_FIELDS = ("buyer_name", "supplier_name")
 _WORDY = re.compile(r"[A-Za-z]")
 _TEMPORAL_RELATION_RE = re.compile(r"\b(after|before|later|subsequently|previously|prior to|then)\b", re.I)
+_BUYERS_OF_SUPPLIER_DRIFT_RE = re.compile(
+    r"\bwhere\s+(?:the\s+)?(?:contract|notice|contract\s+notice)s?\s+"
+    r"(?:was|were|is|are)?\s*awarded\s+to\b",
+    re.I,
+)
 
 
 # ---------------------------------------------------------------------------- atoms
@@ -206,6 +211,22 @@ def _new_temporal_relations(surface: str, source_question: str) -> tuple[str, ..
     source_terms = {m.group(1).casefold() for m in _TEMPORAL_RELATION_RE.finditer(source_question)}
     surface_terms = {m.group(1).casefold() for m in _TEMPORAL_RELATION_RE.finditer(surface)}
     return tuple(sorted(surface_terms - source_terms))
+
+
+def bridge_drift_reasons(surface: str, row: dict[str, Any]) -> tuple[str, ...]:
+    """Plan-aware L2 guards for bridge rewrites that can fool a generic checker."""
+    reasons: list[str] = []
+    for constraint in row.get("constraints", ()):
+        value = constraint.get("value")
+        if (
+            constraint.get("field") == "buyer_name"
+            and constraint.get("op") == "in_subquery"
+            and isinstance(value, dict)
+            and value.get("resolve") == "buyers_of_supplier"
+            and _BUYERS_OF_SUPPLIER_DRIFT_RE.search(surface)
+        ):
+            reasons.append("bridge_relation_drift:buyers_of_supplier_as_direct_supplier_filter")
+    return tuple(reasons)
 
 
 def _foreign_org(text: str, atoms: SurfaceAtoms, *, org_resolver: Any = None,
@@ -466,6 +487,8 @@ def checker_messages(surface: str, row: dict[str, Any]) -> tuple[str, str]:
             "Reject if the asked-for quantity changes, such as count vs total value vs which supplier.",
             "Reject if comparison direction changes, such as more-than vs less-than or after vs before.",
             "Reject if a bridge relationship changes, such as suppliers-who-worked-with-X vs buyers-of-supplier-X.",
+            "For buyers-of-supplier bridge questions, reject wording that makes the final notices themselves "
+            "sound awarded to the supplier, such as 'where the contract was awarded to X'.",
             "For unsupported/ambiguous/no-results rows, accept only if the rewritten question preserves the same reason to abstain."
         ],
         "judge": judge,
@@ -668,6 +691,6 @@ def surface_row(row: dict[str, Any], *, level: int, question: str, origin: str,
 
 
 __all__ = ["LEVELS", "PERSONAS", "PERSONA_EXAMPLES", "SurfaceAtoms", "SurfaceVerdict", "answer_request",
-           "check_surface", "checker_accepts", "checker_messages", "filter_phrases",
+           "bridge_drift_reasons", "check_surface", "checker_accepts", "checker_messages", "filter_phrases",
            "l2_plan_ready", "l2_rewrite_messages", "persona_for", "plan_bank_row", "required_atoms",
            "rewrite_messages", "surface_row", "verbalize_messages"]

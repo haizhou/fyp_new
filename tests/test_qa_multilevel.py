@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 from procurement_graph.qa.multilevel import (
-    check_surface, plan_bank_row, required_atoms, rewrite_messages, surface_row,
+    bridge_drift_reasons, check_surface, plan_bank_row, required_atoms, rewrite_messages, surface_row,
 )
 
 ROW = {
@@ -98,6 +98,16 @@ class TestSurfaceGate(unittest.TestCase):
         verdict = check_surface("After 2022, how many notices were published?",
                                 atoms, row["question"], level=2)
         self.assertNotIn("new_temporal_relation:after", verdict.reasons)
+
+    def test_buyers_of_supplier_bridge_drift_rejected(self):
+        row = {**ROW, "question": "How many notices were published by buyers who have awarded a contract to S1?",
+               "constraints": [{"field": "buyer_name", "op": "in_subquery",
+                                "value": {"resolve": "buyers_of_supplier", "supplier": "S1"}}]}
+        bad = "How many contract notices did buyers publish where the contract was awarded to S1?"
+        self.assertIn("bridge_relation_drift:buyers_of_supplier_as_direct_supplier_filter",
+                      bridge_drift_reasons(bad, row))
+        good = "How many contract notices were published by buyers that have awarded a contract to S1?"
+        self.assertEqual(bridge_drift_reasons(good, row), ())
 
     def test_unchanged_template_rejected_at_l3_but_allowed_at_l2(self):
         # L3 is a paraphrase level (must differ); L2 is plan-generated (similarity legitimate)
