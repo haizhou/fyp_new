@@ -82,6 +82,23 @@ class TestSurfaceGate(unittest.TestCase):
                               "SUPPORT UNIT publish any services contract notices in 2022?")
         self.assertTrue(any(r.startswith("new_numbers") for r in verdict.reasons))
 
+    def test_new_temporal_relation_rejected(self):
+        row = {**ROW, "question": "How many notices were published by buyers who have awarded a contract to S1?",
+               "constraints": [{"field": "buyer_name", "op": "in_subquery",
+                                "value": {"resolve": "buyers_of_supplier", "supplier": "S1"}}]}
+        atoms = required_atoms(row)
+        verdict = check_surface("How many notices were published by buyers who later awarded a contract to S1?",
+                                atoms, row["question"], level=2)
+        self.assertIn("new_temporal_relation:later", verdict.reasons)
+
+    def test_existing_temporal_relation_allowed(self):
+        row = {**ROW, "question": "How many notices were published after 2022?",
+               "constraints": [{"field": "release_year", "op": "gt", "value": 2022}]}
+        atoms = required_atoms(row)
+        verdict = check_surface("After 2022, how many notices were published?",
+                                atoms, row["question"], level=2)
+        self.assertNotIn("new_temporal_relation:after", verdict.reasons)
+
     def test_unchanged_template_rejected_at_l3_but_allowed_at_l2(self):
         # L3 is a paraphrase level (must differ); L2 is plan-generated (similarity legitimate)
         self.assertIn("not_actually_rewritten", self._check(ROW["question"], level=3).reasons)

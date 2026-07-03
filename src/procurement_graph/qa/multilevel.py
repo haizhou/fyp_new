@@ -36,6 +36,7 @@ LEVELS = (1, 2, 3)
 _NUM_RE = re.compile(r"(?<![A-Za-z0-9])\d+(?:\.\d+)?(?![A-Za-z0-9])")
 _ORG_FIELDS = ("buyer_name", "supplier_name")
 _WORDY = re.compile(r"[A-Za-z]")
+_TEMPORAL_RELATION_RE = re.compile(r"\b(after|before|later|subsequently|previously|prior to|then)\b", re.I)
 
 
 # ---------------------------------------------------------------------------- atoms
@@ -175,6 +176,9 @@ def check_surface(surface: str, atoms: SurfaceAtoms, source_question: str, *,
     foreign = [n for n in _NUM_RE.findall(text) if n not in allowed_numbers]
     if foreign:
         reasons.append(f"new_numbers:{','.join(sorted(set(foreign)))[:60]}")
+    new_temporal = _new_temporal_relations(text, source_question)
+    if new_temporal:
+        reasons.append(f"new_temporal_relation:{','.join(new_temporal)}")
 
     if level == 3 and _too_similar(lowered, source_lowered):
         reasons.append("not_actually_rewritten")
@@ -195,6 +199,13 @@ def _too_similar(a: str, b: str) -> bool:
     if not ta or not tb:
         return True
     return len(ta & tb) / len(ta | tb) > 0.9
+
+
+def _new_temporal_relations(surface: str, source_question: str) -> tuple[str, ...]:
+    """Reject invented ordering language such as "later awarded" on bridge questions."""
+    source_terms = {m.group(1).casefold() for m in _TEMPORAL_RELATION_RE.finditer(source_question)}
+    surface_terms = {m.group(1).casefold() for m in _TEMPORAL_RELATION_RE.finditer(surface)}
+    return tuple(sorted(surface_terms - source_terms))
 
 
 def _foreign_org(text: str, atoms: SurfaceAtoms, *, org_resolver: Any = None,
@@ -312,6 +323,8 @@ def l2_rewrite_messages(row: dict[str, Any], atoms: SurfaceAtoms, *,
             "only when it still clearly refers to the same organisation.",
             "Do not introduce any new organisation, place, CPV code, year, amount, threshold, filter, "
             "or condition.",
+            "Do not add ordering or timing relations such as later, subsequently, after, before, "
+            "previously, or prior to unless the L1 question already says that.",
             "Avoid database-style wording such as release_year, buyer_name, supplier_name, "
             "tender_cpv_id, tender_category, in_subquery, matching procurement records, or asked-for field.",
             "Vary sentence structure substantially; do not just swap one or two words.",
