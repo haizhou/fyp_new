@@ -1,0 +1,222 @@
+{
+  "_meta": {
+    "description": "Curated lookup: normalised organisation name → synthetic canonical_id for UK public bodies that lack a GB-COH registration. Used in ER Phase 2 (gov_lookup step). Each entry also carries a _source field documenting the evidence basis for the mapping.",
+    "format": "normalised_name (output of normalise.normalise_name()) → { canonical_id, _source }",
+    "canonical_id_prefix": "GOV-",
+    "warning": "Entries here cause ALL GB-FTS IDs matching this normalised name to be merged into one canonical entity. Only add entries where the canonical identity is unambiguous. When in doubt, leave out and use the fuzzy candidate report instead.",
+    "status": "DRAFT — verified against 2024 data sample (5,000 records). Requires review before treating as authoritative."
+  },
+
+  "MINISTRY OF DEFENCE": {
+    "canonical_id": "GOV-MOD",
+    "_source": "2024 data: 77 distinct GB-FTS IDs all bearing the name 'MINISTRY OF DEFENCE'. Single UK central government department (no CH number). Unambiguous."
+  },
+  "UK RESEARCH AND INNOVATION": {
+    "canonical_id": "GOV-UKRI",
+    "_source": "2024 data: 18 distinct GB-FTS IDs. UKRI is a non-departmental public body established by Higher Education and Research Act 2017. No CH number."
+  },
+  "NHS ENGLAND": {
+    "canonical_id": "GOV-NHSE",
+    "_source": "2024 data: 12 distinct GB-FTS IDs plus 1 GB-NHS-Y56. GOV-NHSE chosen as primary; GB-NHS-Y56 will be linked as alias in Phase 1 cross-ref. NHS England is a single statutory body."
+  },
+  "SCOTTISH GOVERNMENT": {
+    "canonical_id": "GOV-SCOTGOV",
+    "_source": "2024 data: 8 distinct GB-FTS IDs. Scottish Government is a single devolved administration. No CH number."
+  },
+  "NHS WALES SHARED SERVICES PARTNERSHIP PROCUREMENT SERVICES HOSTED BY VELINDRE UNIVERSITY NHS TRUST": {
+    "canonical_id": "GOV-NWSSP",
+    "_source": "2024 data: 13 distinct GB-FTS IDs. Shared services body for Welsh NHS procurement."
+  },
+  "NATIONAL HIGHWAYS": {
+    "canonical_id": "GOV-NATHWY",
+    "_source": "2024 data: 6 distinct GB-FTS IDs. Government company (formerly Highways England). Has CH number 09346363 but appears primarily as GB-FTS in data."
+  },
+  "DEPARTMENT FOR INFRASTRUCTURE": {
+    "canonical_id": "GOV-DFI-NI",
+    "_source": "2024 data: 6 distinct GB-FTS IDs. Northern Ireland Executive department. No CH number."
+  },
+  "DEPARTMENT FOR EDUCATION": {
+    "canonical_id": "GOV-DFE",
+    "_source": "UK central government department. No CH number."
+  },
+  "DEPARTMENT FOR TRANSPORT": {
+    "canonical_id": "GOV-DFT",
+    "_source": "UK central government department. No CH number."
+  },
+  "DEPARTMENT OF HEALTH AND SOCIAL CARE": {
+    "canonical_id": "GOV-DHSC",
+    "_source": "UK central government department. No CH number."
+  },
+  "HOME OFFICE": {
+    "canonical_id": "GOV-HO",
+    "_source": "UK central government department. No CH number."
+  },
+  "HM REVENUE AND CUSTOMS": {
+    "canonical_id": "GOV-HMRC",
+    "_source": "UK non-ministerial department. No CH number."
+  },
+  "CABINET OFFICE": {
+    "canonical_id": "GOV-CO",
+    "_source": "UK central government department. No CH number."
+  },
+  "DEPARTMENT FOR WORK AND PENSIONS": {
+    "canonical_id": "GOV-DWP",
+    "_source": "UK central government department. No CH number."
+  },
+  "FOREIGN COMMONWEALTH AND DEVELOPMENT OFFICE": {
+    "canonical_id": "GOV-FCDO",
+    "_source": "UK central government department (merged FCO + DFID 2020). No CH number."
+  },
+  "DEPARTMENT FOR BUSINESS AND TRADE": {
+    "canonical_id": "GOV-DBT",
+    "_source": "UK central government department (formerly BEIS). No CH number."
+  },
+  "DEPARTMENT FOR ENERGY SECURITY AND NET ZERO": {
+    "canonical_id": "GOV-DESNZ",
+    "_source": "UK central government department created 2023 from BEIS. No CH number."
+  },
+  "DEPARTMENT FOR SCIENCE INNOVATION AND TECHNOLOGY": {
+    "canonical_id": "GOV-DSIT",
+    "_source": "UK central government department created 2023. No CH number."
+  },
+  "DEPARTMENT FOR LEVELLING UP HOUSING AND COMMUNITIES": {
+    "canonical_id": "GOV-DLUHC",
+    "_source": "UK central government department. No CH number."
+  },
+  "ATTORNEY GENERALS OFFICE": {
+    "canonical_id": "GOV-AGO",
+    "_source": "UK central government department. No CH number."
+  },
+  "MINISTRY OF JUSTICE": {
+    "canonical_id": "GOV-MOJ",
+    "_source": "UK central government department. No CH number."
+  },
+  "HM TREASURY": {
+    "canonical_id": "GOV-HMT",
+    "_source": "UK central government department. No CH number."
+  },
+  "DEPARTMENT FOR ENVIRONMENT FOOD AND RURAL AFFAIRS": {
+    "canonical_id": "GOV-DEFRA",
+    "_source": "UK central government department. No CH number."
+  },
+  "DEPARTMENT FOR CULTURE MEDIA AND SPORT": {
+    "canonical_id": "GOV-DCMS",
+    "_source": "UK central government department. No CH number."
+  },
+  "WALES OFFICE": {
+    "canonical_id": "GOV-WALESOFFICE",
+    "_source": "UK central government (Office of the Secretary of State for Wales). No CH number."
+  },
+  "SCOTLAND OFFICE": {
+    "canonical_id": "GOV-SCOTOFFICE",
+    "_source": "UK central government (Office of the Secretary of State for Scotland). No CH number."
+  },
+  "NORTHERN IRELAND OFFICE": {
+    "canonical_id": "GOV-NIO",
+    "_source": "UK central government department. No CH number."
+  },
+  "CROWN PROSECUTION SERVICE": {
+    "canonical_id": "GOV-CPS",
+    "_source": "UK non-ministerial government department. No CH number."
+  },
+  "FOOD STANDARDS AGENCY": {
+    "canonical_id": "GOV-FSA",
+    "_source": "UK non-ministerial department. No CH number."
+  },
+  "ENVIRONMENT AGENCY": {
+    "canonical_id": "GOV-EA",
+    "_source": "Non-departmental public body (NDPB), sponsored by DEFRA. No CH number."
+  },
+  "NATURAL ENGLAND": {
+    "canonical_id": "GOV-NATENG",
+    "_source": "Non-departmental public body. No CH number."
+  },
+  "COMPANIES HOUSE": {
+    "canonical_id": "GOV-CH",
+    "_source": "Executive agency of DBT. No CH number (it is the registrar)."
+  },
+  "LAND REGISTRY": {
+    "canonical_id": "GOV-LR",
+    "_source": "HM Land Registry — executive agency. No CH number."
+  },
+  "DRIVER AND VEHICLE LICENSING AGENCY": {
+    "canonical_id": "GOV-DVLA",
+    "_source": "Executive agency of DVSA / DfT. No CH number."
+  },
+  "DRIVER AND VEHICLE STANDARDS AGENCY": {
+    "canonical_id": "GOV-DVSA",
+    "_source": "Executive agency of DfT. No CH number."
+  },
+  "MEDICINES AND HEALTHCARE PRODUCTS REGULATORY AGENCY": {
+    "canonical_id": "GOV-MHRA",
+    "_source": "Executive agency of DHSC. No CH number."
+  },
+  "NATIONAL CRIME AGENCY": {
+    "canonical_id": "GOV-NCA",
+    "_source": "Non-ministerial department. No CH number."
+  },
+  "OFSTED": {
+    "canonical_id": "GOV-OFSTED",
+    "_source": "Non-ministerial department. No CH number."
+  },
+  "OFFICE FOR NATIONAL STATISTICS": {
+    "canonical_id": "GOV-ONS",
+    "_source": "Executive office (part of UKSA). No CH number."
+  },
+  "COMPETITION AND MARKETS AUTHORITY": {
+    "canonical_id": "GOV-CMA",
+    "_source": "Non-ministerial department. No CH number."
+  },
+  "FINANCIAL CONDUCT AUTHORITY": {
+    "canonical_id": "GOV-FCA",
+    "_source": "Statutory body (not government dept, but commonly a buyer in data). No CH number."
+  },
+  "WELSH GOVERNMENT": {
+    "canonical_id": "GOV-WELSHGOV",
+    "_source": "Devolved administration. No CH number."
+  },
+  "WELSH REVENUE AUTHORITY": {
+    "canonical_id": "GOV-WRA",
+    "_source": "Welsh devolved tax authority. No CH number."
+  },
+  "NORTHERN IRELAND EXECUTIVE": {
+    "canonical_id": "GOV-NIEXEC",
+    "_source": "Devolved administration. No CH number."
+  },
+  "DEFENCE INFRASTRUCTURE ORGANISATION": {
+    "canonical_id": "GOV-DIO",
+    "_source": "Executive agency of MOD. No CH number."
+  },
+  "DEFENCE EQUIPMENT AND SUPPORT": {
+    "canonical_id": "GOV-DESUPPORT",
+    "_source": "Executive agency of MOD. No CH number."
+  },
+  "DEFENCE SCIENCE AND TECHNOLOGY LABORATORY": {
+    "canonical_id": "GOV-DSTL",
+    "_source": "Executive agency of MOD. No CH number."
+  },
+  "UK HYDROGRAPHIC OFFICE": {
+    "canonical_id": "GOV-UKHO",
+    "_source": "Executive agency of MOD. No CH number."
+  },
+  "NATIONAL AUDIT OFFICE": {
+    "canonical_id": "GOV-NAO",
+    "_source": "Parliamentary body. No CH number."
+  },
+  "CENTRAL DIGITAL AND DATA OFFICE": {
+    "canonical_id": "GOV-CDDO",
+    "_source": "Unit of Cabinet Office. No CH number."
+  },
+  "GOVERNMENT DIGITAL SERVICE": {
+    "canonical_id": "GOV-GDS",
+    "_source": "Unit of Cabinet Office. No CH number."
+  },
+  "CROWN COMMERCIAL SERVICE": {
+    "canonical_id": "GOV-CCS",
+    "_source": "Executive agency of Cabinet Office. Key central purchasing body."
+  },
+  "LONDONWIDE LOCAL MEDICAL COMMITTEES": {
+    "canonical_id": "GOV-LLMC",
+    "_source": "NHS-related body in London. No CH number in data."
+  }
+}

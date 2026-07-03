@@ -1,0 +1,39 @@
+# fyp_new project settings
+# All paths are relative to the project root (fyp_new/).
+
+data:
+  raw_dir:      data/raw
+  interim_dir:  data/interim
+  entities_dir: data/entities
+  kg_dir:       data/kg
+
+ingest:
+  # Deduplication strategy for OCIDs appearing in multiple year files.
+  # "latest_date": keep the release with the most recent date field.
+  deduplicate_by: latest_date
+
+entity_resolution:
+  # Official schemes in priority order (index 0 = highest trust).
+  # GB-FTS is intentionally absent — it is never a canonical ID.
+  official_schemes:
+    - GB-COH
+    - GB-NHS
+    - GB-UKPRN
+    - GB-CHC
+    - GB-SC
+    - GB-NIC
+    - GB-MPR
+
+  # Path to manually curated government entity lookup.
+  gov_lookup_path: configs/gov_lookup.json
+
+  # Jaro-Winkler threshold for generating the fuzzy candidate report.
+  # Candidates are for HUMAN REVIEW ONLY — never auto-merged.
+  fuzzy_threshold: 0.92
+
+kg:
+  # Contracts with value_amount above this (GBP) are flagged is_framework=True.
+  framework_value_threshold: 500_000_000
+
+  # Contracts with n_lots at or above this are flagged is_framework=True.
+  framework_lot_threshold: 5
