@@ -17,6 +17,7 @@ the KG is tabular.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, replace
 
 from .models import QueryConstraint, RuntimeQuerySpec
@@ -118,7 +119,10 @@ def ground_spec(spec: RuntimeQuerySpec, *, allowed_fields: frozenset[str] | set[
     if op not in _SUPPORTED_OPERATIONS:
         return GroundingResult(spec=spec, ok=False, reason=f"answer_operation '{op}' is not executable")
 
-    # 1. alias + validate constraint fields
+    # 1. alias + validate constraint fields, then value SHAPES. A mechanically impossible value
+    # (free text as an in-list, a category outside the enum, a bare year against a timestamp
+    # column) can never match a row — it executes "successfully" and returns a verified-looking 0.
+    # Rejecting here turns that silent wrong answer into a structured reason the replan loop sees.
     new_constraints: list[QueryConstraint] = []
     for constraint in spec.constraints:
         field = FIELD_ALIASES.get(constraint.field, constraint.field)
@@ -127,13 +131,28 @@ def ground_spec(spec: RuntimeQuerySpec, *, allowed_fields: frozenset[str] | set[
             constraint = replace(constraint, field=field)
         if field not in allowed:
             return GroundingResult(spec=spec, ok=False, reason=f"constraint field {field!r} is not in the KG schema")
+        constraint, value_error = _ground_constraint_value(constraint, changes)
+        if value_error:
+            return GroundingResult(spec=spec, ok=False, reason=value_error)
         new_constraints.append(constraint)
+
+    # a predicate over a money total and a top_k ranked by money totals are sums in disguise:
+    # they must carry the same additive-only guard, or framework CEILING values inflate them.
+    sums_money = (
+        op == "sum"
+        or (op == "predicate" and str(spec.metadata.get("predicate_subject", "")) == "sum")
+        or (op == "top_k" and str(spec.metadata.get("metric", "")) == "sum")
+    )
 
     # 2. alias + validate answer field (count answers over contract_node_id, so any is fine)
     answer_field = FIELD_ALIASES.get(spec.answer_field, spec.answer_field)
     if answer_field != spec.answer_field:
         changes.append(f"aliased answer_field {spec.answer_field!r}->{answer_field!r}")
-    if op in _COUNT_LIKE:
+    if op == "predicate" and sums_money:
+        if answer_field != "value_amount":
+            changes.append("forced predicate-sum answer_field to value_amount")
+        answer_field = "value_amount"  # summing any other column (or a defaulted id) is meaningless
+    elif op in _COUNT_LIKE:
         answer_field = answer_field or "contract_node_id"
     elif op == "sum":
         answer_field = "value_amount"  # the only additive numeric field
@@ -144,15 +163,16 @@ def ground_spec(spec: RuntimeQuerySpec, *, allowed_fields: frozenset[str] | set[
     elif answer_field and answer_field not in allowed:
         return GroundingResult(spec=spec, ok=False, reason=f"answer_field {answer_field!r} is not in the KG schema")
 
-    # 3. additive-sum guard (safety): a sum must only aggregate additive rows
-    if op == "sum" and not any(
+    # 3. additive-sum guard (safety): any money aggregation (sum, predicate over a sum, top_k by
+    # summed value) must only aggregate additive rows
+    if sums_money and not any(
         c.field == "value_is_additive" and c.op == "eq" and bool(c.value) for c in new_constraints
     ):
         new_constraints.append(
             QueryConstraint("value_is_additive", "eq", True, visible_to_user=False,
                             source_text="additive value guard (grounded)")
         )
-        changes.append("added value_is_additive guard for sum")
+        changes.append(f"added value_is_additive guard for {op}")
 
     # 4. reductions must be exhaustive; factoids need a dedupe key
     requires_exhaustive = spec.requires_exhaustive_retrieval
@@ -197,6 +217,113 @@ def ground_spec(spec: RuntimeQuerySpec, *, allowed_fields: frozenset[str] | set[
         metadata=metadata,
     )
     return GroundingResult(spec=grounded, ok=True, changes=tuple(changes), issues=tuple(issues))
+
+
+_CATEGORY_VALUES = frozenset({"goods", "services", "works"})
+_CATEGORY_NOISE_RE = re.compile(r"\b(?:contract|notice|tender)s?\b")
+_FULL_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}")
+
+
+def _ground_constraint_value(
+    constraint: QueryConstraint, changes: list[str]
+) -> tuple[QueryConstraint, str]:
+    """Mechanical value-shape checks; returns (constraint, "") or (constraint, reason).
+
+    Repairs what is unambiguous (category noise words, year strings -> int) and rejects what can
+    never match ('in' over free text, a bare year against a timestamp column) with a reason the
+    feedback replan can act on.
+    """
+    field, op, value = constraint.field, constraint.op, constraint.value
+    if op == "in":
+        if isinstance(value, str) or not isinstance(value, (list, tuple, set, frozenset)):
+            return constraint, (
+                f"'in' filter on {field} needs an explicit list of KG values, not free text "
+                f"({str(value)[:60]!r}); derive the set with a bridge_join step instead"
+            )
+        items = list(value)
+        if not items:
+            return constraint, f"'in' filter on {field} has an empty value list"
+        if field == "release_year":
+            coerced, ok = _coerce_years(items)
+            if not ok:
+                return constraint, f"release_year 'in' list has a non-year item: {items!r}"
+            if coerced != items:
+                changes.append("coerced release_year in-list to integers")
+                return replace(constraint, value=coerced), ""
+        return constraint, ""
+    if op == "between":
+        items = list(value) if isinstance(value, (list, tuple)) else []
+        if len(items) != 2:
+            return constraint, f"'between' filter on {field} needs a [low, high] pair"
+        if field == "release_year":
+            coerced, ok = _coerce_years(items)
+            if not ok:
+                return constraint, f"release_year 'between' bounds are not years: {items!r}"
+            if coerced != items:
+                changes.append("coerced release_year between-bounds to integers")
+                return replace(constraint, value=coerced), ""
+        return constraint, ""
+    if field == "tender_category" and op == "eq":
+        raw = str(value).strip().casefold()
+        cleaned = _CATEGORY_NOISE_RE.sub("", raw).strip()
+        cleaned = {"good": "goods", "service": "services", "work": "works"}.get(cleaned, cleaned)
+        if cleaned not in _CATEGORY_VALUES:
+            return constraint, f"tender_category value {value!r} is not one of goods|services|works"
+        if cleaned != value:
+            changes.append(f"normalised tender_category {value!r}->{cleaned!r}")
+            return replace(constraint, value=cleaned), ""
+        return constraint, ""
+    if field == "award_date_signed" and op in ("eq", "gt", "lt", "gte", "lte"):
+        text = str(value).strip()
+        if not _FULL_DATE_RE.match(text):
+            parsed = _parse_written_date(text)
+            if parsed is None:
+                return constraint, (
+                    f"award_date_signed needs a full YYYY-MM-DD date, got {str(value)[:40]!r}; "
+                    "for a publication year use release_year"
+                )
+            changes.append(f"normalised award_date_signed {value!r}->{parsed!r}")
+            return replace(constraint, value=parsed), ""
+        return constraint, ""
+    if field == "release_year" and op == "eq" and not isinstance(value, int):
+        text = str(value).strip()
+        if text.isdigit() and len(text) == 4:
+            changes.append(f"coerced release_year {value!r} to integer")
+            return replace(constraint, value=int(text)), ""
+        return constraint, f"release_year needs a 4-digit year, got {str(value)[:40]!r}"
+    return constraint, ""
+
+
+_ORDINAL_DAY_RE = re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)\b", re.I)
+
+# Unambiguous written-date layouts only; numeric d/m/y layouts are locale-ambiguous and rejected.
+_WRITTEN_DATE_FORMATS = ("%d %B %Y", "%d %b %Y", "%B %d %Y", "%b %d %Y")
+
+
+def _parse_written_date(text: str) -> str | None:
+    from datetime import datetime
+
+    cleaned = " ".join(_ORDINAL_DAY_RE.sub(r"\1", text).replace(",", " ").split())
+    for fmt in _WRITTEN_DATE_FORMATS:
+        try:
+            return datetime.strptime(cleaned, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+    return None
+
+
+def _coerce_years(items: list) -> tuple[list, bool]:
+    out: list = []
+    for item in items:
+        if isinstance(item, int):
+            out.append(item)
+            continue
+        text = str(item).strip()
+        if text.isdigit() and len(text) == 4:
+            out.append(int(text))
+        else:
+            return items, False
+    return out, True
 
 
 def _ground_bookkeeping_field(

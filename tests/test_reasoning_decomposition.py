@@ -109,6 +109,13 @@ class _Resolver:
         return []
 
 
+class _WeakResolver:
+    def resolve(self, mention):
+        from procurement_graph.reasoning.models import EntityLinkCandidate
+        return [EntityLinkCandidate(mention=mention, linked_id="B1 Facilities", linked_label="B1 Facilities",
+                                    entity_type="organization", score=0.42, source="records_substring")]
+
+
 class TestDecompositionPlannerEndToEnd(unittest.TestCase):
     def setUp(self):
         from procurement_graph.reasoning import ReasoningPipeline
@@ -237,6 +244,15 @@ class TestLLMDecompositionAndHybrid(unittest.TestCase):
         trace = self.Pipeline(backend=self.backend, planner=llm, org_resolver=self.resolver).run("total value for vendors linked to B1")
         self.assertTrue(trace.execution.passed)
         self.assertEqual(str(trace.answer_card.answer), "420")
+
+    def test_llm_decomposition_does_not_snap_weak_org_hit(self):
+        from procurement_graph.reasoning.llm_planner import decomposition_from_payload
+
+        plan = decomposition_from_payload("total value for vendors linked to B1",
+                                          _bridge_payload()["plans"][0],
+                                          org_resolver=_WeakResolver())
+        self.assertIsNotNone(plan)
+        self.assertEqual(plan.steps[0].spec.constraints[0].value, "B1")
 
     def test_hybrid_escalates_only_when_rule_ambiguous(self):
         llm = self.LLM(client=_StubDecompChat(_bridge_payload()), model="stub", org_resolver=self.resolver)

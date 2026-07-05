@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .decomposition import Binding, DecompositionPlan, SubQuery
+from .entity_resolution import resolve_confident_org
 from .linking import SUM_PHRASE_RE, OrgResolver, link_question
 from .models import CandidatePlan, QueryConstraint, RuntimeQuerySpec
 from .planner import RULE_BASED_PLANNER_VERSION, RuleBasedDryRunPlanner
@@ -321,13 +322,10 @@ class DecompositionAwarePlanner:
         if self.org_resolver is None:
             return span
         for candidate_span in (span, span.rstrip("s")):
-            hits = self.org_resolver.resolve(candidate_span)
-            if hits and hits[0].source == "records_exact":
-                return hits[0].linked_id
-        hits = self.org_resolver.resolve(span)
-        # length guard: a tiny stub ('The C') can score >=0.6 against a short org name by
-        # length-ratio alone — that is a hallucinated link, not a resolution.
-        return hits[0].linked_id if hits and hits[0].score >= 0.6 and len(span) >= 6 else ""
+            resolved = resolve_confident_org(self.org_resolver, candidate_span)
+            if resolved.ok and resolved.hit is not None:
+                return resolved.hit.linked_id
+        return ""
 
 
 @dataclass

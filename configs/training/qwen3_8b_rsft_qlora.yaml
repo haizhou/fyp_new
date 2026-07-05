@@ -1,0 +1,49 @@
+# LLaMA-Factory RSFT config — CICADA Step-2 planner student (Qwen3-8B, QLoRA)
+# Rejection-sampling round: the SFT student self-harvests on the train pool
+# (run_teacher.py --plan-base-url <vLLM> --plan-model <student>), the verifier keeps
+# what passes, export_llamafactory.py renders round-2 data — NO teacher involved.
+# Continues training from the SFT adapter on that self-generated pool.
+
+### model
+model_name_or_path: Qwen/Qwen3-8B
+adapter_name_or_path: outputs/qwen3_8b_cicada_sft_v1
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+quantization_bit: 4
+bf16: true
+flash_attn: fa2
+
+### dataset
+dataset_dir: data/training/llamafactory_rsft_qwen_r1   # round-2 export dir
+dataset: cicada_plan_sft,cicada_repair_sft
+eval_dataset: cicada_plan_sft_val
+template: qwen3
+enable_thinking: false         # train/serve consistency (no think blocks)
+cutoff_len: 6144
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### training
+output_dir: outputs/qwen3_8b_cicada_rsft_v1
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 5.0e-5            # lower than SFT: refinement round, not cold start
+num_train_epochs: 2
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+max_grad_norm: 1.0
+logging_steps: 10
+save_steps: 200
+eval_strategy: steps
+eval_steps: 200
+plot_loss: true
+gradient_checkpointing: true
+report_to: none

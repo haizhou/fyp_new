@@ -52,7 +52,8 @@ def build_pipeline(args, backend, resolver):
     elif args.planner == "typed":
         from procurement_graph.qa.benchmark.chat import ChatClient
         from procurement_graph.reasoning.typed_planning import TypedLLMPlanner
-        planner = TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver)
+        planner = TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver,
+                                  understanding_model=args.understanding_model)
     elif args.planner == "hybrid":
         from procurement_graph.reasoning.llm_planner import LLMReasoningPlanner
         from procurement_graph.reasoning.planner_decomposition import DecompositionAwarePlanner, HybridPlanner
@@ -73,7 +74,8 @@ def build_pipeline(args, backend, resolver):
         planner = VerifyingHybridPlanner(
             rule=DecompositionAwarePlanner(org_resolver=resolver),
             backend=backend,
-            llm=TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver),
+            llm=TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver,
+                                understanding_model=args.understanding_model),
         )
     trace_reflector = None
     if args.reflect == "on":
@@ -92,6 +94,8 @@ def main() -> int:
                                           "typed", "verified_typed"],
                     default="rule_decomp")
     ap.add_argument("--model", default="gpt-5.4-nano")
+    ap.add_argument("--understanding-model", default="",
+                    help="optional Step-1 understanding model for typed planners; defaults to --model")
     ap.add_argument("--levels", default="1,2,3")
     ap.add_argument("--limit", type=int, default=0, help="stride-sample surfaces per level")
     ap.add_argument("--max-per-level", type=int, default=0,
@@ -101,6 +105,11 @@ def main() -> int:
     ap.add_argument("--progress-every", type=int, default=25,
                     help="print live progress every N evaluated rows per level (0 disables)")
     ap.add_argument("--reflect", choices=["off", "on"], default="off")
+    ap.add_argument("--wrong-answer-repair", choices=["off", "on"], default="off",
+                    help="offline teacher mode: if an answered row mismatches the hidden oracle, "
+                         "send wrong_answer feedback to the planner once (oracle is not shown)")
+    ap.add_argument("--trace-log", choices=["off", "on"], default="off",
+                    help="write per-row trace JSONL files next to the result files")
     ap.add_argument("--in-dir", default=str(ML_DIR))
     ap.add_argument("--out-dir", default=str(ML_DIR / "eval"))
     args = ap.parse_args()
@@ -152,9 +161,21 @@ def main() -> int:
             step = len(rows) / args.limit
             rows = [rows[int(i * step)] for i in range(args.limit)]
         results = []
+        trace_records = []
         total = len(rows)
         for index, row in enumerate(rows, start=1):
-            outcome = eval_row(row, mode=args.mode, pipeline=pipeline, backend=backend, allowed=allowed)
+            outcome = eval_row(
+                row,
+                mode=args.mode,
+                pipeline=pipeline,
+                backend=backend,
+                allowed=allowed,
+                wrong_answer_repair=args.wrong_answer_repair == "on",
+                return_trace=args.trace_log == "on",
+            )
+            trace_record = outcome.pop("_trace_record", None)
+            if trace_record is not None:
+                trace_records.append(trace_record)
             results.append({**outcome, "id": row.get("id"), "plan_id": row.get("plan_id"),
                             "subset": row.get("subset", ""), "level": level})
             if args.progress_every and (index % args.progress_every == 0 or index == total):
@@ -173,6 +194,10 @@ def main() -> int:
         (out_dir / f"{level}.{label}.results.jsonl").write_text(
             "".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in results),
             encoding="utf-8")
+        if args.trace_log == "on":
+            (out_dir / f"{level}.{label}.traces.jsonl").write_text(
+                "".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in trace_records),
+                encoding="utf-8")
         print(f"  {level}: acc={summary['accuracy']:.0%} scored={summary['scored']} "
               f"gap={summary['planner_or_exec_gap']}", flush=True)
 

@@ -63,6 +63,57 @@ class ChatClient:
 
     def complete_json(self, *, model: str, system: str, user: str) -> ChatResult:
         """Call chat.completions and parse the first JSON object from the reply."""
+        result = self.complete_text(model=model, system=system, user=user)
+        return ChatResult(
+            parsed=extract_json_object(result.raw_text),
+            raw_text=result.raw_text,
+            model=result.model,
+            usage=result.usage,
+            attempts=result.attempts,
+        )
+
+    def complete_schema(self, *, model: str, system: str, user: str,
+                        schema: dict[str, Any]) -> ChatResult:
+        """Call chat.completions with a strict json_schema response_format.
+
+        The provider constrains generation to the schema, so the reply is guaranteed well-shaped
+        (no nested-key echo, no placeholder slots, enum-only fields). `schema` is the full
+        ``{"name", "strict", "schema"}`` object. Falls back to first-JSON-object extraction only if
+        the (guaranteed) content is not directly parseable.
+        """
+        import json as _json
+
+        self._ensure()
+        messages = [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ]
+        kwargs: dict[str, Any] = {
+            "model": model, "messages": messages, "temperature": self.temperature,
+            "response_format": {"type": "json_schema", "json_schema": schema},
+        }
+        last_exc: Exception | None = None
+        for attempt in range(self.max_retries + 1):
+            try:
+                response = self._client.chat.completions.create(**kwargs)
+                text = response.choices[0].message.content or ""
+                try:
+                    parsed = _json.loads(text) if text.strip() else {}
+                except (ValueError, TypeError):
+                    parsed = extract_json_object(text)
+                return ChatResult(parsed=parsed if isinstance(parsed, dict) else {}, raw_text=text,
+                                  model=model, usage=_usage(response), attempts=attempt + 1)
+            except Exception as exc:  # pragma: no cover - exercised only in live API calls
+                last_exc = exc
+                if attempt >= self.max_retries or _non_retryable(exc):
+                    break
+                time.sleep(self.retry_wait_seconds * (attempt + 1))
+        raise RuntimeError(
+            f"chat.completions (json_schema) failed for {model} after {self.max_retries + 1} attempts: {last_exc}"
+        )
+
+    def complete_text(self, *, model: str, system: str, user: str) -> ChatResult:
+        """Call chat.completions and return raw text without requiring JSON."""
         self._ensure()
         messages = [
             {"role": "system", "content": system},
@@ -77,7 +128,7 @@ class ChatClient:
                 response = self._client.chat.completions.create(**kwargs)
                 text = response.choices[0].message.content or ""
                 return ChatResult(
-                    parsed=extract_json_object(text),
+                    parsed={},
                     raw_text=text,
                     model=model,
                     usage=_usage(response),
@@ -85,12 +136,22 @@ class ChatClient:
                 )
             except Exception as exc:  # pragma: no cover - exercised only in live API calls
                 last_exc = exc
-                if attempt >= self.max_retries:
+                if attempt >= self.max_retries or _non_retryable(exc):
                     break
                 time.sleep(self.retry_wait_seconds * (attempt + 1))
         raise RuntimeError(
             f"chat.completions failed for {model} after {self.max_retries + 1} attempts: {last_exc}"
         )
+
+
+def _non_retryable(exc: Exception) -> bool:
+    """4xx client errors (bad schema, invalid request) will fail identically on every retry —
+    burning retry backoff on them turned one dead run into 15+ minutes of pure waiting.
+    429 (rate limit) stays retryable."""
+    text = str(exc)
+    if "Error code: 429" in text:
+        return False
+    return "Error code: 4" in text or "invalid_request_error" in text
 
 
 def _usage(response: Any) -> dict[str, Any]:

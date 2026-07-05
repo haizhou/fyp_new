@@ -61,6 +61,17 @@ class _Resolver:
                 for i, n in enumerate(names)]
 
 
+class _WeakAlternativeResolver:
+    def resolve(self, mention):
+        return [
+            EntityLinkCandidate(mention=mention, linked_id="ACME LTD", linked_label="ACME LTD",
+                                entity_type="organization", score=1.0, source="records_exact"),
+            EntityLinkCandidate(mention=mention, linked_id="Acme Facilities Ltd",
+                                linked_label="Acme Facilities Ltd", entity_type="organization",
+                                score=0.42, source="records_substring"),
+        ]
+
+
 class TestFaithfulness(unittest.TestCase):
     def setUp(self):
         self.reflector = TraceReflector()
@@ -119,6 +130,13 @@ class TestPlanValidityAndRepair(unittest.TestCase):
         self.assertEqual(reflection.action, "mark_ambiguous")
         self.assertEqual(reflection.metadata["distinct_values"], ["A", "B"])
 
+    def test_highest_total_value_reads_as_superlative_before_sum(self):
+        trace = _trace("Which contract had the highest total value?",
+                       _spec("argmax", answer_field="contract_node_id", value_type="string"),
+                       answer="c1", evidence_count=1)
+        reflection = TraceReflector().reflect_trace(trace)
+        self.assertTrue(reflection.plan_valid, reflection.plan_issues)
+
     def test_no_results_with_alternative_candidate_relinks(self):
         resolver = _Resolver({"acme ltd": ["ACME LTD", "Acme Ltd."]})
         spec = _spec("count", constraints=(("supplier_name", "eq", "ACME LTD"),))
@@ -127,6 +145,13 @@ class TestPlanValidityAndRepair(unittest.TestCase):
         self.assertEqual(reflection.action, "re_link_entity")
         swapped = [c for c in reflection.repair_spec.constraints if c.field == "supplier_name"]
         self.assertEqual(swapped[0].value, "Acme Ltd.")
+
+    def test_no_results_weak_alternative_does_not_relink(self):
+        spec = _spec("count", constraints=(("supplier_name", "eq", "ACME LTD"),))
+        trace = _trace("How many notices were awarded to Acme Ltd?", spec, answer=None, status="no_results")
+        reflection = TraceReflector(org_resolver=_WeakAlternativeResolver()).reflect_trace(trace)
+        self.assertEqual(reflection.action, "relax_constraints")
+        self.assertIsNone(reflection.repair_spec)
 
     def test_no_results_without_alternative_relaxes(self):
         spec = _spec("count", constraints=(("release_year", "eq", 2024), ("tender_category", "eq", "goods")))

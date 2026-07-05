@@ -37,6 +37,17 @@ from .evidence import (
 )
 from .executor import execute_query_spec
 from .grounding import CANONICAL_FIELDS, FIELD_ALIASES, GroundingResult, ground_spec
+from .graph_planning import (
+    GraphExecutionPlan,
+    GraphExecutionResult,
+    GraphOperationUnitSpec,
+    GraphRelationSpec,
+    GraphReturnSpec,
+    GraphVariableSpec,
+    GraphVariableTrace,
+    compile_graph_plan,
+    execute_graph_plan,
+)
 from .linking import LinkingResult, OrgResolver, link_question
 from .memory import ReflectorMemory
 from .pipeline import ReasoningPipeline
@@ -44,6 +55,7 @@ from .verbalize import LLMVerbalizer, VerbalizationResult, answer_preserves_atom
 from .planner import (
     PLANNER_SCHEMA_VERSION,
     RULE_BASED_PLANNER_VERSION,
+    FallbackChainPlanner,
     PlanningError,
     ReasoningPlanner,
     RuleBasedDryRunPlanner,
@@ -60,6 +72,7 @@ from .typed_planning import (
     plan_consistency_check,
     question_understanding_messages,
     typed_plan_messages,
+    typed_replan_messages,
 )
 from .diagnostics import LLMReflectionAnalyzer, LLMVerificationAnalyzer, ReflectionAnalyzer, VerificationAnalyzer
 from .retrieval import (
@@ -107,6 +120,7 @@ __all__ = [
     # planner
     "PLANNER_SCHEMA_VERSION",
     "RULE_BASED_PLANNER_VERSION",
+    "FallbackChainPlanner",
     "PlanningError",
     "ReasoningPlanner",
     "RuleBasedDryRunPlanner",
@@ -150,6 +164,15 @@ __all__ = [
     "FIELD_ALIASES",
     "GroundingResult",
     "ground_spec",
+    "GraphExecutionPlan",
+    "GraphExecutionResult",
+    "GraphOperationUnitSpec",
+    "GraphRelationSpec",
+    "GraphReturnSpec",
+    "GraphVariableSpec",
+    "GraphVariableTrace",
+    "compile_graph_plan",
+    "execute_graph_plan",
     "SanityVerdict",
     "check_sum_sanity",
     "sanity_for_execution",
@@ -174,4 +197,5 @@ __all__ = [
     "plan_consistency_check",
     "question_understanding_messages",
     "typed_plan_messages",
+    "typed_replan_messages",
 ]

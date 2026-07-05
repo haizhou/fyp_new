@@ -148,6 +148,9 @@ class CandidatePlan:
     fallback_used: bool = False
     fallback_reason: str = ""
     fallback_planner: str = ""
+    # Optional graph plan with reviewable A/B/C variables. When set, the pipeline routes to the
+    # graph executor instead of treating query_spec as the planner-facing representation.
+    graph_plan: Any = None
     # Optional multi-hop plan (a DecompositionPlan). When set, the pipeline routes to
     # execute_decomposition instead of the single-spec path. Typed Any to avoid a models<-decomposition
     # import cycle. query_spec still carries the terminal step's spec for card/metadata.

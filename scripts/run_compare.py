@@ -65,8 +65,52 @@ def run_ours(rows, args):
                              trace_reflector=trace_reflector)
     out = []
     for row in rows:
+        if trace_reflector is not None:
+            pipe.oracle_matcher = lambda _q, trace, _row=row: is_correct(
+                trace.answer_card.answer if trace.answer_card else None, _row
+            )
         pred = pipe.run(row["question"]).answer_card.answer
         out.append({**_slim(row), "predicted": _jsonable(pred), "correct": is_correct(pred, row)})
+    return out
+
+
+# ------------------------------------------------------------------ CICADA (current two-step system)
+def run_cicada(rows, args):
+    """The CURRENT production stack: nano Step-1 briefing + grok Step-2 graph planning
+    (measured lean/optional config), deterministic compile + gated reflector (repair on,
+    structural resample) — identical to the teacher runner configuration."""
+    from procurement_graph.qa.benchmark.chat import ChatClient
+    from procurement_graph.reasoning import ReasoningPipeline
+    from procurement_graph.reasoning.kg_backend import RuntimeKGBackend
+    from procurement_graph.reasoning.typed_planning import TypedLLMPlanner, resolve_planner_variants
+    print("[compare/cicada] loading KG ...", flush=True)
+    backend = RuntimeKGBackend.from_directory(ROOT / "data" / "kg")
+    resolver = backend.org_resolver()
+    chat = ChatClient.from_env(temperature=0.0)
+    plan_model = args.plan_model
+    plan_chat = (ChatClient(base_url=args.plan_base_url, api_key=args.plan_api_key,
+                            temperature=0.0)
+                 if getattr(args, "plan_base_url", None) else chat)
+    pv, sv = resolve_planner_variants(plan_model)
+    planner = TypedLLMPlanner(client=plan_chat, model=plan_model, org_resolver=resolver, two_step=True,
+                              understanding_client=chat, understanding_model=args.model,
+                              plan_prompt_variant=pv, plan_schema_variant=sv, plan_samples=2)
+    pipe = ReasoningPipeline(backend=backend, planner=planner, org_resolver=resolver,
+                             max_feedback_replans=1)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    def one(row):
+        try:
+            pred = pipe.run(row["question"]).answer_card.answer
+        except Exception as exc:  # noqa: BLE001 - live boundary
+            return {**_slim(row), "predicted": None, "correct": False, "error": repr(exc)[:120]}
+        return {**_slim(row), "predicted": _jsonable(pred), "correct": is_correct(pred, row)}
+    out = []
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        futs = [pool.submit(one, r) for r in rows]
+        for i, f in enumerate(as_completed(futs), 1):
+            out.append(f.result())
+            if i % 25 == 0:
+                print(f"[compare/cicada] {i}/{len(rows)}", flush=True)
     return out
 
 
@@ -160,9 +204,15 @@ def main():
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--system", choices=["ours", "rag"], required=True)
+    ap.add_argument("--system", choices=["ours", "rag", "cicada"], required=True)
     ap.add_argument("--planner", choices=["rule", "rule_decomp", "hybrid", "llm"], default="rule_decomp")
     ap.add_argument("--model", default="gpt-5.4-nano")
+    ap.add_argument("--plan-model", default="grok-4-1-fast-non-reasoning")
+    ap.add_argument("--plan-base-url", default=None,
+                    help="OpenAI-compatible endpoint for Step-2 only (local vLLM student); "
+                         "Step-1 stays on the default endpoint")
+    ap.add_argument("--plan-api-key", default="local")
+    ap.add_argument("--workers", type=int, default=5)
     ap.add_argument("--rag-llm", choices=["on", "off"], default="on")
     ap.add_argument("--rag-mode", choices=["naive", "strong"], default="naive")
     ap.add_argument("--reflect", choices=["off", "on"], default="off",
@@ -176,8 +226,13 @@ def main():
     rows = read_jsonl(Path(args.in_path))
     if args.limit:
         rows = rows[: args.limit]
-    results = run_ours(rows, args) if args.system == "ours" else run_rag(rows, args)
-    label = "ours" if args.system == "ours" else f"rag_{args.rag_mode}"
+    if args.system == "cicada":
+        results = run_cicada(rows, args)
+    elif args.system == "ours":
+        results = run_ours(rows, args)
+    else:
+        results = run_rag(rows, args)
+    label = {"ours": "ours", "cicada": "cicada"}.get(args.system, f"rag_{args.rag_mode}")
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"compare_{label}.results.jsonl").write_text(

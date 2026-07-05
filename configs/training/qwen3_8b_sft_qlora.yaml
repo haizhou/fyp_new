@@ -1,0 +1,53 @@
+# LLaMA-Factory SFT config — CICADA Step-2 planner student (Qwen3-8B, QLoRA, 1x24GB)
+# usage: llamafactory-cli train configs/training/qwen3_8b_sft_qlora.yaml
+# Prereq: merge data/training/llamafactory_v1/dataset_info.json entries into
+#         LLaMA-Factory/data/dataset_info.json (or point dataset_dir here).
+
+### model
+model_name_or_path: Qwen/Qwen3-8B
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+quantization_bit: 4            # QLoRA (nf4) -> fits 1x24GB
+bf16: true
+flash_attn: fa2
+
+### dataset
+dataset_dir: data/training/llamafactory_v1
+dataset: cicada_plan_sft,cicada_repair_sft
+eval_dataset: cicada_plan_sft_val
+template: qwen3
+enable_thinking: false         # train WITHOUT think blocks == how we serve (train/serve consistency)
+cutoff_len: 6144               # lean prompt + briefing + schema context ~3-5k tokens
+overwrite_cache: true
+preprocessing_num_workers: 8
+
+### training
+output_dir: outputs/qwen3_8b_cicada_sft_v1
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8   # effective batch 16
+learning_rate: 1.0e-4
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+max_grad_norm: 1.0
+logging_steps: 10
+save_steps: 200
+eval_strategy: steps
+eval_steps: 200
+plot_loss: true
+gradient_checkpointing: true
+report_to: none
+
+### notes
+# - Non-thinking mode at inference (enable_thinking=false when serving).
+# - Targets are single-line compact JSON graph plans; do NOT add a generation prompt suffix.
+# - Serve with vLLM + guided-json (the project's "optional"-variant schema) for hard format
+#   guarantees; resolve_planner_variants gains a student profile (lean prompt).

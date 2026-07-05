@@ -86,6 +86,64 @@ class TestGrounding(unittest.TestCase):
         self.assertTrue(grounded.ok)
         self.assertEqual(grounded.spec.answer_field, "award_date_signed")
 
+    # --- value-shape validation (silent zero-match filters become structured failures) ---
+
+    def test_in_with_free_text_rejected(self) -> None:
+        # the L2 bridge-flattening failure: `tender_cpv_id in "CPV codes used by X"` ran and
+        # returned a verified-looking 0; it must be a grounding failure with a bridge hint.
+        grounded = ground_spec(self._spec(
+            answer_operation="count", answer_field="contract_node_id",
+            constraints=(QueryConstraint("tender_cpv_id", "in", "CPV codes previously used by ACME"),)))
+        self.assertFalse(grounded.ok)
+        self.assertIn("explicit list", grounded.reason)
+        self.assertIn("bridge_join", grounded.reason)
+
+    def test_category_noise_normalised(self) -> None:
+        grounded = ground_spec(self._spec(
+            answer_operation="count", answer_field="contract_node_id",
+            constraints=(QueryConstraint("tender_category", "eq", "goods notice"),)))
+        self.assertTrue(grounded.ok)
+        values = {c.field: c.value for c in grounded.spec.constraints}
+        self.assertEqual(values["tender_category"], "goods")
+
+    def test_category_outside_enum_rejected(self) -> None:
+        grounded = ground_spec(self._spec(
+            answer_operation="count", answer_field="contract_node_id",
+            constraints=(QueryConstraint("tender_category", "eq", "nonexistent"),)))
+        self.assertFalse(grounded.ok)
+        self.assertIn("goods|services|works", grounded.reason)
+
+    def test_bare_year_on_timestamp_field_rejected(self) -> None:
+        # eq "2023" against an ISO-timestamp column can never match: reject with a pointer to
+        # release_year instead of executing into a silent 0.
+        grounded = ground_spec(self._spec(
+            answer_operation="count", answer_field="contract_node_id",
+            constraints=(QueryConstraint("award_date_signed", "eq", "2023"),)))
+        self.assertFalse(grounded.ok)
+        self.assertIn("release_year", grounded.reason)
+
+    def test_full_date_on_timestamp_field_ok(self) -> None:
+        grounded = ground_spec(self._spec(
+            answer_operation="count", answer_field="contract_node_id",
+            constraints=(QueryConstraint("award_date_signed", "eq", "2023-05-01"),)))
+        self.assertTrue(grounded.ok)
+
+    def test_year_string_coerced_to_int(self) -> None:
+        grounded = ground_spec(self._spec(
+            answer_operation="count", answer_field="contract_node_id",
+            constraints=(QueryConstraint("release_year", "eq", "2024"),)))
+        self.assertTrue(grounded.ok)
+        values = {c.field: c.value for c in grounded.spec.constraints}
+        self.assertEqual(values["release_year"], 2024)
+
+    def test_year_in_list_coerced(self) -> None:
+        grounded = ground_spec(self._spec(
+            answer_operation="count", answer_field="contract_node_id",
+            constraints=(QueryConstraint("release_year", "in", ["2022", 2023]),)))
+        self.assertTrue(grounded.ok)
+        values = {c.field: c.value for c in grounded.spec.constraints}
+        self.assertEqual(values["release_year"], [2022, 2023])
+
 
 # --- answer sanity -------------------------------------------------------------------
 

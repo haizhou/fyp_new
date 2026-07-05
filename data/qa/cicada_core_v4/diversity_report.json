@@ -1,0 +1,33 @@
+{
+ "rows_in": 10292,
+ "rows_out": 12975,
+ "jobs": 5081,
+ "accepted": 4206,
+ "stats": {
+  "variant_reject:missing_literal": 707,
+  "variant_ok:typo_noise": 492,
+  "variant_ok:embedded_request": 462,
+  "variant_ok:verbose_context": 450,
+  "variant_ok:terse_query": 438,
+  "variant_ok:multi_sentence": 423,
+  "variant_ok:syntactic_flip": 418,
+  "inplace_ok:terse_query": 328,
+  "inplace_ok:verbose_context": 312,
+  "inplace_ok:multi_sentence": 310,
+  "inplace_ok:embedded_request": 298,
+  "inplace_ok:syntactic_flip": 275,
+  "inplace_reject:missing_literal": 234,
+  "inplace_reject:category_injection": 4,
+  "inplace_reject:flip_too_similar": 4,
+  "variant_reject:flip_too_similar": 4
+ },
+ "trigram_overlap_median": 0.429,
+ "trigram_overlap_p90": 1.0,
+ "split_sizes": {
+  "dev_smoke": 49,
+  "dev_select": 677,
+  "dev_tune": 559,
+  "train": 9391,
+  "final_test": 2299
+ }
+}

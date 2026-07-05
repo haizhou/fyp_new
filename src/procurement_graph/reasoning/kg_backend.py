@@ -43,6 +43,7 @@ class RuntimeKGBackend:
     def __init__(self, parquet_backend: ParquetKGQueryBackend) -> None:
         self._backend = parquet_backend
         self._columns = {str(column) for column in parquet_backend.records_df.columns}
+        self._org_resolver: RecordsOrgResolver | None = None
 
     @classmethod
     def from_directory(cls, kg_dir: Path | str, *, include_evidence: bool = False) -> "RuntimeKGBackend":
@@ -69,6 +70,23 @@ class RuntimeKGBackend:
         """Matching rows with only `fields` (cheap aggregation over a large match set)."""
         return self._backend.project(self._translate_all(constraints), fields)
 
+    def distinct(self, constraints: tuple[QueryConstraint, ...], field: str) -> tuple[Any, ...]:
+        """Distinct non-empty values for a single field."""
+        distinct = getattr(self._backend, "distinct", None)
+        if distinct is not None:
+            return distinct(self._translate_all(constraints), field)
+        rows = self.project(constraints, [field])
+        return tuple(sorted({row.get(field) for row in rows if row.get(field) not in (None, "")}, key=str))
+
+    def top_k(self, constraints: tuple[QueryConstraint, ...], *, group_by: str, k: int,
+              metric: str = "count", metric_field: str = "value_amount",
+              dedupe_field: str = "contract_node_id") -> dict[str, Any]:
+        top_k = getattr(self._backend, "top_k", None)
+        if top_k is None:
+            return {"passed": False, "reason": "backend_top_k_unavailable", "answer": [], "groups": 0}
+        return top_k(self._translate_all(constraints), group_by=group_by, k=k, metric=metric,
+                     metric_field=metric_field, dedupe_field=dedupe_field)
+
     def _translate_all(self, constraints: tuple[QueryConstraint, ...]) -> tuple[BenchConstraint, ...]:
         translated: list[BenchConstraint] = []
         for constraint in constraints:
@@ -76,7 +94,9 @@ class RuntimeKGBackend:
         return tuple(translated)
 
     def org_resolver(self) -> "RecordsOrgResolver":
-        return RecordsOrgResolver(self._backend)
+        if self._org_resolver is None:
+            self._org_resolver = RecordsOrgResolver(self._backend)
+        return self._org_resolver
 
     def candidate_retriever(self, fields: tuple[str, ...] | None = None) -> LexicalTopKCandidateRetriever:
         """Build a local top-k retriever over text fields.

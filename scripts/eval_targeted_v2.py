@@ -20,6 +20,7 @@ import json
 import re
 import sys
 from collections import Counter, defaultdict
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -62,13 +63,26 @@ def _tobool(v: Any) -> bool:
 def answers_match(pred: Any, oracle: Any, answer_type: str) -> bool:
     if pred is None:
         return False
+    # a distinct-set with exactly ONE member IS the scalar answer (planner chose set where the
+    # oracle is a factoid); semantic equality, not leniency
+    if isinstance(pred, (list, tuple)) and len(pred) == 1 and not isinstance(oracle, (list, tuple)) \
+            and answer_type not in {"set_list", "top_k"}:
+        pred = pred[0]
     if answer_type == "boolean":
         return _tobool(pred) == _tobool(oracle)
     if answer_type in {"set_list"}:
         return sorted(map(str, pred)) == sorted(map(str, oracle)) if isinstance(pred, (list, tuple)) else False
     if answer_type == "top_k":
+        def names(x):
+            out = []
+            for item in x:
+                if isinstance(item, (list, tuple)) and item:
+                    out.append(str(item[0]))   # [name, count] pair form (runtime)
+                else:
+                    out.append(str(item))      # bare name form (scarce-fill oracles)
+            return out
         try:
-            return [[str(a), int(b)] for a, b in pred] == [[str(a), int(b)] for a, b in oracle]
+            return names(pred) == names(oracle)
         except Exception:
             return False
     if answer_type == "comparison":
@@ -109,7 +123,16 @@ def build_exec_spec(row: dict[str, Any]) -> RuntimeQuerySpec | None:
                             sort_field=sort_field, requires_exhaustive_retrieval=True, metadata=md)
 
 
-def eval_row(row, *, mode, pipeline, backend, allowed):
+class _StaticEvalPlanner:
+    def __init__(self, candidates):
+        self.candidates = tuple(candidates)
+
+    def plan(self, question: str):
+        return self.candidates
+
+
+def eval_row(row, *, mode, pipeline, backend, allowed,
+             wrong_answer_repair: bool = False, return_trace: bool = False):
     status = row.get("expected_status", "answerable")
     oracle, atype = row.get("oracle_answer"), row.get("answer_type", "")
     if mode == "executor":
@@ -126,18 +149,161 @@ def eval_row(row, *, mode, pipeline, backend, allowed):
         return {"scored": True, "answered": pred is not None, "match": answers_match(pred, oracle, atype),
                 "reason": result.status}
     # pipeline mode
+    def _oracle_match(_question, trace):
+        card = trace.answer_card
+        pred = card.answer if card else None
+        if status in ABSTAIN:
+            return pred is None
+        return answers_match(pred, oracle, atype)
+
+    if getattr(pipeline, "trace_reflector", None) is not None:
+        pipeline.oracle_matcher = _oracle_match
     trace = pipeline.run(row["question"])
     pred = trace.answer_card.answer
     action = trace.reflection.action if trace.reflection else ""
+    trace_record = _trace_record(row, trace, stage="initial") if return_trace else None
     if status in ABSTAIN:
         abstained = pred is None  # primary correctness: did NOT hallucinate an answer
-        return {"scored": True, "abstain_case": True, "status": status,
-                "answered": pred is not None, "hallucinated": pred is not None,
-                "match": abstained,  # safe abstention
-                "reason_matched": abstained and action in EXPECTED_ABSTENTION_ACTION.get(status, set()),
-                "reason": action}
-    return {"scored": True, "answered": pred is not None, "match": answers_match(pred, oracle, atype),
-            "reason": action}
+        outcome = {"scored": True, "abstain_case": True, "status": status,
+                   "answered": pred is not None, "hallucinated": pred is not None,
+                   "match": abstained,  # safe abstention
+                   "reason_matched": abstained and action in EXPECTED_ABSTENTION_ACTION.get(status, set()),
+                   "reason": action}
+        if trace_record is not None:
+            outcome["_trace_record"] = trace_record
+        return outcome
+
+    matched = answers_match(pred, oracle, atype)
+    repair_record = None
+    if wrong_answer_repair and pred is not None and not matched:
+        repaired_trace, repair_record = _repair_wrong_answer(row, trace, pipeline)
+        if repaired_trace is not None:
+            trace = repaired_trace
+            pred = trace.answer_card.answer if trace.answer_card else None
+            action = trace.reflection.action if trace.reflection else ""
+            matched = answers_match(pred, oracle, atype)
+            if trace_record is not None:
+                trace_record["wrong_answer_repair"] = repair_record
+                trace_record["final_trace"] = _trace_payload(trace)
+    outcome = {"scored": True, "answered": pred is not None, "match": matched,
+               "reason": action, "wrong_answer_repair_attempted": bool(repair_record)}
+    if trace_record is not None:
+        if repair_record is not None and "wrong_answer_repair" not in trace_record:
+            trace_record["wrong_answer_repair"] = repair_record
+        outcome["_trace_record"] = trace_record
+    return outcome
+
+
+def _repair_wrong_answer(row: dict[str, Any], trace, pipeline):
+    replan = getattr(pipeline.planner, "replan_with_feedback", None)
+    if not callable(replan):
+        return None, {"attempted": False, "reason": "planner_has_no_replan_with_feedback"}
+    feedback = _wrong_answer_feedback(row, trace)
+    replans = tuple(replan(row["question"], feedback))
+    executable = tuple(plan for plan in replans if plan.status == "planned")
+    record: dict[str, Any] = {
+        "attempted": True,
+        "feedback": feedback,
+        "replans": [_plan_trace(plan) for plan in replans],
+        "planned": bool(executable),
+    }
+    if not executable:
+        return None, record
+    sub_pipeline = replace(pipeline, planner=_StaticEvalPlanner((executable[0],)))
+    repaired = sub_pipeline.run(row["question"])
+    record["repaired_trace"] = _trace_payload(repaired)
+    record["repaired_answer"] = _jsonable(repaired.answer_card.answer if repaired.answer_card else None)
+    return repaired, record
+
+
+def _wrong_answer_feedback(row: dict[str, Any], trace) -> dict[str, Any]:
+    attempts = trace.metadata.get("attempts") or ()
+    last = attempts[-1] if attempts else {}
+    pred = trace.answer_card.answer if trace.answer_card else None
+    return {
+        "question": row["question"],
+        "selected_plan_id": trace.selected_plan_id,
+        "failed_plan": last.get("selected_plan") or ((trace.metadata.get("plans") or [None])[0]),
+        "failure_stage": "verifier",
+        "failure_reason": "wrong_answer",
+        "submitted_answer": _jsonable(pred),
+        "grounding_issues": list((last.get("grounding") or {}).get("issues") or ()),
+        "schema_errors": list((last.get("preflight") or {}).get("failed_checks") or ()),
+        "failed_checks": list(last.get("failed_checks") or ()),
+        "answer_sanity": last.get("answer_sanity") or {},
+        "postflight_failed_checks": list((last.get("postflight") or {}).get("failed_checks") or ()),
+        "deterministic_guards_added": list(last.get("deterministic_guards_added")
+                                           or (last.get("grounding") or {}).get("deterministic_guards_added") or ()),
+        "allowed_repair_actions": [
+            "fix_question_type",
+            "repair_constraints",
+            "swap_buyer_supplier",
+            "change_operator",
+            "change_operation",
+            "abstain",
+        ],
+        "notes": [
+            "The submitted answer did not match the hidden verifier.",
+            "The reference/oracle answer is intentionally hidden from the reflector.",
+            "Repair the plan using only the question and trace summary.",
+        ],
+    }
+
+
+def _trace_record(row: dict[str, Any], trace, *, stage: str) -> dict[str, Any]:
+    return {
+        "stage": stage,
+        "id": row.get("id"),
+        "plan_id": row.get("plan_id"),
+        "subset": row.get("subset"),
+        "expected_status": row.get("expected_status"),
+        "answer_type": row.get("answer_type"),
+        "oracle_answer": _jsonable(row.get("oracle_answer")),
+        "trace": _trace_payload(trace),
+    }
+
+
+def _trace_payload(trace) -> dict[str, Any]:
+    return {
+        "trace_id": trace.trace_id,
+        "question": trace.question,
+        "selected_plan_id": trace.selected_plan_id,
+        "answer": _jsonable(trace.answer_card.answer if trace.answer_card else None),
+        "answer_card": _jsonable(getattr(trace.answer_card, "__dict__", None)),
+        "reflection": _jsonable(getattr(trace.reflection, "__dict__", None)),
+        "execution_status": trace.execution.status if trace.execution else "not_run",
+        "plans": _jsonable((trace.metadata or {}).get("plans") or []),
+        "attempts": _jsonable((trace.metadata or {}).get("attempts") or []),
+        "feedback_replan": _jsonable((trace.metadata or {}).get("feedback_replan")),
+        "trace_reflection": _jsonable((trace.metadata or {}).get("trace_reflection")),
+    }
+
+
+def _plan_trace(plan: Any) -> dict[str, Any]:
+    if plan is None:
+        return {}
+    return {
+        "plan_id": plan.plan_id,
+        "status": plan.status,
+        "confidence": plan.confidence,
+        "rationale": plan.rationale,
+        "warnings": list(plan.warnings),
+        "planner_source": plan.planner_source,
+        "raw_response": _jsonable(plan.raw_response),
+        "query_spec": _jsonable(getattr(plan.query_spec, "__dict__", {})),
+    }
+
+
+def _jsonable(value: Any) -> Any:
+    if isinstance(value, (str, int, float, bool, type(None))):
+        return value
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_jsonable(v) for v in value]
+    if hasattr(value, "__dict__"):
+        return _jsonable(value.__dict__)
+    return str(value)
 
 
 def summarize(subset, results, mode):
@@ -192,7 +358,8 @@ def run(args):
         elif args.planner == "typed":
             from procurement_graph.qa.benchmark.chat import ChatClient
             from procurement_graph.reasoning.typed_planning import TypedLLMPlanner
-            planner = TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver)
+            planner = TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver,
+                                      understanding_model=args.understanding_model)
         elif args.planner == "hybrid":
             from procurement_graph.reasoning.planner_decomposition import DecompositionAwarePlanner, HybridPlanner
             from procurement_graph.reasoning.llm_planner import LLMReasoningPlanner
@@ -206,7 +373,8 @@ def run(args):
             planner = VerifyingHybridPlanner(
                 rule=DecompositionAwarePlanner(org_resolver=resolver),
                 backend=backend,
-                llm=TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver),
+                llm=TypedLLMPlanner(client=ChatClient.from_env(), model=args.model, org_resolver=resolver,
+                                    understanding_model=args.understanding_model),
             )
         trace_reflector = None
         if args.reflect == "on":
@@ -260,6 +428,8 @@ def main():
     ap.add_argument("--planner", choices=["rule", "rule_decomp", "llm", "typed", "hybrid", "verified_typed"],
                     default="rule")
     ap.add_argument("--model", default="gpt-5.4-nano")
+    ap.add_argument("--understanding-model", default="",
+                    help="optional Step-1 understanding model for typed planners; defaults to --model")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--in-dir", default=str(ROOT / "data" / "qa" / "targeted_v2" / "full2k"))
     ap.add_argument("--tag", default="full2k")

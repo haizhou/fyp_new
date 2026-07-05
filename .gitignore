@@ -78,8 +78,19 @@ Thumbs.db
 data/*
 !data/kg/
 !data/kg/**
+# QA: whitelist only current-generation artifacts (server + thesis needs).
+# Legacy dirs (_archive 299M, old merged/generated pools) stay local-only.
 !data/qa/
-!data/qa/**
+data/qa/*
+!data/qa/cicada_core_v4/
+!data/qa/cicada_core_v4/**
+!data/qa/eval/
+!data/qa/eval/**
+!data/qa/teacher_full_v1/
+!data/qa/teacher_full_v1/**
+# LLaMA-Factory training exports (server clones train directly from these)
+!data/training/
+!data/training/**
 !data/entities/
 data/entities/*
 !data/entities/alias_map.parquet
@@ -87,7 +98,9 @@ data/entities/*
 !data/entities/er_audit.csv
 logs/
 tmp/
+.tmp/
 reports/
+outputs/
 
 # Databases
 *.sqlite3

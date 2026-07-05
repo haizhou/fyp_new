@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CICADA — Verifiable Procurement Answers</title>
+<style>
+  :root {
+    --ink:#211d33; --dim:#716c85; --faint:#a29dbb;
+    --panel:rgba(255,255,255,.72); --card:#ffffff; --line:#e9e5f4;
+    --grad:linear-gradient(135deg,#7c5cf6 0%,#c05cf0 55%,#f0619e 100%);
+    --violet:#7c5cf6; --pink:#f0619e;
+    --ok:#0e9f6e; --ok-bg:#e4f7ef; --warn:#c98a06; --warn-bg:#fdf3dd;
+    --bad:#dc2626; --bad-bg:#fdeaea;
+    --shadow:0 10px 34px rgba(94,70,160,.10);
+    --r:18px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body {
+    font:15px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:#f3eef8 fixed;
+    background-image:
+      radial-gradient(900px 620px at 42% -8%, rgba(244,114,142,.38), transparent 62%),
+      radial-gradient(820px 600px at 88% 18%, rgba(124,92,246,.26), transparent 60%),
+      radial-gradient(760px 560px at 8% 78%, rgba(96,165,250,.22), transparent 60%),
+      radial-gradient(600px 480px at 70% 96%, rgba(240,97,158,.16), transparent 65%);
+  }
+  #app { display:flex; height:100vh; overflow:hidden; }
+
+  /* ---------------- sidebar ---------------- */
+  aside {
+    width:284px; flex:0 0 284px; display:flex; flex-direction:column; gap:14px;
+    padding:22px 16px 16px; background:var(--panel); backdrop-filter:blur(18px);
+    border-right:1px solid rgba(255,255,255,.65); box-shadow:2px 0 24px rgba(94,70,160,.05);
+    z-index:20; transition:margin-left .25s ease;
+  }
+  .brand { padding:0 6px; }
+  .brand h1 { font-size:23px; letter-spacing:.6px; font-weight:800; }
+  .brand h1 em { font-style:normal; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .brand p { font-size:12.5px; color:var(--dim); margin-top:2px; }
+  #newChat {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--grad); color:#fff; border:0; border-radius:14px; padding:12px;
+    font-size:14.5px; font-weight:600; cursor:pointer; box-shadow:0 6px 18px rgba(150,80,220,.35);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  #newChat:hover { transform:translateY(-1px); box-shadow:0 9px 22px rgba(150,80,220,.45); }
+  .hist-label { font-size:11px; font-weight:700; letter-spacing:1.4px; color:var(--faint);
+                text-transform:uppercase; padding:4px 8px 0; }
+  #hist { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:4px; padding-right:2px; }
+  .hist-item {
+    position:relative; padding:10px 30px 10px 12px; border-radius:12px; cursor:pointer;
+    font-size:13.5px; color:var(--ink); border:1px solid transparent;
+  }
+  .hist-item .t { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+  .hist-item .d { font-size:11.5px; color:var(--faint); }
+  .hist-item:hover { background:rgba(255,255,255,.85); }
+  .hist-item.active { background:#fff; border-color:var(--line); box-shadow:var(--shadow); }
+  .hist-item .del {
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    border:0; background:none; color:var(--faint); font-size:15px; cursor:pointer;
+    padding:2px 4px; border-radius:6px; display:none;
+  }
+  .hist-item:hover .del { display:block; }
+  .hist-item .del:hover { color:var(--bad); background:var(--bad-bg); }
+  .side-foot { font-size:11.5px; color:var(--faint); padding:8px 6px 0; border-top:1px solid rgba(255,255,255,.8); }
+
+  /* ---------------- main column ---------------- */
+  main { flex:1; display:flex; flex-direction:column; min-width:0; }
+  #topbar { display:none; padding:12px 16px 0; }
+  #menuBtn { border:1px solid var(--line); background:#fff; border-radius:10px; padding:6px 12px;
+             font-size:16px; cursor:pointer; color:var(--dim); }
+  #scroll { flex:1; overflow-y:auto; scroll-behavior:smooth; }
+  #thread { max-width:860px; margin:0 auto; padding:34px 26px 20px; display:flex; flex-direction:column; gap:22px; }
+
+  /* hero / empty state */
+  #hero { max-width:760px; margin:0 auto; padding:9vh 26px 40px; text-align:center; }
+  #hero h2 { font-size:clamp(28px,4.2vw,42px); line-height:1.2; font-weight:800; letter-spacing:-.5px; }
+  #hero h2 em { font-style:normal; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  #hero p.sub { color:var(--dim); font-size:16px; margin:14px auto 6px; max-width:560px; }
+  .stats { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:18px 0 26px; }
+  .stat { background:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.9); border-radius:30px;
+          padding:7px 16px; font-size:13px; color:var(--dim); backdrop-filter:blur(8px); }
+  .stat b { color:var(--ink); font-weight:700; }
+  .examples { display:flex; flex-direction:column; gap:10px; max-width:600px; margin:0 auto; }
+  .examples button {
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px 18px;
+    font-size:14px; color:var(--ink); text-align:left; cursor:pointer; box-shadow:0 3px 14px rgba(94,70,160,.06);
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .examples button:hover { transform:translateY(-1px); border-color:#d5c8f5; box-shadow:var(--shadow); }
+  .examples button::before { content:"↗ "; color:var(--violet); font-weight:700; }
+
+  /* messages */
+  .msg-user { align-self:flex-end; max-width:78%; background:var(--grad); color:#fff;
+              padding:12px 18px; border-radius:20px 20px 6px 20px; font-size:15px;
+              box-shadow:0 6px 18px rgba(150,80,220,.28); white-space:pre-wrap; }
+  .msg-bot { align-self:stretch; background:var(--card); border:1px solid var(--line);
+             border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden; }
+  .bot-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:14px 20px 0; }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+          border-radius:30px; padding:4px 12px; }
+  .pill.ok   { background:var(--ok-bg); color:var(--ok); }
+  .pill.warn { background:var(--warn-bg); color:var(--warn); }
+  .pill.bad  { background:var(--bad-bg); color:var(--bad); }
+  .pill.mut  { background:#f2effb; color:var(--dim); font-weight:500; }
+  .answer-wrap { padding:14px 20px 6px; }
+  .answer-big { font-size:30px; font-weight:800; letter-spacing:-.4px; }
+  .answer-big.small { font-size:20px; font-weight:700; }
+  .answer-cap { color:var(--dim); font-size:14px; margin-top:4px; }
+  .answer-abstain { font-size:18px; font-weight:600; color:var(--warn); }
+  .yesno { display:inline-flex; align-items:center; gap:10px; font-size:26px; font-weight:800; }
+  .yesno .dot { width:34px; height:34px; border-radius:50%; display:inline-flex; align-items:center;
+                justify-content:center; color:#fff; font-size:18px; }
+  .ranklist { list-style:none; margin-top:6px; }
+  .ranklist li { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); }
+  .ranklist li:last-child { border-bottom:0; }
+  .rank-n { width:30px; height:30px; border-radius:10px; background:#f2effb; color:var(--violet);
+            font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; flex:0 0 30px; }
+  .ranklist li:first-child .rank-n { background:var(--grad); color:#fff; }
+  .rank-name { flex:1; font-weight:600; font-size:14.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rank-val { color:var(--dim); font-size:13.5px; }
+  .chipset { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .chip { background:#f2effb; color:#4c3f80; border-radius:30px; padding:5px 14px; font-size:13px; font-weight:500; }
+  .lims { padding:0 20px 4px; }
+  .lim { font-size:13px; color:var(--dim); padding:3px 0; }
+  .lim::before { content:"ⓘ "; color:var(--faint); }
+
+  /* evidence */
+  .section { border-top:1px solid var(--line); padding:12px 20px 16px; }
+  .sec-title { font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+               color:var(--faint); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .tblwrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; }
+  table.ev { width:100%; border-collapse:collapse; font-size:13px; min-width:640px; }
+  table.ev th { text-align:left; font-size:11px; letter-spacing:.8px; text-transform:uppercase;
+                color:var(--faint); font-weight:700; padding:9px 12px; background:#faf8fe;
+                border-bottom:1px solid var(--line); white-space:nowrap; }
+  table.ev td { padding:9px 12px; border-bottom:1px solid #f2eff9; vertical-align:top; }
+  table.ev tr:last-child td { border-bottom:0; }
+  td.ev-title { max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink); font-weight:500; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .cat { display:inline-block; border-radius:8px; padding:2px 9px; font-size:11.5px; font-weight:600; }
+  .cat.goods    { background:#e8f0fe; color:#2456c4; }
+  .cat.services { background:#e4f7ef; color:#0d7a56; }
+  .cat.works    { background:#fdf3dd; color:#9a6b03; }
+
+  /* reasoning */
+  details.reason > summary {
+    list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:600; color:var(--violet); user-select:none;
+  }
+  details.reason > summary::-webkit-details-marker { display:none; }
+  details.reason > summary .tw { transition:transform .15s ease; display:inline-block; }
+  details.reason[open] > summary .tw { transform:rotate(90deg); }
+  .steps { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+  details.step { background:#faf9fe; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  details.step > summary { list-style:none; cursor:pointer; display:flex; align-items:center; gap:12px;
+                           padding:11px 14px; user-select:none; }
+  details.step > summary::-webkit-details-marker { display:none; }
+  .step-n { width:26px; height:26px; border-radius:9px; background:var(--grad); color:#fff;
+            font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 26px; }
+  .step-t { font-weight:600; font-size:14px; }
+  .step-sub { color:var(--dim); font-size:12.5px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .step-state { font-size:13px; }
+  .step-body { padding:2px 16px 14px 52px; font-size:13.5px; }
+  .kv { display:grid; grid-template-columns:130px 1fr; gap:4px 14px; }
+  .kv dt { color:var(--faint); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; padding-top:2px; }
+  .kv dd { color:var(--ink); white-space:pre-wrap; }
+  .plan-var { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 14px; margin-bottom:8px; }
+  .plan-var .pv-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .pv-id { background:#efeafd; color:var(--violet); font-weight:700; font-size:12px;
+           border-radius:8px; padding:2px 9px; }
+  .pv-kind { color:var(--dim); font-size:12.5px; }
+  .pv-dep { margin-left:auto; color:var(--faint); font-size:12px; }
+  .fchip { display:inline-block; background:#f5f3fb; border:1px solid #e6e1f5; border-radius:8px;
+           padding:3px 10px; font-size:12.5px; margin:2px 4px 2px 0; color:#3d3560; }
+  .fchip b { color:var(--violet); font-weight:600; }
+  .plan-return { display:flex; align-items:center; gap:10px; background:#efeafd; border-radius:12px;
+                 padding:10px 14px; font-size:13.5px; font-weight:600; color:#4c3f80; }
+  .vrow { display:flex; align-items:center; gap:10px; padding:5px 0; font-size:13.5px; }
+  .vrow .ic { width:20px; text-align:center; }
+  .vrow.pass .ic { color:var(--ok); } .vrow.fail .ic { color:var(--bad); }
+  .vrow .meta { color:var(--faint); font-size:12.5px; margin-left:auto; white-space:nowrap; }
+
+  /* composer */
+  #composer { padding:14px 26px 22px; }
+  .comp-inner { max-width:860px; margin:0 auto; display:flex; gap:10px; background:#fff;
+                border:1px solid var(--line); border-radius:20px; padding:8px 8px 8px 20px;
+                box-shadow:0 12px 40px rgba(94,70,160,.14); align-items:center; }
+  .comp-inner:focus-within { border-color:#c9b8f5; box-shadow:0 12px 40px rgba(124,92,246,.20); }
+  #q { flex:1; border:0; outline:0; font-size:15px; font-family:inherit; background:none; color:var(--ink);
+       resize:none; max-height:120px; line-height:1.5; padding:8px 0; }
+  #send { background:var(--grad); border:0; color:#fff; width:42px; height:42px; border-radius:14px;
+          font-size:17px; cursor:pointer; flex:0 0 42px; box-shadow:0 5px 14px rgba(150,80,220,.35);
+          transition:transform .12s ease; display:flex; align-items:center; justify-content:center; }
+  #send:hover { transform:translateY(-1px); }
+  #send:disabled { opacity:.45; transform:none; cursor:default; }
+  .comp-note { text-align:center; color:var(--faint); font-size:11.5px; margin-top:8px; }
+
+  /* thinking indicator */
+  .thinking { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--line);
+              border-radius:var(--r); padding:16px 20px; box-shadow:var(--shadow); color:var(--dim); font-size:14px; }
+  .orbs { display:flex; gap:5px; }
+  .orbs i { width:8px; height:8px; border-radius:50%; background:var(--violet); opacity:.35;
+            animation:pulse 1.2s infinite ease-in-out; }
+  .orbs i:nth-child(2) { animation-delay:.2s; background:#c05cf0; }
+  .orbs i:nth-child(3) { animation-delay:.4s; background:var(--pink); }
+  @keyframes pulse { 0%,100% { opacity:.25; transform:scale(.85);} 50% { opacity:1; transform:scale(1.15);} }
+
+  @media (max-width:860px) {
+    aside { position:fixed; left:0; top:0; bottom:0; margin-left:-300px; }
+    aside.open { margin-left:0; box-shadow:0 0 60px rgba(40,20,80,.25); }
+    #topbar { display:flex; }
+    #thread { padding:20px 14px; }
+    #composer { padding:10px 14px 16px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="side">
+    <div class="brand">
+      <h1>CICADA<em>.</em></h1>
+      <p>Verifiable answers over UK public procurement</p>
+    </div>
+    <button id="newChat">＋ New conversation</button>
+    <div class="hist-label">History</div>
+    <div id="hist"></div>
+    <div class="side-foot">215,221 contract notices · every answer executed &amp; verified on the knowledge graph</div>
+  </aside>
+
+  <main>
+    <div id="topbar"><button id="menuBtn">☰</button></div>
+    <div id="scroll">
+      <div id="hero">
+        <h2>Ask anything about<br><em>UK public procurement</em></h2>
+        <p class="sub">CICADA plans a query over the contract-notice knowledge graph, executes it, and verifies the result — so every answer comes with evidence, not vibes.</p>
+        <div class="stats">
+          <div class="stat"><b>215,221</b> contract notices</div>
+          <div class="stat"><b>Verified</b> execution chain</div>
+          <div class="stat"><b>Evidence</b> with every answer</div>
+        </div>
+        <div class="examples" id="examples">
+          <button>How many contract notices were published in 2024 under CPV 85149000?</button>
+          <button>What is the total value of goods contract notices published in 2025?</button>
+          <button>How many contract notices are there for CPV codes that the UNIVERSITY OF MANCHESTER has used before?</button>
+          <button>Which three buyers published the most services contract notices in 2024?</button>
+          <button>What invoice or payment date is shown for the contract awarded to A. CONNOLLY LIMITED?</button>
+        </div>
+      </div>
+      <div id="thread"></div>
+    </div>
+    <div id="composer">
+      <div class="comp-inner">
+        <textarea id="q" rows="1" placeholder="Ask about buyers, suppliers, CPV codes, values…"></textarea>
+        <button id="send" title="Ask">➤</button>
+      </div>
+      <div class="comp-note">Answers are computed live on the knowledge graph and checked by the verifier. CICADA abstains when it cannot answer verifiably.</div>
+    </div>
+  </main>
+</div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------------- chat storage (localStorage) ---------------- */
+const STORE = "cicada.chats.v1";
+let chats = [];
+try { chats = JSON.parse(localStorage.getItem(STORE) || "[]"); } catch (e) { chats = []; }
+let current = null;          // {id, title, ts, turns:[{q, resp}]}
+
+function saveChats() {
+  try { localStorage.setItem(STORE, JSON.stringify(chats.slice(0, 60))); } catch (e) {}
+}
+function relTime(ts) {
+  const m = Math.round((Date.now() - ts) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return m + " min ago";
+  const h = Math.round(m / 60);
+  if (h < 24) return h + " h ago";
+  return new Date(ts).toLocaleDateString();
+}
+function renderHist() {
+  $("#hist").innerHTML = chats.map(c => `
+    <div class="hist-item ${current && c.id === current.id ? "active" : ""}" data-id="${c.id}">
+      <span class="t">${esc(c.title)}</span><span class="d">${relTime(c.ts)} · ${c.turns.length} question${c.turns.length > 1 ? "s" : ""}</span>
+      <button class="del" title="Delete" data-del="${c.id}">×</button>
+    </div>`).join("");
+}
+$("#hist").addEventListener("click", e => {
+  const del = e.target.closest("[data-del]");
+  if (del) {
+    chats = chats.filter(c => c.id !== del.dataset.del);
+    if (current && current.id === del.dataset.del) newChat();
+    saveChats(); renderHist(); return;
+  }
+  const item = e.target.closest(".hist-item");
+  if (item) loadChat(item.dataset.id);
+});
+function newChat() {
+  current = null;
+  $("#thread").innerHTML = "";
+  $("#hero").style.display = "";
+  renderHist();
+  $("#side").classList.remove("open");
+  $("#q").focus();
+}
+function loadChat(id) {
+  const c = chats.find(x => x.id === id);
+  if (!c) return;
+  current = c;
+  $("#hero").style.display = "none";
+  $("#thread").innerHTML = "";
+  c.turns.forEach(t => { addUser(t.q); addBot(t.resp); });
+  renderHist();
+  $("#side").classList.remove("open");
+  $("#scroll").scrollTop = $("#scroll").scrollHeight;
+}
+$("#newChat").onclick = newChat;
+$("#menuBtn").onclick = () => $("#side").classList.toggle("open");
+
+/* ---------------- formatting helpers ---------------- */
+const nf = new Intl.NumberFormat("en-GB");
+const money = v => "£" + new Intl.NumberFormat("en-GB", { maximumFractionDigits: 2 }).format(Number(v));
+const slotLabel = { category:"Category", cpv:"CPV code", year:"Year", buyer:"Buyer", supplier:"Supplier",
+  title:"Title", amount:"Value", value:"Value", date:"Date", org:"Organisation", role:"Role",
+  tender_category:"Category", tender_cpv_id:"CPV code", release_year:"Year", buyer_name:"Buyer",
+  supplier_name:"Supplier", value_amount:"Value", tender_title:"Title", award_date_signed:"Award date" };
+const opLabel = { eq:"is", neq:"is not", gte:"≥", lte:"≤", gt:">", lt:"<", contains:"contains",
+  in:"is one of", between:"between", in_subquery:"comes from" };
+const kindLabel = { record_set:"Contract records", entity_set:"Entity set", scalar:"Value", literal:"Literal" };
+const prettyKey = k => esc(String(k).replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()));
+
+function isMoneyAnswer(d) {
+  const r = (((d.chain || {}).compiled_plan) || {}).return || {};
+  const f = `${r.metric || ""} ${r.field || ""} ${r.operation || ""}`;
+  return /sum|amount|value/.test(f) && !/count/.test(String(r.metric || r.operation));
+}
+
+/* ---------------- answer rendering ---------------- */
+function answerHTML(d) {
+  if (d.abstained) {
+    return `<div class="answer-abstain">⚠ ${esc(d.answer_text || "CICADA abstains — this cannot be answered verifiably from the data.")}</div>`;
+  }
+  const a = d.answer;
+  const cap = d.answer_text ? `<div class="answer-cap">${esc(d.answer_text)}</div>` : "";
+  if (typeof a === "boolean") {
+    return `<div class="yesno"><span class="dot" style="background:${a ? "var(--ok)" : "var(--bad)"}">${a ? "✓" : "✕"}</span>${a ? "Yes" : "No"}</div>${cap}`;
+  }
+  if (typeof a === "number") {
+    const big = isMoneyAnswer(d) ? money(a) : nf.format(a);
+    return `<div class="answer-big">${esc(big)}</div>${cap}`;
+  }
+  if (Array.isArray(a)) {
+    if (a.length && Array.isArray(a[0]) && a[0].length === 2) {
+      const isM = isMoneyAnswer(d);
+      return `<ol class="ranklist">${a.map(([n, v]) => `
+        <li><span class="rank-n"></span><span class="rank-name" title="${esc(n)}">${esc(n)}</span>
+        <span class="rank-val">${esc(isM ? money(v) : nf.format(v))}${isM ? "" : " notices"}</span></li>`).join("")}</ol>${cap}`;
+    }
+    if (a.length > 8) {
+      return `<div class="answer-big small">${nf.format(a.length)} results</div>
+              <div class="chipset">${a.slice(0, 8).map(x => `<span class="chip">${esc(x)}</span>`).join("")}
+              <span class="chip">＋${nf.format(a.length - 8)} more</span></div>${cap}`;
+    }
+    return `<div class="chipset">${a.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>${cap}`;
+  }
+  if (a && typeof a === "object") {
+    return `<div class="answer-big small">${esc(Object.entries(a).map(([k, v]) => `${k}: ${v}`).join(" · "))}</div>${cap}`;
+  }
+  return `<div class="answer-big small">${esc(a)}</div>${cap}`;
+}
+
+/* ---------------- reasoning chain rendering ---------------- */
+const BRIEF_LABELS = { answer_type:"Answer type", question_type:"Answer type", query_template:"Strategy",
+  explicit_info:"Facts from the question", known_information:"Facts from the question",
+  reverse_tree:"Dependency chain", procedure:"Procedure", reasoning_chain:"Procedure",
+  targets:"Intermediate sets", roles_direction:"Organisation roles", role_direction:"Organisation roles",
+  ambiguities:"Ambiguities", missing_or_unsupported_information:"Ambiguities",
+  needs_to_return:"Needs to return", notes_for_planner:"Planner notes", briefing:"Briefing" };
+
+function briefingHTML(b) {
+  if (!b) return `<span style="color:var(--faint)">Briefing not captured for this run.</span>`;
+  if (typeof b === "string") return `<div class="kv"><dt>Briefing</dt><dd>${esc(b)}</dd></div>`;
+  const rows = Object.entries(b)
+    .filter(([k, v]) => BRIEF_LABELS[k] && String(v ?? "").trim() && !/^(none|n\/a)$/i.test(String(v).trim()))
+    .map(([k, v]) => `<dt>${BRIEF_LABELS[k]}</dt><dd>${esc(typeof v === "string" ? v : JSON.stringify(v, null, 1))}</dd>`);
+  return rows.length ? `<dl class="kv">${rows.join("")}</dl>`
+                     : `<span style="color:var(--faint)">Briefing not captured for this run.</span>`;
+}
+
+function filterChips(v) {
+  const chips = (v.filters || [])
+    .filter(f => f && String(f.value ?? "") !== "" && f.slot !== "none")
+    .map(f => `<span class="fchip">${esc(slotLabel[f.slot] || prettyKey(f.slot))} <b>${esc(opLabel[f.operator || f.op] || f.operator || "=")}</b> ${esc(f.value)}</span>`);
+  return chips.join("") || `<span class="fchip">no filters — all records</span>`;
+}
+
+function returnSentence(r) {
+  if (!r) return "";
+  const fld = f => slotLabel[f] || prettyKey(f || "");
+  switch (r.operation) {
+    case "count":        return `Count the records in ${r.input}`;
+    case "sum":          return `Sum contract value over ${r.input}`;
+    case "exists":       return `Check whether any record exists in ${r.input}`;
+    case "select":       return `Read ${fld(r.field)} from ${r.input}`;
+    case "distinct_set": return `List the distinct ${fld(r.field)} values in ${r.input}`;
+    case "argmax":       return `Take the record with the highest ${fld(r.metric)} in ${r.input}`;
+    case "argmin":       return `Take the record with the lowest ${fld(r.metric)} in ${r.input}`;
+    case "top_k":        return `Rank ${fld(r.group_by)} in ${r.input} by ${r.metric === "amount" ? "total value" : "number of notices"}, keep the top ${r.k}`;
+    case "compare":      return `Compare ${r.left} vs ${r.right} (${r.comparator || "?"}${r.metric && r.metric !== "none" ? ", by " + r.metric : ""})`;
+    case "abstain":      return "Abstain — the question cannot be answered from this data";
+    default:             return r.operation || "";
+  }
+}
+
+function planHTML(p) {
+  if (!p) return `<span style="color:var(--faint)">No compiled plan (the pipeline abstained before planning).</span>`;
+  const vars = (p.variables || []).map(v => {
+    const deps = (v.depends_on || []).filter(Boolean);
+    return `<div class="plan-var">
+      <div class="pv-head"><span class="pv-id">${esc(v.var_id)}</span>
+        <span class="pv-kind">${esc(kindLabel[v.kind] || v.kind)}${v.role && v.role !== "contract_records" && v.role !== "none" ? " · " + esc(prettyKey(v.role)) : ""}</span>
+        ${deps.length ? `<span class="pv-dep">built from ${esc(deps.join(", "))}</span>` : ""}</div>
+      ${filterChips(v)}</div>`;
+  }).join("");
+  return `${vars}<div class="plan-return">🎯 ${esc(returnSentence(p.return))}</div>`;
+}
+
+function execHTML(vars) {
+  if (!vars || !vars.length) return `<span style="color:var(--faint)">No execution (abstained before running).</span>`;
+  return vars.map(v => `
+    <div class="vrow ${v.status === "passed" ? "pass" : "fail"}">
+      <span class="ic">${v.status === "passed" ? "✓" : "✕"}</span>
+      <span><b>${esc(v.var_id)}</b> · ${esc(kindLabel[v.kind] || v.kind)}</span>
+      <span class="meta">${v.output_size != null ? nf.format(v.output_size) + " rows" : ""}</span>
+    </div>`).join("");
+}
+
+function checksHTML(checks) {
+  if (!checks || !checks.length) return `<span style="color:var(--faint)">No verifier checks recorded.</span>`;
+  return checks.map(c => `
+    <div class="vrow ${c.passed ? "pass" : "fail"}">
+      <span class="ic">${c.passed ? "✓" : "✕"}</span>
+      <span>${esc(prettyKey(c.check || c.name || "check"))}</span>
+    </div>`).join("");
+}
+
+/* ---------------- evidence ---------------- */
+function evidenceHTML(d) {
+  const ev = d.evidence || [];
+  if (!ev.length) return "";
+  const rows = ev.map(r => `
+    <tr>
+      <td class="ev-title" title="${esc(r.tender_title)}">${esc(r.tender_title || "—")}</td>
+      <td>${esc(r.buyer_name || "—")}</td>
+      <td>${esc(r.supplier_name || "—")}</td>
+      <td>${esc(r.release_year ?? "—")}</td>
+      <td>${r.tender_category ? `<span class="cat ${esc(r.tender_category)}">${esc(r.tender_category)}</span>` : "—"}</td>
+      <td class="num">${r.value_amount != null && r.value_amount !== "" ? esc(money(r.value_amount)) : "—"}</td>
+    </tr>`).join("");
+  return `<div class="section">
+    <div class="sec-title">Evidence <span class="pill mut">${nf.format(d.evidence_count)} matching record${d.evidence_count === 1 ? "" : "s"}${d.evidence_count > ev.length ? " · showing " + ev.length : ""}</span></div>
+    <div class="tblwrap"><table class="ev">
+      <tr><th>Contract</th><th>Buyer</th><th>Supplier</th><th>Year</th><th>Category</th><th>Value</th></tr>
+      ${rows}</table></div></div>`;
+}
+
+/* ---------------- message assembly ---------------- */
+function addUser(q) {
+  $("#thread").insertAdjacentHTML("beforeend", `<div class="msg-user">${esc(q)}</div>`);
+}
+
+function addBot(d) {
+  const ch = d.chain || {};
+  const checks = ch.verifier_checks || [];
+  const allPassed = checks.length > 0 && checks.every(c => c.passed);
+  const repair = ch.repair || {};
+  const statusPill = d.abstained
+    ? `<span class="pill warn">⚠ Abstained</span>`
+    : allPassed ? `<span class="pill ok">✓ Verified</span>`
+                : `<span class="pill mut">Answered</span>`;
+  const repairPill = repair.attempted ? `<span class="pill mut">🔧 self-repaired (${repair.attempts})</span>` : "";
+  const nVars = (ch.execution_variables || []).length;
+  const briefSub = ch.step1_briefing && typeof ch.step1_briefing === "object"
+    ? [ch.step1_briefing.answer_type, ch.step1_briefing.query_template].filter(Boolean).join(" · ") : "";
+
+  $("#thread").insertAdjacentHTML("beforeend", `
+    <div class="msg-bot">
+      <div class="bot-head">${statusPill}${repairPill}
+        <span class="pill mut">⏱ ${esc(d.seconds)}s</span></div>
+      <div class="answer-wrap">${answerHTML(d)}</div>
+      ${(d.limitations || []).length ? `<div class="lims">${d.limitations.map(l => `<div class="lim">${esc(l)}</div>`).join("")}</div>` : ""}
+      ${evidenceHTML(d)}
+      <div class="section">
+        <details class="reason">
+          <summary><span class="tw">▸</span> How CICADA answered this</summary>
+          <div class="steps">
+            <details class="step"><summary><span class="step-n">1</span><span class="step-t">Understand</span>
+              <span class="step-sub">${esc(briefSub || "semantic reading of the question")}</span><span class="step-state">🧠</span></summary>
+              <div class="step-body">${briefingHTML(ch.step1_briefing)}</div></details>
+            <details class="step"><summary><span class="step-n">2</span><span class="step-t">Plan</span>
+              <span class="step-sub">${esc(ch.compiled_plan ? returnSentence(ch.compiled_plan.return) : "no executable plan")}</span><span class="step-state">🗺</span></summary>
+              <div class="step-body">${planHTML(ch.compiled_plan)}</div></details>
+            <details class="step"><summary><span class="step-n">3</span><span class="step-t">Execute</span>
+              <span class="step-sub">${nVars ? nVars + " variable" + (nVars > 1 ? "s" : "") + " run on the knowledge graph" : "not executed"}</span><span class="step-state">⚙️</span></summary>
+              <div class="step-body">${execHTML(ch.execution_variables)}</div></details>
+            <details class="step"><summary><span class="step-n">4</span><span class="step-t">Verify</span>
+              <span class="step-sub">${checks.length ? checks.filter(c => c.passed).length + "/" + checks.length + " checks passed" : "no checks recorded"}</span>
+              <span class="step-state">${checks.length && allPassed ? "✅" : checks.length ? "❗" : "—"}</span></summary>
+              <div class="step-body">${checksHTML(checks)}</div></details>
+          </div>
+        </details>
+      </div>
+    </div>`);
+}
+
+/* ---------------- ask flow ---------------- */
+let busy = false;
+async function ask(q) {
+  q = (q || "").trim();
+  if (!q || busy) return;
+  busy = true; $("#send").disabled = true;
+  $("#hero").style.display = "none";
+  addUser(q);
+  $("#thread").insertAdjacentHTML("beforeend",
+    `<div class="thinking" id="think"><span class="orbs"><i></i><i></i><i></i></span>
+     Planning → grounding → executing → verifying…</div>`);
+  $("#scroll").scrollTop = $("#scroll").scrollHeight;
+  let resp;
+  try {
+    const r = await fetch("/ask", { method: "POST", headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ question: q }) });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    resp = await r.json();
+  } catch (err) {
+    resp = { abstained: true, answer_text: "The server could not process this question (" + err + ").",
+             seconds: "—", chain: {}, evidence: [], evidence_count: 0, limitations: [] };
+  }
+  $("#think")?.remove();
+  addBot(resp);
+  if (!current) {
+    current = { id: String(Date.now()), title: q.slice(0, 60), ts: Date.now(), turns: [] };
+    chats.unshift(current);
+  }
+  current.turns.push({ q, resp });
+  current.ts = Date.now();
+  saveChats(); renderHist();
+  $("#scroll").scrollTop = $("#scroll").scrollHeight;
+  busy = false; $("#send").disabled = false; $("#q").focus();
+}
+
+$("#send").onclick = () => { ask($("#q").value); $("#q").value = ""; };
+$("#q").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask($("#q").value); $("#q").value = ""; }
+});
+$("#examples").addEventListener("click", e => {
+  if (e.target.tagName === "BUTTON") ask(e.target.textContent);
+});
+
+renderHist();
+</script>
+</body>
+</html>

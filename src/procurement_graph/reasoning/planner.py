@@ -8,7 +8,7 @@ runtime reasoning loop can be tested without any model call.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Protocol
 
 from .linking import link_question
@@ -22,6 +22,29 @@ RULE_BASED_PLANNER_VERSION = "rule_based_planner_v1"
 class ReasoningPlanner(Protocol):
     def plan(self, question: str) -> tuple[CandidatePlan, ...]:
         ...
+
+
+@dataclass(frozen=True)
+class FallbackChainPlanner:
+    """Concatenate planner candidates in policy order for pipeline-level fallback.
+
+    The runtime pipeline treats this order as authoritative and does not compare confidence scores
+    across heterogeneous planners. Use it as e.g. typed -> flat LLM -> rule.
+    """
+
+    planners: tuple[ReasoningPlanner, ...]
+
+    def plan(self, question: str) -> tuple[CandidatePlan, ...]:
+        candidates: list[CandidatePlan] = []
+        for planner_index, planner in enumerate(self.planners):
+            source = getattr(planner, "planner_version", planner.__class__.__name__)
+            for plan in tuple(planner.plan(question)):
+                candidates.append(replace(
+                    plan,
+                    warnings=plan.warnings + (f"fallback_chain:{planner_index}:{source}",),
+                    fallback_planner=str(source),
+                ))
+        return tuple(candidates)
 
 
 @dataclass(frozen=True)

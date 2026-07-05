@@ -1,0 +1,50 @@
+{
+  "L2": {
+    "subset": "L2",
+    "mode": "pipeline",
+    "scored": 414,
+    "matched": 331,
+    "accuracy": 0.7995,
+    "answerable_scored": 346,
+    "answerable_matched": 265,
+    "abstention_cases": 68,
+    "abstained_safely": 66,
+    "abstained_right_reason": 36,
+    "hallucinated": 2,
+    "abstention_by_status": {
+      "unsupported": {
+        "cases": 9,
+        "abstained_safely": 9,
+        "abstained_right_reason": 9,
+        "hallucinated": 0
+      },
+      "ambiguous": {
+        "cases": 29,
+        "abstained_safely": 27,
+        "abstained_right_reason": 27,
+        "hallucinated": 2
+      },
+      "no_results": {
+        "cases": 30,
+        "abstained_safely": 30,
+        "abstained_right_reason": 0,
+        "hallucinated": 0
+      }
+    },
+    "answered_not_matched": 23,
+    "planner_or_exec_gap": 58,
+    "reason": {
+      "no_repair_needed": 290,
+      "ask_clarifying_question": 112,
+      "report_insufficient_evidence": 3,
+      "mark_unsupported": 9
+    },
+    "by_subset_accuracy": {
+      "bridge_join": 0.704,
+      "coverage_fixed": 0.95,
+      "extended_ops": 0.559,
+      "naturalized": 0.808,
+      "unanswerable": 0.971
+    }
+  }
+}

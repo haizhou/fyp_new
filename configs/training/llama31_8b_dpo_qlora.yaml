@@ -1,0 +1,43 @@
+# LLaMA-Factory DPO config — CICADA Step-2 planner student (Llama-3.1-8B, QLoRA)
+# Cross-base twin of qwen3_8b_dpo_qlora.yaml — identical data & hyperparameters,
+# only base model, adapter path and chat template differ.
+# Continues the RSFT adapter (rank/alpha must match it: 64/128); point at
+# outputs/llama31_8b_cicada_sft_v1 if skipping RSFT.
+
+### model
+model_name_or_path: meta-llama/Llama-3.1-8B-Instruct
+adapter_name_or_path: outputs/llama31_8b_cicada_rsft_v1
+
+### method
+stage: dpo
+do_train: true
+finetuning_type: lora
+lora_target: all
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+quantization_bit: 4
+bf16: true
+flash_attn: fa2
+pref_beta: 0.1
+pref_loss: sigmoid
+
+### dataset
+dataset_dir: data/training/llamafactory_v1
+dataset: cicada_dpo
+template: llama3
+cutoff_len: 6144
+overwrite_cache: true
+
+### training
+output_dir: outputs/llama31_8b_cicada_dpo_v1
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 5.0e-6
+num_train_epochs: 1
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+logging_steps: 10
+save_steps: 100
+gradient_checkpointing: true
+report_to: none

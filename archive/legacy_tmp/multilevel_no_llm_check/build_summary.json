@@ -1,0 +1,13 @@
+{
+  "plans": 5,
+  "L1": {
+    "accepted": 5
+  },
+  "per_subset": {
+    "naturalized": 1,
+    "coverage_fixed": 1,
+    "unanswerable": 1,
+    "extended_ops": 1,
+    "bridge_join": 1
+  }
+}

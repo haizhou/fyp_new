@@ -62,7 +62,7 @@ def reflect(result: ExecutionResult, plan: CandidatePlan, *, rounds_used: int = 
                                 "the matching evidence cannot be safely aggregated as requested")
 
     if result.status == "no_results":
-        relaxed = _relaxed_constraints(spec.constraints)
+        relaxed = _relaxed_constraints(spec.constraints, question=spec.question)
         if relaxed is not None and budget_left:
             dropped = _dropped_field(spec.constraints, relaxed)
             return ReflectionAction(
@@ -82,10 +82,11 @@ def reflect(result: ExecutionResult, plan: CandidatePlan, *, rounds_used: int = 
         )
 
     if result.status == "constraint_conflict":
-        deduped = _dedupe_eq_conflicts(spec.constraints)
-        if deduped is not None and budget_left:
-            return ReflectionAction("replan_query", "contradictory constraints; keeping the first value per field",
-                                    rollback_to="query_spec", suggested_constraints=deduped)
+        merged = _merge_eq_conflicts(spec.constraints)
+        if merged is not None and budget_left:
+            return ReflectionAction("replan_query",
+                                    "several equality values on one field; merged into a set-membership filter",
+                                    rollback_to="query_spec", suggested_constraints=merged)
         return ReflectionAction("ask_clarifying_question", "the question contains contradictory constraints",
                                 message_to_user="Your question seems to ask for two conflicting values. Which did you mean?")
 
@@ -103,11 +104,31 @@ def _has_additive_guard(spec) -> bool:
     return any(c.field == "value_is_additive" and c.op == "eq" and bool(c.value) for c in spec.constraints)
 
 
-def _relaxed_constraints(constraints: tuple[QueryConstraint, ...]) -> tuple[QueryConstraint, ...] | None:
-    """Drop the single most specific non-answer, user-visible constraint. None if nothing droppable."""
-    droppable = [c for c in constraints if c.visible_to_user and c.field not in _ANSWER_ANCHORS]
-    if len(droppable) <= 1:
+def _relaxed_constraints(constraints: tuple[QueryConstraint, ...],
+                         question: str = "") -> tuple[QueryConstraint, ...] | None:
+    """Drop the single most specific non-answer, user-visible constraint. None if nothing droppable.
+
+    A constraint whose value the QUESTION states is never dropped — relaxing it answers a
+    different question (measured: this was the first domino turning correct empty-result
+    abstentions into hallucinated answers). Only planner-invented values are relaxation
+    candidates. (Values canonicalised by the resolver still casefold-match their mention today;
+    revisit if a true alias resolver lands.)
+    """
+    question_low = " ".join(str(question).casefold().split())
+
+    def _invented(constraint: QueryConstraint) -> bool:
+        if not question_low:
+            return True  # no question context: preserve the old behaviour
+        text = " ".join(str(constraint.value).casefold().split())
+        return bool(text) and text not in question_low
+
+    droppable = [c for c in constraints if c.visible_to_user and c.field not in _ANSWER_ANCHORS
+                 and _invented(c)]
+    if not droppable:
         return None
+    visible = [c for c in constraints if c.visible_to_user]
+    if len(visible) <= 1:
+        return None  # never relax the only user-visible filter away
     target = max(droppable, key=lambda c: _SPECIFICITY.get(c.field, 0))
     return tuple(c for c in constraints if c is not target)
 
@@ -120,18 +141,39 @@ def _dropped_field(before: tuple[QueryConstraint, ...], after: tuple[QueryConstr
     return ""
 
 
-def _dedupe_eq_conflicts(constraints: tuple[QueryConstraint, ...]) -> tuple[QueryConstraint, ...] | None:
-    seen_eq: set[str] = set()
-    kept: list[QueryConstraint] = []
-    changed = False
+def _merge_eq_conflicts(constraints: tuple[QueryConstraint, ...]) -> tuple[QueryConstraint, ...] | None:
+    """Merge several eq values on one field into a single `in` filter (union), never drop one.
+
+    "in 2022 and 2023" planned as two eq years is a contradiction as an intersection, but the
+    question means the union; keeping only the first year would answer a silently narrowed
+    question. For a select_unique the union may surface as multiple_answers -> a clarifying
+    question, which is still honest. Returns None when there is nothing to merge.
+    """
+    eq_values: dict[str, list] = {}
     for c in constraints:
-        if c.op == "eq" and c.field in seen_eq:
-            changed = True
-            continue
         if c.op == "eq":
-            seen_eq.add(c.field)
-        kept.append(c)
-    return tuple(kept) if changed else None
+            values = eq_values.setdefault(c.field, [])
+            if c.value not in values:
+                values.append(c.value)
+    conflicted = {field for field, values in eq_values.items() if len(values) > 1}
+    if not conflicted:
+        return None
+    merged: list[QueryConstraint] = []
+    emitted: set[str] = set()
+    for c in constraints:
+        if c.op == "eq" and c.field in conflicted:
+            if c.field in emitted:
+                continue
+            emitted.add(c.field)
+            merged.append(QueryConstraint(
+                c.field, "in", list(eq_values[c.field]),
+                visible_to_user=c.visible_to_user,
+                source_text=f"merged {len(eq_values[c.field])} equality values",
+                metadata={"merged_from_eq_conflict": True},
+            ))
+        else:
+            merged.append(c)
+    return tuple(merged)
 
 
 __all__ = ["reflect", "reflect_plan"]

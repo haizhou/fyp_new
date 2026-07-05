@@ -3,10 +3,14 @@ stub-LLM rejection-sampling round trip. No KG or API needed."""
 
 from __future__ import annotations
 
+import json
+import re
 import sys
+import tempfile
 import unittest
 import uuid
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
@@ -245,6 +249,192 @@ class TestRejectionSampling(unittest.TestCase):
         )
         self.assertEqual(len(accepted), 1)
         self.assertEqual(rejected, [])
+
+
+class _AutoStubChat:
+    """Deterministic stand-in for the generator+checker models used by ``run_l2_auto``.
+
+    The generator embeds a variant marker before the trailing '?'; the checker accepts once the
+    marker index reaches a per-plan threshold read off ``accept_from`` (keyed by the plan's L1
+    question, which the real prompts pass through verbatim). A threshold higher than
+    ``max_candidates_per_plan`` can ever reach simulates a permanently unresolvable plan. No
+    network calls -- this only exercises the round/ceiling control flow in `build_multilevel_qa`.
+    """
+
+    def __init__(self, accept_from: dict[str, int], *, initial_index: dict[str, int] | None = None):
+        self.accept_from = accept_from
+        # seeds the per-plan counter for candidates that were written to disk directly (bypassing
+        # this stub) so a freshly-generated candidate's embedded index still matches the script's
+        # own running `offset` for that plan.
+        self._gen_counts: dict[str, int] = dict(initial_index or {})
+        self.gen_calls = 0
+        self.chk_calls = 0
+
+    def complete_json(self, *, model: str, system: str, user: str):
+        payload = json.loads(user)
+        if model == "gen":
+            self.gen_calls += 1
+            l1 = payload["task"]["l1_question"]
+            idx = self._gen_counts.get(l1, 0)
+            self._gen_counts[l1] = idx + 1
+            text = re.sub(r"\?\s*$", f" [[v{idx}]]?", l1)
+
+            class _R:
+                parsed = {"variants": [text]}
+            return _R()
+
+        self.chk_calls += 1
+        question, source = payload["question"], payload["source_question"]
+        match = re.search(r"\[\[v(\d+)\]\]", question)
+        idx = int(match.group(1)) if match else -1
+        ok = idx >= self.accept_from.get(source, 10**9)
+
+        class _R:
+            parsed = {"matches_original_plan": ok, "can_derive_reference_answer": ok,
+                      "same_meaning_as_source_question": ok, "preserves_unanswerable_status": True,
+                      "mismatch_reason": None if ok else "stub_reject"}
+        return _R()
+
+
+def _auto_row(name: str, *, question: str) -> dict[str, Any]:
+    return {
+        "id": name, "subset": "test", "question": question,
+        "answer_type": "count", "answer_operation": "count", "expected_status": "answerable",
+        "constraints": [{"field": "release_year", "op": "eq", "value": 2024, "visible_to_user": True}],
+        "oracle_answer": 3,
+    }
+
+
+class TestL2AutoDriver(unittest.TestCase):
+    """`run_l2_auto` is the unattended overnight driver: it must converge plans that need more
+    than the starting candidate budget, and must STOP (not spin forever) on plans that never
+    pass, reporting them by id with their reject reasons."""
+
+    def test_ceiling_raise_and_stuck_plan_report(self):
+        from build_multilevel_qa import run_l2_auto
+
+        rows = [
+            _auto_row("easy", question="How many contract notices were published for the easy plan in 2024?"),
+            _auto_row("retry", question="How many contract notices were published for the retry plan in 2024?"),
+            _auto_row("impossible",
+                     question="How many contract notices were published for the impossible plan in 2024?"),
+        ]
+        accept_from = {rows[0]["question"]: 0, rows[1]["question"]: 2, rows[2]["question"]: 999}
+        chat = _AutoStubChat(accept_from)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            report = run_l2_auto(
+                rows, chat=chat, model="gen", checker_model="chk", out_dir=out_dir,
+                variants=1, base_candidates_per_plan=2, candidate_top_up=2,
+                max_candidates_per_plan=4, max_rounds=3, org_resolver=None, known_orgs=None,
+                seed=1, progress_every=0, resume=True, workers=1, rpm=0,
+            )
+            surfaces = [json.loads(line) for line in
+                       (out_dir / "surfaces.L2.jsonl").read_text(encoding="utf-8").splitlines()]
+
+        self.assertEqual(report["total_plans"], 3)
+        self.assertEqual(report["accepted_plans"], 2)
+        self.assertEqual(report["unresolved_plan_ids"], ["impossible"])
+        self.assertTrue(any("stub_reject" in reason
+                            for reason in report["unresolved_reject_reasons"]["impossible"]))
+        # capped by max_candidates_per_plan (4), not by max_rounds (3) -- confirms the ceiling
+        # cap, not just the round cap, can end the loop.
+        self.assertEqual(report["rounds_run"], 2)
+        self.assertEqual(report["final_ceiling"], 4)
+        self.assertEqual(chat.gen_calls, 10)  # 3 plans x 2 (round1) + 2 still-unresolved x 2 (round2)
+        self.assertEqual({s["plan_id"] for s in surfaces}, {"easy", "retry"})
+        self.assertEqual(len(surfaces), 2)  # exactly `variants`=1 accepted surface per resolved plan
+
+    def test_resume_seeds_ceiling_from_existing_candidates(self):
+        from build_multilevel_qa import candidate_path, run_l2_auto, write_jsonl
+
+        row = _auto_row("resumed",
+                        question="How many contract notices were published for the resumed plan in 2024?")
+        # the 5 pre-seeded candidates below are written straight to disk, bypassing the stub, so
+        # its internal counter must be told to resume from index 5 -- otherwise a freshly
+        # generated candidate would be mislabelled index 0 and never reach the index-5 threshold.
+        chat = _AutoStubChat({row["question"]: 5}, initial_index={row["question"]: 5})
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            # Simulate 5 already-generated (not yet checked) candidates from an earlier, interrupted
+            # run, so resume must start the ceiling at >=5, not replay 2 -> 4 -> 6 from scratch.
+            write_jsonl(candidate_path(out_dir, 2), [
+                {"candidate_id": f"resumed#L2c{i}", "plan_id": "resumed", "level": 2,
+                 "candidate_index": i, "question": re.sub(r"\?\s*$", f" [[v{i}]]?", row["question"]),
+                 "persona": "citizen", "surface_origin": "gen"}
+                for i in range(5)
+            ])
+            report = run_l2_auto(
+                [row], chat=chat, model="gen", checker_model="chk", out_dir=out_dir,
+                variants=1, base_candidates_per_plan=2, candidate_top_up=2,
+                max_candidates_per_plan=9, max_rounds=6, org_resolver=None, known_orgs=None,
+                seed=1, progress_every=0, resume=True, workers=1, rpm=0,
+            )
+
+        self.assertEqual(report["accepted_plans"], 1)
+        self.assertEqual(report["final_ceiling"], 7)
+        # only the 2 candidates past the resumed high-water mark were freshly generated --
+        # the 5 pre-seeded ones were reused from disk, not regenerated.
+        self.assertEqual(chat.gen_calls, 2)
+
+    def test_one_attempt_per_round_three_distinct_personas_then_give_up(self):
+        """Stated production policy: at most 3 attempts per plan, exactly 1 candidate generated
+        per round, a different persona each of the first 3 attempts (seed+plan_id determined,
+        reproducible), abandon after 3. Realised by base_candidates_per_plan=1,
+        candidate_top_up=1, max_candidates_per_plan=3, max_rounds=3 -- no special-casing needed;
+        this locks in that exact parameterisation against regressions."""
+        from build_multilevel_qa import candidate_path, run_l2_auto
+
+        row = _auto_row("gives_up_after_3",
+                        question="How many contract notices were published for the giveup plan in 2024?")
+        chat = _AutoStubChat({row["question"]: 10**9})  # never accepts
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            report = run_l2_auto(
+                [row], chat=chat, model="gen", checker_model="chk", out_dir=out_dir,
+                variants=1, base_candidates_per_plan=1, candidate_top_up=1,
+                max_candidates_per_plan=3, max_rounds=3, org_resolver=None, known_orgs=None,
+                seed=20260702, progress_every=0, resume=True, workers=1, rpm=0,
+            )
+            candidates = [json.loads(line) for line in
+                         candidate_path(out_dir, 2).read_text(encoding="utf-8").splitlines()]
+
+        self.assertEqual(report["rounds_run"], 3)
+        self.assertEqual(report["final_ceiling"], 3)
+        self.assertEqual(report["unresolved_plan_ids"], ["gives_up_after_3"])
+        self.assertEqual(len(candidates), 3)  # exactly one attempt generated per round, not a batch
+        self.assertEqual(len({c["persona"] for c in candidates}), 3)  # no persona repeated
+
+    def test_checker_rpm_and_workers_are_independent_of_generator(self):
+        """Regression: generator (e.g. nano, high rpm) and checker (e.g. grok, ~50 rpm) are
+        commonly different deployments with different limits -- a shared cap would either
+        throttle the generator or exceed the checker's limit. `run_l2_auto` must forward
+        `checker_workers`/`checker_rpm` to the check phase only, leaving generate untouched."""
+        from unittest.mock import patch
+        import build_multilevel_qa as bmq
+
+        row = _auto_row("easy", question="How many contract notices were published for the easy plan in 2024?")
+        chat = _AutoStubChat({row["question"]: 0})
+        calls: list[tuple[int, float]] = []
+        real_run_concurrent = bmq.run_concurrent
+
+        def spy(items, fn, *, workers, rpm, on_result):
+            calls.append((workers, rpm))
+            return real_run_concurrent(items, fn, workers=workers, rpm=rpm, on_result=on_result)
+
+        with tempfile.TemporaryDirectory() as tmp, patch.object(bmq, "run_concurrent", spy):
+            bmq.run_l2_auto(
+                [row], chat=chat, model="gen", checker_model="chk", out_dir=Path(tmp),
+                variants=1, base_candidates_per_plan=2, candidate_top_up=2,
+                max_candidates_per_plan=4, max_rounds=3, org_resolver=None, known_orgs=None,
+                seed=1, progress_every=0, resume=True, workers=8, rpm=300,
+                checker_workers=4, checker_rpm=40,
+            )
+        # one round resolves this plan: [0]=generate call, [1]=check call
+        self.assertEqual(calls, [(8, 300), (4, 40)])
 
 
 if __name__ == "__main__":

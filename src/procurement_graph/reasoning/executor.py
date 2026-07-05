@@ -42,12 +42,37 @@ def execute_query_spec(backend: RuntimeQueryBackend, spec: RuntimeQuerySpec) -> 
             return ExecutionResult(query_spec=spec, status="passed", answer=answer, evidence=evidence,
                                    checks=tuple(checks), metrics={"evidence_count": total})
 
+    if spec.answer_operation == "top_k" and hasattr(backend, "top_k") and hasattr(backend, "sample"):
+        group_by = str(spec.metadata.get("group_by_field") or "")
+        k = int(spec.metadata.get("k") or 3)
+        metric = str(spec.metadata.get("metric") or "count")
+        metric_field = str(spec.metadata.get("metric_field") or "value_amount")
+        if group_by:
+            try:
+                ranked = backend.top_k(spec.constraints, group_by=group_by, k=k, metric=metric,
+                                       metric_field=metric_field,
+                                       dedupe_field=spec.dedupe_key or "contract_node_id")
+            except Exception:  # pragma: no cover - defensive; fall back to full path
+                ranked = {"passed": False, "reason": "backend_top_k_error"}
+            if ranked.get("passed"):
+                total = backend.count(spec.constraints, dedupe_field=spec.dedupe_key or "contract_node_id") \
+                    if hasattr(backend, "count") else int(ranked.get("groups") or 0)
+                sample_rows = backend.sample(spec.constraints, _EVIDENCE_ID_CAP)
+                evidence = _sampled_evidence_bundle(backend, sample_rows, total)
+                checks.append({"check": "top_k_group_field", "passed": True, "group_by_field": group_by})
+                return ExecutionResult(query_spec=spec, status="passed", answer=ranked.get("answer") or [],
+                                       evidence=evidence, checks=tuple(checks),
+                                       metrics={"group_by_field": group_by, "k": k,
+                                                "groups": ranked.get("groups"), "backend_top_k": True})
+            if ranked.get("reason") == "non_additive_values":
+                checks.append({"check": "sum_additive_safety", "passed": False, "reason": "non_additive_values"})
+                return ExecutionResult(query_spec=spec, status="incomplete_evidence",
+                                       checks=tuple(checks), metrics={"backend_top_k": True})
+
     try:
-        if spec.answer_operation == "sum" and hasattr(backend, "project"):
-            # a sum needs only a few columns; projecting avoids materialising all 42 fields per row
-            needed = list(dict.fromkeys([spec.dedupe_key or "contract_node_id", spec.answer_field or "value_amount",
-                                         "value_is_additive", "supplier_count", "buyer_count", "ocid"]))
-            rows = backend.project(spec.constraints, needed)
+        projected_fields = _projection_fields(spec)
+        if projected_fields and hasattr(backend, "project"):
+            rows = backend.project(spec.constraints, projected_fields)
         else:
             rows = backend.query(spec.constraints)
     except Exception as exc:  # pragma: no cover - defensive boundary
@@ -115,6 +140,9 @@ def _execute_extreme(backend: RuntimeQueryBackend, spec: RuntimeQuerySpec, rows:
     metric_field = spec.sort_field or "value_amount"
     scored = [(row, _to_decimal_or_none(row.get(metric_field))) for row in rows]
     scored = [(row, value) for row, value in scored if value is not None]
+    if spec.metadata.get("exclude_zero"):
+        # "lowest NON-ZERO value": zero/placeholder values are not candidates for the extreme
+        scored = [(row, value) for row, value in scored if value != 0]
     checks.append({"check": "extreme_metric_present", "passed": bool(scored), "metric_field": metric_field})
     if not scored:
         return ExecutionResult(query_spec=spec, status="no_results", evidence=evidence, checks=tuple(checks))
@@ -151,6 +179,10 @@ def _execute_predicate(spec: RuntimeQuerySpec, rows: list[dict[str, Any]],
     if subject == "count":
         subject_value: Any = len(rows)
     elif subject == "sum":
+        additive = additive_value_check(rows)
+        checks.append(additive)
+        if not additive.get("passed"):
+            return ExecutionResult(query_spec=spec, status="incomplete_evidence", evidence=evidence, checks=tuple(checks))
         values = [_to_decimal_or_none(row.get(spec.answer_field or "value_amount")) for row in rows]
         subject_value = sum(v for v in values if v is not None)
     else:  # field: needs a single consistent value across the (anchor) match set
@@ -205,6 +237,11 @@ def _execute_top_k(spec: RuntimeQuerySpec, rows: list[dict[str, Any]],
     checks.append({"check": "top_k_group_field", "passed": bool(group_by), "group_by_field": group_by})
     if not group_by:
         return ExecutionResult(query_spec=spec, status="unsupported_operation", checks=tuple(checks), evidence=evidence)
+    if metric == "sum":
+        additive = additive_value_check(rows)
+        checks.append(additive)
+        if not additive.get("passed"):
+            return ExecutionResult(query_spec=spec, status="incomplete_evidence", evidence=evidence, checks=tuple(checks))
     groups: dict[str, Decimal] = {}
     for row in rows:
         key = str(row.get(group_by))
@@ -229,9 +266,37 @@ def _to_decimal_or_none(value: Any) -> Decimal | None:
     return parsed if parsed.is_finite() else None  # NaN/Inf must not enter min/max comparisons
 
 
+def _projection_fields(spec: RuntimeQuerySpec) -> list[str]:
+    """Fields needed to execute this operation, plus ids for evidence/dedupe."""
+    fields: list[str] = [spec.dedupe_key or "contract_node_id", "contract_node_id", "ocid"]
+    op = spec.answer_operation
+    if op == "sum":
+        fields += [spec.answer_field or "value_amount", "value_is_additive", "supplier_count", "buyer_count"]
+    elif op == "select_unique":
+        fields.append(spec.answer_field)
+    elif op in {"distinct_set", "set"}:
+        fields.append(spec.answer_field)
+    elif op in {"argmax", "argmin"}:
+        fields += [spec.sort_field or "value_amount", spec.answer_field or "contract_node_id"]
+    elif op == "top_k":
+        fields.append(str(spec.metadata.get("group_by_field") or ""))
+        if str(spec.metadata.get("metric") or "count") == "sum":
+            fields += [str(spec.metadata.get("metric_field") or "value_amount"),
+                       "value_is_additive", "supplier_count", "buyer_count"]
+    elif op == "predicate":
+        subject = str(spec.metadata.get("predicate_subject") or "field")
+        if subject == "sum":
+            fields += [spec.answer_field or "value_amount", "value_is_additive", "supplier_count", "buyer_count"]
+        elif subject == "field":
+            fields.append(str(spec.metadata.get("predicate_field") or spec.answer_field))
+    else:
+        return []
+    return [field for field in dict.fromkeys(fields) if field]
+
+
 # Large reductions (esp. bridge hops) can match tens of thousands of rows. Materialising an id
-# string + ocid for every one dominates execution time and is pure overhead: the ANSWER never needs
-# it. Cap evidence_ids/ocids to a sample; keep evidence_count EXACT and flag the cap for auditability.
+# string + ocid + row dict for every one dominates execution time and is pure overhead: the ANSWER
+# never needs it. Cap evidence samples; keep evidence_count EXACT and flag the cap for auditability.
 _EVIDENCE_ID_CAP = 200
 
 
@@ -244,8 +309,10 @@ def _evidence_bundle(backend: RuntimeQueryBackend, rows: list[dict[str, Any]]) -
         "evidence_count": total,  # exact
         "evidence_ids_capped": total > _EVIDENCE_ID_CAP,
         "evidence_ids_sampled": len(evidence_ids),
+        "rows_capped": total > _EVIDENCE_ID_CAP,
+        "rows_sampled": len(sample),
     }
-    return EvidenceBundle(evidence_ids=evidence_ids, ocids=ocids, rows=tuple(rows), fields=fields, coverage=fields)
+    return EvidenceBundle(evidence_ids=evidence_ids, ocids=ocids, rows=tuple(sample), fields=fields, coverage=fields)
 
 
 def _sampled_evidence_bundle(backend: RuntimeQueryBackend, sample_rows: list[dict[str, Any]], total: int) -> EvidenceBundle:

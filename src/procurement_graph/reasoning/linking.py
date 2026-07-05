@@ -13,10 +13,13 @@ import re
 from dataclasses import dataclass, field
 from typing import Protocol
 
+from .entity_resolution import resolve_confident_org
 from .models import EntityLinkCandidate, QueryConstraint
 
 CPV_RE = re.compile(r"\b(?:CPV\s*)?(\d{8})\b", flags=re.IGNORECASE)
 YEAR_RE = re.compile(r"\b(20[2-3]\d)\b")
+# "between 2022 and 2024" / "from 2022 to 2024": a RANGE, not two contradictory eq filters.
+YEAR_RANGE_RE = re.compile(r"\b(?:between|from)\s+(20[2-3]\d)\s+(?:and|to|through|until)\s+(20[2-3]\d)\b")
 CONTRACT_ID_RE = re.compile(r"\b(contract:[A-Za-z0-9:_\-.]+|c\d+)\b")
 CATEGORIES = ("goods", "services", "works")
 # A bare category word is not evidence of a category filter: org names ("Atos IT Services UK
@@ -90,8 +93,18 @@ def link_question(question: str, *, org_resolver: OrgResolver | None = None) -> 
     entities: list[EntityLinkCandidate] = []
     notes: list[str] = []
 
-    for year in YEAR_RE.findall(text):
-        constraints.append(QueryConstraint("release_year", "eq", int(year), source_text=year))
+    # Years: a range phrase becomes ONE between filter; several bare years become an `in` union
+    # ("in 2022 and 2023" counts both). Two eq filters on the same field would be a contradiction
+    # that the reflector can only repair by narrowing — i.e. a silently wrong scope.
+    range_match = YEAR_RANGE_RE.search(lowered)
+    years = sorted({int(year) for year in YEAR_RE.findall(text)})
+    if range_match:
+        low, high = sorted((int(range_match.group(1)), int(range_match.group(2))))
+        constraints.append(QueryConstraint("release_year", "between", [low, high], source_text=range_match.group(0)))
+    elif len(years) > 1:
+        constraints.append(QueryConstraint("release_year", "in", years, source_text=", ".join(str(y) for y in years)))
+    elif years:
+        constraints.append(QueryConstraint("release_year", "eq", years[0], source_text=str(years[0])))
     category_match = CATEGORY_CONTEXT_RE.search(lowered)
     if category_match:
         category = next(group for group in category_match.groups() if group)
@@ -112,19 +125,22 @@ def link_question(question: str, *, org_resolver: OrgResolver | None = None) -> 
     # planner/backend as buyer_name/supplier_name text filters.
     if org_resolver is not None:
         for role_field, mention in _org_mentions(text, lowered):
-            candidates = org_resolver.resolve(mention)
+            resolve_mention = mention
+            candidates = org_resolver.resolve(resolve_mention)
             if not candidates and mention.rstrip(". ") != mention:
-                candidates = org_resolver.resolve(mention.rstrip(". "))  # sentence-final period
+                resolve_mention = mention.rstrip(". ")
+                candidates = org_resolver.resolve(resolve_mention)  # sentence-final period
             if not candidates:
                 notes.append(f"unresolved organisation mention: {mention!r}")
                 continue
-            best = candidates[0]
-            if best.source != "records_exact" and best.score < 0.6:
+            resolved = resolve_confident_org(org_resolver, resolve_mention)
+            if not resolved.ok or resolved.hit is None:
                 # a weak fuzzy hit is a hallucinated entity link waiting to happen — leave the
                 # mention unresolved (the planner/LLM layer can still handle it) rather than
                 # silently constraining on the wrong organisation.
-                notes.append(f"low-confidence organisation link dropped: {mention!r} -> {best.linked_label!r}")
+                notes.append(f"low-confidence organisation link dropped: {mention!r}: {resolved.reason}")
                 continue
+            best = resolved.hit
             entities.append(best)
             constraints.append(
                 QueryConstraint(role_field, "eq", best.linked_label, source_text=mention,

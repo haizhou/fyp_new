@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -42,6 +42,8 @@ class ParquetKGQueryBackend:
 
     records_df: pd.DataFrame
     id_field: str = "contract_node_id"
+    _mask_cache: dict[tuple[Any, ...], Any] = field(default_factory=dict, repr=False)
+    _mask_cache_limit: int = 512
 
     @classmethod
     def from_directory(cls, kg_dir: Path | str, *, include_evidence: bool = True) -> "ParquetKGQueryBackend":
@@ -99,11 +101,18 @@ class ParquetKGQueryBackend:
     def _mask(self, constraints: tuple[Constraint, ...]):
         if self.records_df.empty:
             return None
+        key = _constraints_key(constraints)
+        cached = self._mask_cache.get(key)
+        if cached is not None:
+            return cached
         mask = pd.Series(True, index=self.records_df.index)
         for constraint in constraints:
             if constraint.field not in self.records_df.columns:
                 return None
             mask &= _series_matches(self.records_df[constraint.field], constraint)
+        if len(self._mask_cache) >= self._mask_cache_limit:
+            self._mask_cache.clear()
+        self._mask_cache[key] = mask
         return mask
 
     def query(self, constraints: tuple[Constraint, ...]) -> list[dict[str, Any]]:
@@ -135,6 +144,54 @@ class ParquetKGQueryBackend:
             return []
         cols = [f for f in fields if f in self.records_df.columns]
         return self.records_df.loc[mask, cols].to_dict(orient="records")
+
+    def distinct(self, constraints: tuple[Constraint, ...], field: str) -> tuple[Any, ...]:
+        """Distinct non-empty values for one field without materialising full row dicts."""
+        mask = self._mask(constraints)
+        if mask is None or not bool(mask.any()) or field not in self.records_df.columns:
+            return tuple()
+        values = self.records_df.loc[mask, field].dropna()
+        out: set[Any] = set()
+        for value in values:
+            for item in _as_values(value):
+                if item not in (None, ""):
+                    out.add(item)
+        return tuple(sorted(out, key=str))
+
+    def top_k(self, constraints: tuple[Constraint, ...], *, group_by: str, k: int,
+              metric: str = "count", metric_field: str = "value_amount",
+              dedupe_field: str = "contract_node_id") -> dict[str, Any]:
+        """Vectorised top-k for grouped count/sum without materialising all rows as dicts."""
+        mask = self._mask(constraints)
+        if mask is None or not bool(mask.any()) or group_by not in self.records_df.columns:
+            return {"passed": False, "reason": "no_results", "answer": [], "groups": 0}
+        cols = [group_by]
+        dedupe = dedupe_field if dedupe_field in self.records_df.columns else self.id_field
+        if dedupe not in cols:
+            cols.append(dedupe)
+        if metric == "sum":
+            if metric_field not in self.records_df.columns:
+                return {"passed": False, "reason": "missing_metric_field", "answer": [], "groups": 0}
+            cols.append(metric_field)
+            if "value_is_additive" in self.records_df.columns:
+                cols.append("value_is_additive")
+        df = self.records_df.loc[mask, cols].copy()
+        df = df[df[group_by].notna() & (df[group_by].astype(str) != "")]
+        if df.empty:
+            return {"passed": False, "reason": "no_groups", "answer": [], "groups": 0}
+        if metric == "sum":
+            if "value_is_additive" in df.columns and not df["value_is_additive"].map(_truthy).all():
+                return {"passed": False, "reason": "non_additive_values", "answer": [], "groups": 0}
+            df[metric_field] = pd.to_numeric(df[metric_field], errors="coerce").fillna(0)
+            grouped = df.groupby(group_by, dropna=True)[metric_field].sum()
+        else:
+            grouped = df.drop_duplicates([group_by, dedupe]).groupby(group_by, dropna=True)[dedupe].count()
+        ranked_items = sorted(grouped.items(), key=lambda kv: (-float(kv[1]), str(kv[0])))[: max(1, int(k or 3))]
+        answer = [
+            [str(key), int(value) if float(value).is_integer() else float(value)]
+            for key, value in ranked_items
+        ]
+        return {"passed": True, "answer": answer, "groups": int(grouped.shape[0])}
 
 
 def _matches(record: dict[str, Any], constraint: Constraint) -> bool:
@@ -248,6 +305,24 @@ def _series_matches(series: pd.Series, constraint: Constraint) -> pd.Series:
     if constraint.op == "lte":
         return pd.to_numeric(series, errors="coerce") <= target
     raise ValueError(f"Unsupported constraint op: {constraint.op}")
+
+
+def _constraints_key(constraints: tuple[Constraint, ...]) -> tuple[Any, ...]:
+    return tuple((c.field, c.op, _freeze_value(c.value)) for c in constraints)
+
+
+def _freeze_value(value: Any) -> Any:
+    if isinstance(value, dict):
+        return tuple(sorted((str(k), _freeze_value(v)) for k, v in value.items()))
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return tuple(_freeze_value(v) for v in value)
+    return value
+
+
+def _truthy(value: Any) -> bool:
+    if isinstance(value, str):
+        return value.strip().casefold() in {"1", "true", "yes", "y"}
+    return bool(value)
 
 
 __all__ = ["ParquetKGQueryBackend", "QueryBackend", "TabularQueryBackend"]

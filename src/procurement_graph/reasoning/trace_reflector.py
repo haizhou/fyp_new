@@ -31,6 +31,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
+from .entity_resolution import resolve_confident_org
 from .linking import link_question
 from .models import QueryConstraint, ReasoningTrace, RuntimeQuerySpec
 
@@ -217,12 +218,12 @@ class TraceReflector:
     def _expected_type(question: str) -> str:
         lowered = " ".join(question.casefold().split())
         link = link_question(question)
+        if any(cue in lowered for cue in ("top ", "highest", "lowest", "most expensive", "cheapest")):
+            return "superlative"
         if link.asks_sum:
             return "sum"
         if link.asks_count:
             return "count"
-        if any(cue in lowered for cue in ("top ", "highest", "lowest", "most expensive", "cheapest")):
-            return "superlative"
         if lowered.startswith(("did ", "is ", "was ", "were ", "are ")) or " did " in lowered:
             return "boolean"
         if link.factoid_field:
@@ -298,19 +299,22 @@ class TraceReflector:
             if constraint.field not in _ORG_FIELDS or constraint.op != "eq":
                 continue
             mention = str(constraint.source_text or constraint.value)
-            candidates = [hit.linked_id for hit in self.org_resolver.resolve(mention)]
             if preferred:
                 choice = str(preferred.get("value", ""))
-                if preferred.get("field") == constraint.field and choice in candidates \
-                        and choice != constraint.value:
+                resolved = resolve_confident_org(self.org_resolver, mention,
+                                                 exclude_ids={str(constraint.value)})
+                if preferred.get("field") == constraint.field and resolved.ok \
+                        and resolved.hit is not None and choice == resolved.hit.linked_id:
                     return _swap_constraint(spec, constraint, choice)
                 continue
-            alternatives = [c for c in candidates if c != constraint.value]
-            if variant_only:
-                alternatives = [c for c in alternatives
-                                if _normalize_org(c) == _normalize_org(str(constraint.value))]
-            if alternatives:
-                return _swap_constraint(spec, constraint, alternatives[0])
+            resolved = resolve_confident_org(
+                self.org_resolver,
+                mention,
+                exclude_ids={str(constraint.value)},
+                variant_only_against=str(constraint.value) if variant_only else "",
+            )
+            if resolved.ok and resolved.hit is not None:
+                return _swap_constraint(spec, constraint, resolved.hit.linked_id)
         return None
 
     def _retype_spec(self, trace: ReasoningTrace) -> RuntimeQuerySpec | None:

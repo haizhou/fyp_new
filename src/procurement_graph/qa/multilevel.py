@@ -284,31 +284,30 @@ def rewrite_messages(row: dict[str, Any], atoms: SurfaceAtoms, *, level: int,
 
 
 PERSONAS = {
-    "citizen": "an ordinary member of the public who wants a plain-language answer",
-    "policy_analyst": "a policy analyst writing a briefing note, precise and formal",
-    "auditor": "a public-spending auditor checking records, terse and exact",
-    "journalist": "an investigative journalist drafting a data query, direct and probing",
+    "citizen": "an ordinary member of the public asking in plain, everyday language",
+    "policy_analyst": "a policy analyst framing the question for a concise briefing note",
+    "auditor": "a public-spending auditor checking the records with terse, exact wording",
+    "journalist": "an investigative journalist asking a direct, probing data question",
 }
 
 PERSONA_EXAMPLES = {
     "citizen": {
         "before": "How many services contract notices did Birmingham City Council publish in 2024 under CPV 85000000?",
-        "after": "In 2024, how many services notices did Birmingham City Council put out under CPV 85000000?",
+        "after": "Can you tell me how many services contract notices Birmingham City Council put out in 2024 under CPV 85000000?",
     },
     "policy_analyst": {
         "before": "What is the total value of works contracts awarded to suppliers who also worked with NHS England?",
-        "after": "For suppliers that had also worked with NHS England, what was the total value of the relevant works contracts?",
+        "after": "For the purposes of this briefing, could you set out the total value of works contracts awarded to suppliers that had also delivered work for NHS England?",
     },
     "auditor": {
         "before": "Which supplier is recorded for contract notices published in 2023 by Kent County Council under CPV 72000000?",
-        "after": "For 2023 notices from Kent County Council under CPV 72000000, which supplier is recorded?",
+        "after": "Record check: Kent County Council, 2023, CPV 72000000 - which supplier is listed?",
     },
     "journalist": {
         "before": "Did Leeds City Council publish more goods notices in 2025 than Sheffield City Council?",
-        "after": "In 2025, did Leeds City Council put out more goods notices than Sheffield City Council?",
+        "after": "Here is the numbers question: in 2025, did Leeds City Council outnumber Sheffield City Council on goods notices?",
     },
 }
-
 
 def persona_for(plan_id: str) -> str:
     """Balanced deterministic persona assignment: ONE style per plan (diversity mechanism,
@@ -329,7 +328,8 @@ def l2_rewrite_messages(row: dict[str, Any], atoms: SurfaceAtoms, *,
             "instruction": (
                 "Rewrite the L1 question into a natural question in this identity's voice. "
                 "Keep the exact same meaning, answer target, filters, comparison direction, "
-                "and unanswerable/ambiguous/no-results status if applicable."
+                "and unanswerable/ambiguous/no-results status if applicable. Use the selected "
+                "identity's example as a style cue, but do not copy its sentence pattern mechanically."
             ),
             "n_variants": n_variants,
             "l1_question": row.get("question", ""),
@@ -348,7 +348,9 @@ def l2_rewrite_messages(row: dict[str, Any], atoms: SurfaceAtoms, *,
             "previously, or prior to unless the L1 question already says that.",
             "Avoid database-style wording such as release_year, buyer_name, supplier_name, "
             "tender_cpv_id, tender_category, in_subquery, matching procurement records, or asked-for field.",
-            "Vary sentence structure substantially; do not just swap one or two words.",
+            "Vary sentence structure substantially; do not just swap one or two words or reuse the "
+            "same question skeleton.",
+            "The four identities should feel different in register and emphasis, not because of fixed templates.",
         ],
         "must_keep_exact_numbers": list(atoms.required_numbers),
         "must_preserve_meaning_of_text": list(atoms.required_texts),
@@ -356,45 +358,6 @@ def l2_rewrite_messages(row: dict[str, Any], atoms: SurfaceAtoms, *,
         "must_keep_unanswerable_phrase_if_present": atoms.unanswerable_trigger or None,
     }, ensure_ascii=False)
     return system, user
-
-
-def checker_messages(surface: str, row: dict[str, Any]) -> tuple[str, str]:
-    """Independent Checker LLM: judges whether the generated question still expresses the plan.
-
-    The checker never sees or produces the oracle answer — it outputs its own reading of the
-    question (operation / answer field / constraints) plus a match verdict, and acceptance
-    requires `matches_original_plan` and `can_be_answered_by_original_plan`.
-    """
-    system = ("You verify benchmark questions for a procurement KGQA dataset. Read the question, "
-              "state the reasoning task it expresses, and judge whether it matches the reference "
-              "plan. NEVER answer the question itself. Return strict JSON with keys: "
-              "intended_operation, intended_answer_field, required_constraints (object), "
-              "reasoning_steps (array), matches_original_plan (bool), "
-              "can_be_answered_by_original_plan (bool), mismatch_reason (string|null).")
-    user = json.dumps({
-        "question": surface,
-        "reference_plan": {
-            "operation": row.get("answer_operation"),
-            "answer_type": row.get("answer_type"),
-            "constraints": [c for c in row.get("constraints", ())
-                            if c.get("visible_to_user") is not False],
-            "expected_status": row.get("expected_status", "answerable"),
-        },
-        "judge": "Does the question ask EXACTLY the task the reference plan computes — same "
-                 "operation, same filters, same asked-for field, buyer/supplier roles the right "
-                 "way round, comparison directions preserved?",
-    }, ensure_ascii=False)
-    return system, user
-
-
-def checker_accepts(verdict: Any) -> tuple[bool, str]:
-    if not isinstance(verdict, dict):
-        return False, "checker_unparseable"
-    if not verdict.get("matches_original_plan"):
-        return False, f"checker_mismatch:{verdict.get('mismatch_reason')}"
-    if not verdict.get("can_be_answered_by_original_plan"):
-        return False, f"checker_unanswerable:{verdict.get('mismatch_reason')}"
-    return True, ""
 
 
 def checker_messages(surface: str, row: dict[str, Any]) -> tuple[str, str]:

@@ -15,6 +15,7 @@ import re
 from dataclasses import dataclass, replace
 from typing import Any, Protocol
 
+from .entity_resolution import resolve_confident_org
 from .linking import OrgResolver
 from .models import QueryConstraint, RuntimeQuerySpec
 
@@ -274,14 +275,17 @@ def _resolve_entities(
     new_constraints: list[QueryConstraint] = []
     for constraint in spec.constraints:
         if constraint.field in {"buyer_name", "supplier_name"} and constraint.op == "eq" and "canonical_id" not in constraint.metadata:
-            candidates = org_resolver.resolve(str(constraint.value))
-            if not candidates:
-                notes.append(f"unresolved organisation: {constraint.value!r}")
+            resolved = resolve_confident_org(org_resolver, str(constraint.value))
+            if not resolved.ok or resolved.hit is None:
+                if resolved.reason == "entity_not_found":
+                    notes.append(f"unresolved organisation: {constraint.value!r}")
+                elif resolved.reason == "ambiguous_entity_candidates":
+                    notes.append(f"ambiguous organisation: {constraint.value!r} ({len(resolved.candidates)} candidates)")
+                else:
+                    notes.append(f"low-confidence organisation: {constraint.value!r} ({resolved.reason})")
                 new_constraints.append(constraint)
                 continue
-            if len(candidates) > 1 and candidates[0].score - candidates[1].score < 0.05:
-                notes.append(f"ambiguous organisation: {constraint.value!r} ({len(candidates)} candidates)")
-            best = candidates[0]
+            best = resolved.hit
             new_constraints.append(
                 replace(constraint, value=best.linked_label,
                         metadata={**constraint.metadata, "canonical_id": best.linked_id})

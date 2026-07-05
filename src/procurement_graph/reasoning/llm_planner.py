@@ -15,6 +15,7 @@ from dataclasses import dataclass, field, replace
 from typing import Any, Protocol
 
 from .linking import UNSUPPORTED_TERMS
+from .entity_resolution import resolve_confident_org
 from .models import CandidatePlan
 from .planner import (
     PLANNER_SCHEMA_VERSION,
@@ -74,9 +75,9 @@ def _resolve_constraint(item: dict[str, Any], org_resolver: Any):
     value = item.get("value")
     # snap an org MENTION to the canonical KG name; the LLM need not know exact strings.
     if org_resolver is not None and field in _ORG_FIELDS and op == "eq" and isinstance(value, str):
-        hits = org_resolver.resolve(value)
-        if hits:
-            value = hits[0].linked_id
+        resolved = resolve_confident_org(org_resolver, value)
+        if resolved.ok and resolved.hit is not None:
+            value = resolved.hit.linked_id
     return QueryConstraint(field=field, op=op, value=value)
 
 

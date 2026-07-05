@@ -1,0 +1,28 @@
+{
+ "questions": 3,
+ "verified": 2,
+ "verified_at_1": 0,
+ "repair_gain": 2,
+ "verified_and_oracle_match": 2,
+ "errors": 0,
+ "per_bucket": {
+  "bridge_join": {
+   "n": 2,
+   "verified": 1
+  },
+  "top_k": {
+   "n": 1,
+   "verified": 1
+  }
+ },
+ "teacher": {
+  "step1": "gpt-5.4-nano",
+  "step2": "grok-4-1-fast-non-reasoning",
+  "step2_endpoint": "default",
+  "plan_temperature": 0.0,
+  "prompt_variant": "lean",
+  "schema_variant": "optional",
+  "max_repairs": 2,
+  "plan_samples": 2
+ }
+}

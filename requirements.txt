@@ -6,3 +6,8 @@ tqdm>=4.0
 openai>=1.0
 azure-identity>=1.16
 pytest>=8.0
+# demo frontend (scripts/serve_demo.py)
+fastapi>=0.110
+uvicorn>=0.29
+# server training extras are installed separately (see docs/training_runbook.md):
+#   pip install llamafactory[torch,metrics] vllm

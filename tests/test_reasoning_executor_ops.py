@@ -74,6 +74,30 @@ class TestExecutorOps(unittest.TestCase):
         self.assertEqual(result.status, "passed")
         self.assertEqual(result.answer, [["B1", 2], ["B2", 1]])
 
+    def test_top_k_by_sum_gets_additive_guard(self) -> None:
+        spec = self._spec_top_k("buyer_name")
+        spec = RuntimeQuerySpec(**{**spec.__dict__, "metadata": {"group_by_field": "buyer_name", "k": 2, "metric": "sum"}})
+        grounded = ground_spec(spec, allowed_fields=self.allowed)
+        self.assertTrue(grounded.ok, grounded.reason)
+        self.assertTrue(any(c.field == "value_is_additive" and c.op == "eq" and c.value is True
+                            for c in grounded.spec.constraints))
+
+    def test_top_k_by_sum_rejects_non_additive_population_without_guard(self) -> None:
+        backend = TabularRuntimeBackend(_records() + [
+            {"contract_node_id": "ceiling", "release_year": 2024, "tender_category": "services",
+             "buyer_name": "B3", "supplier_name": "S3", "value_amount": "999999999",
+             "value_is_additive": False},
+        ])
+        spec = RuntimeQuerySpec(spec_id="s", question="q", intent="top_k",
+                                constraints=(QueryConstraint("release_year", "eq", 2024),),
+                                answer_operation="top_k", answer_field="", answer_value_type="string",
+                                requires_exhaustive_retrieval=True,
+                                metadata={"group_by_field": "buyer_name", "k": 3, "metric": "sum"})
+        result = execute_query_spec(backend, spec)
+        self.assertEqual(result.status, "incomplete_evidence")
+        self.assertTrue(any(c.get("check") == "sum_additive_safety" and not c.get("passed")
+                            for c in result.checks))
+
     def test_top_k_unknown_group_field_rejected(self) -> None:
         grounded = ground_spec(self._spec_top_k("not_a_field"), allowed_fields=self.allowed)
         self.assertFalse(grounded.ok)
@@ -90,6 +114,45 @@ class TestExecutorOps(unittest.TestCase):
                                                 requires_exhaustive_retrieval=True), allowed_fields=self.allowed)
         self.assertFalse(grounded.ok)
         self.assertIn("decomposition", grounded.reason)
+
+
+class _RecordingProjectBackend(TabularRuntimeBackend):
+    def __init__(self, records):
+        super().__init__(records)
+        self.project_fields: list[list[str]] = []
+
+    def project(self, constraints, fields):
+        self.project_fields.append(list(fields))
+        return super().project(constraints, fields)
+
+
+class TestExecutorPerformanceGuards(unittest.TestCase):
+    def test_distinct_set_uses_projection(self):
+        backend = _RecordingProjectBackend(_records())
+        spec = RuntimeQuerySpec(spec_id="s", question="q", intent="set",
+                                constraints=(QueryConstraint("release_year", "eq", 2024),),
+                                answer_operation="distinct_set", answer_field="supplier_name",
+                                answer_value_type="string", requires_exhaustive_retrieval=True)
+        result = execute_query_spec(backend, spec)
+        self.assertEqual(result.status, "passed")
+        self.assertTrue(backend.project_fields)
+        self.assertIn("supplier_name", backend.project_fields[0])
+        self.assertNotIn("value_amount", backend.project_fields[0])
+
+    def test_evidence_rows_are_capped_but_count_is_exact(self):
+        rows = [
+            {"contract_node_id": f"c{i}", "release_year": 2024, "supplier_name": f"S{i % 3}"}
+            for i in range(250)
+        ]
+        backend = TabularRuntimeBackend(rows)
+        spec = RuntimeQuerySpec(spec_id="s", question="q", intent="set",
+                                constraints=(QueryConstraint("release_year", "eq", 2024),),
+                                answer_operation="distinct_set", answer_field="supplier_name",
+                                answer_value_type="string", requires_exhaustive_retrieval=True)
+        result = execute_query_spec(backend, spec)
+        self.assertEqual(result.evidence.fields["evidence_count"], 250)
+        self.assertEqual(len(result.evidence.rows), 200)
+        self.assertTrue(result.evidence.fields["rows_capped"])
 
 
 def _predicate_records():
@@ -139,6 +202,36 @@ class TestPredicateOp(unittest.TestCase):
         r = self._run((("release_year", "eq", 2026), ("value_is_additive", "eq", True)),
                       {"predicate_subject": "sum", "comparator": "gt", "threshold": 10_000_000, "threshold_type": "number"})
         self.assertEqual(r.answer, True)   # 5M + 8M = 13M > 10M
+
+    def test_predicate_sum_gets_additive_guard(self):
+        spec = RuntimeQuerySpec(spec_id="s", question="q", intent="boolean",
+                                constraints=(QueryConstraint("release_year", "eq", 2026),),
+                                answer_operation="predicate", answer_field="",
+                                answer_value_type="boolean", requires_exhaustive_retrieval=True,
+                                metadata={"predicate_subject": "sum", "comparator": "gt",
+                                          "threshold": 10_000_000, "threshold_type": "number"})
+        grounded = ground_spec(spec, allowed_fields=self.allowed)
+        self.assertTrue(grounded.ok, grounded.reason)
+        self.assertEqual(grounded.spec.answer_field, "value_amount")
+        self.assertTrue(any(c.field == "value_is_additive" and c.op == "eq" and c.value is True
+                            for c in grounded.spec.constraints))
+
+    def test_predicate_sum_rejects_non_additive_population_without_guard(self):
+        backend = TabularRuntimeBackend(_predicate_records() + [
+            {"contract_node_id": "p3", "tender_title": "Gamma Ceiling", "tender_category": "goods",
+             "value_amount": "999999999", "value_is_additive": False, "release_year": 2026,
+             "tender_cpv_id": "33600000", "award_date_signed": "2025-04-10T00:00:00+01:00"},
+        ])
+        spec = RuntimeQuerySpec(spec_id="s", question="q", intent="boolean",
+                                constraints=(QueryConstraint("release_year", "eq", 2026),),
+                                answer_operation="predicate", answer_field="value_amount",
+                                answer_value_type="boolean", requires_exhaustive_retrieval=True,
+                                metadata={"predicate_subject": "sum", "comparator": "gt",
+                                          "threshold": 10_000_000, "threshold_type": "number"})
+        result = execute_query_spec(backend, spec)
+        self.assertEqual(result.status, "incomplete_evidence")
+        self.assertTrue(any(c.get("check") == "sum_additive_safety" and not c.get("passed")
+                            for c in result.checks))
 
     def test_planner_recognises_all_three(self):
         from procurement_graph.reasoning import ReasoningPipeline
