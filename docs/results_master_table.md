@@ -78,6 +78,19 @@ Pending fills: incl./excl. 19 cue-matched rows split; llama double-arm; r2 rung.
 
 Four-point decay pattern: fully-local flat on both bases, hybrid steep on both bases -> denoising mechanism cross-base at n=2,285.
 
+
+### Cue-split dual report (disclosure for the dev-derived _UNSUPPORTED_CUES; 19/2,285 rows string-matched)
+
+| System | all 2,285 | excl. 19 cue rows | delta |
+|---|---|---|---|
+| teacher | 69.76% | 69.55% | -0.21pt |
+| qwen hybrid | 78.03% | 77.89% | -0.14pt |
+| qwen fully-local | 85.65% | 85.57% | -0.08pt |
+| llama hybrid | 75.97% | 75.82% | -0.16pt |
+| llama fully-local | 83.33% | 83.23% | -0.10pt |
+
+Bound: every headline moves <=0.21pt; rankings and significance unchanged. (Deltas negative: the cue rows were mostly answered correctly by ALL systems.)
+
 ## Pending (filled as artifacts land)
 - final_test fully-local qwen (RUNNING)
 - r2 rung
