@@ -989,3 +989,18 @@ P3 — 评估卫生：
 3. Step-2 checkpoint verification CLOSED: serve_ft_fully_local.log contains exactly 1 engine-init and 1 args line (launched with truncating redirect - no stale lines possible); its LoRAModulePath pair = step1_v1 + dpo_v1. Same Step-2 across both final_test arms confirmed.
 4. Teacher final_test replicate (workers 4) launched 2026-07-06 evening — noted: this was started before presenting the cost estimate (cost-first discipline slipped; estimate: ~3,000 grok calls ≈ 1/8 of the already-paid harvest). Consequence handled in abstract wording (single-replicate on final_test).
 Adjudication progress at write time: fully-local 437/2,285, hybrid 833/2,285, teacher 205/2,285.
+
+## 2026-07-07 - ADJUDICATION: VERDICT A. Fully-local 85.65% vs hybrid 78.03% on final_test (n=2,285): +7.61pt, CI [+6.10,+9.13], McNemar +242/-68, p<1e-15
+
+**Task**: Execute the pre-committed adjudication playbook on the completed final_test pair (same Step-2 checkpoint qwen3_8b_cicada_dpo_v1; Step-1 = local step1_v1 adapter vs Azure nano; v4.1 questions; eval protocol repair-1).
+
+**Result** (artifacts outputs/eval/final_test/{fully_local_qwen,hybrid_qwen_dpo}/):
+- FULLY-LOCAL 1,957/2,285 = 85.65% | HYBRID 1,783/2,285 = 78.03%.
+- Paired: +242/-68 discordant, McNemar p<1e-15; delta=+7.61pt, 95% CI [+6.10,+9.13]. Playbook branch: A (superiority) — mechanical selection, no wording improvisation.
+- Asymmetric dev->test decay is the mechanism headline: hybrid 83.5->78.0 (-5.5pt under the natural harder mix) vs fully-local 86.2->85.65 (-0.5pt). The "no measurable decay" pattern from the DEV hard-composite slice replicates at n=2,285: the distilled Step-1 is stable exactly where nano wobbles. Third-scale confirmation of distillation-as-denoising.
+- 85.65% clears the 85% target on the HELD-OUT set.
+- Ops note en route: the original fully-local eval wrapper teardown killed the GPU3 server when its client was pkill-ed for the speed restart; partial stayed clean (645 valid rows, 0 error contamination); --resume (id-dedup) recovered perfectly; rebuilt server+client in one wrapper at 16 workers.
+
+**Decision-tree consequences (executed)**: Llama final_test double-arm approved by verdict-A branch -> fully-local-llama launched on GPU3 (zero API). Llama-hybrid arm follows on a free GPU. Llama-r2 still gated on Qwen-r2 DEV results (>= +2pt or bridge >= 15/20). Teacher final_test replicate continues (fills the same-set student-vs-teacher pairing; not blocking, per playbook).
+
+**Next**: teacher final_test completes -> same-set headline triple; r2 harvest (GPU2, ~2,100/9,267) -> export w/ factoid guard -> train -> DEV eval -> r2 gates; then ood_probe pilots.
