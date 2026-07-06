@@ -1025,3 +1025,11 @@ Running: llama hybrid arm (~600/2,285), r2 harvest (~5,000/9,267).
 ## 2026-07-07 - FIVE-PAIRING MATRIX COMPLETE: de-teachering replicates on Llama (+7.35pt, p~0); decay pattern is 4-for-4
 
 Llama hybrid final_test 75.97% (1,736/2,285; dev 83.1 -> decay -7.1). Pairings: llama-FL vs llama-hybrid +262/-94, delta +7.35 CI[+5.73,+8.97] (qwen analogue +7.61 — nearly identical effect size); llama-hybrid vs teacher +230/-88, +6.21. Scoreboard (n=2,285, all p<1e-14): teacher 69.76 < llama-hyb 75.97 < qwen-hyb 78.03 < llama-FL 83.33 < qwen-FL 85.65. Decay: FL flat (-0.5/-0.9) vs hybrid steep (-5.5/-7.1) on both bases — the denoising mechanism now has cross-base, cross-config, held-out-scale evidence. Abstract A "on both bases" wording fully licensed. Remaining pipeline: r2 harvest (~5,000/9,267) -> export/train/eval vs gates; ood_probe pilots; cue-split dual report; schema diagnostic; figures re-render.
+
+## 2026-07-07 - Schema-valid diagnostic: success criteria PRE-COMMITTED (before reading any output)
+
+Criteria written while the first run is still in flight, committed before results are read:
+- Expected: trained model (dpo-v1) no-guided plan_shape rate >= 90%; base model significantly lower -> conclusion "SFT internalised the output contract".
+- Alternative outcome (both high): conclusion becomes "format is carried by the prompt; SFT gains are semantic, not formatting" — equally useful, it strengthens the control-variable claim that ladder deltas measure planning skill.
+- Known instrument risk (user-caught): the v1 extractor (greedy first-{ to last-}) over-counts parse failures on the BASE arm (markdown fences, multiple JSON objects). Patch: fence-aware + balanced-brace extraction; parse failures store FULL raw; 10 failures manually reviewed before any conclusion sentence. First-run numbers are provisional until the patched rerun.
+- Alias landmine defused: cicada-qwen3-zeroshot on the diag server points at SFT weights (labeling hazard); the diagnostic deliberately uses base "Qwen/Qwen3-8B" as the untrained arm; the alias dies with this server window and is banned from any results file.
