@@ -91,6 +91,17 @@ Four-point decay pattern: fully-local flat on both bases, hybrid steep on both b
 
 Bound: every headline moves <=0.21pt; rankings and significance unchanged. (Deltas negative: the cue rows were mostly answered correctly by ALL systems.)
 
+
+### Schema-valid diagnostic (no guided decoding, n=100 stratified DEV, dual-gate)
+
+| Model | JSON-parse | well-formed shell | CONTENT-valid |
+|---|---|---|---|
+| Qwen3-8B (untrained base) | 100% | 100% | **0%** |
+| cicada-qwen3-sft | 100% | 99% | 94% |
+| cicada-qwen3-dpo | 100% | 100% | 99% |
+
+Three-layer separation: JSON SYNTAX is free (all 100%), structural SHELL is near-free (99-100%, but degenerate/empty for the base — 2-var no-filter shells), CONTENT-valid planning (question_type + >=1 grounded filter) is ENTIRELY acquired by fine-tuning (0 -> 94 -> 99). Supports the control-variable claim: guided decoding at eval time enforces the near-free shell, so ladder accuracy deltas isolate the learned content. [artifact outputs/eval/schema_valid_diagnostic.json; instrument twice-verified: JSON extractor fence/brace-fair, shape gate spot-checked and split into wellformed+content after base emitted empty shells.]
+
 ## Pending (filled as artifacts land)
 - final_test fully-local qwen (RUNNING)
 - r2 rung

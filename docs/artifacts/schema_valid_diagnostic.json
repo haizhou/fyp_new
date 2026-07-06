@@ -1,0 +1,580 @@
+{
+ "cicada-qwen3-dpo": {
+  "n": 100,
+  "json_parse_ok": 100,
+  "plan_shape_ok": 100,
+  "parse_rate": 1.0,
+  "shape_rate": 1.0,
+  "content_ok": 99,
+  "content_rate": 0.99,
+  "shape_kinds": {
+   "graph_plan": 98,
+   "abstain": 2
+  },
+  "failures": [
+   {
+    "id": "L2::bridge_join_0385#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"question_type\": \"count\", \"operation\": \"count\", \"variables\": [{\"var_id\": \"a1\", \"kind\": \"entity_set\", \"role\": \"buyer\", \"filters\": [], \"depends_on\": [\"b1\"]}, {\"var_id\": \"b1\", \"kind\": \"record_set\", \"role\": \"contract_records\", \"filters\": [], \"depends_on\": []}, {\"var_id\": \"c1\", \"kind\": \"entity_set\", \"role\": \"supplier\", \"filters\": [], \"depends_on\": [\"b1\"]}], \"return\": {\"operation\": \"count\", \"input\": \"a"
+   }
+  ]
+ },
+ "cicada-qwen3-sft": {
+  "n": 100,
+  "json_parse_ok": 100,
+  "plan_shape_ok": 99,
+  "parse_rate": 1.0,
+  "shape_rate": 0.99,
+  "content_ok": 94,
+  "content_rate": 0.94,
+  "shape_kinds": {
+   "graph_plan": 99
+  },
+  "failures": [
+   {
+    "id": "L2::unanswerable_0445#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"template\": \"abstain\", \"question_type\": \"unanswerable\", \"operation\": \"abstain\", \"answer_field\": \"none\", \"variables\": [{\"var_id\": \"A\", \"kind\": \"record_set\", \"role\": \"contract_records\", \"filters\": [], \"depends_on\": []}], \"relations\": [], \"comparison\": {\"operator\": \"none\", \"threshold\": \"\"}, \"return\": {\"operation\": \"abstain\", \"input\": \"A\", \"field\": \"none\", \"guards\": [], \"k\": 0, \"group_by\": \"none\", \"m"
+   },
+   {
+    "id": "L2::unanswerable_0077#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"template\": \"abstain\", \"question_type\": \"unanswerable\", \"operation\": \"abstain\", \"answer_field\": \"none\", \"variables\": [{\"var_id\": \"A\", \"kind\": \"record_set\", \"role\": \"contract_records\", \"filters\": [], \"depends_on\": []}], \"relations\": [], \"comparison\": {\"operator\": \"none\", \"threshold\": \"\"}, \"return\": {\"operation\": \"abstain\", \"input\": \"A\", \"field\": \"none\", \"guards\": [], \"k\": 0, \"group_by\": \"none\", \"m"
+   },
+   {
+    "id": "L2::unanswerable_0487#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"template\": \"abstain\", \"question_type\": \"unanswerable\", \"operation\": \"abstain\", \"answer_field\": \"none\", \"variables\": [{\"var_id\": \"A\", \"kind\": \"record_set\", \"role\": \"contract_records\", \"filters\": [], \"depends_on\": []}], \"relations\": [], \"comparison\": {\"operator\": \"none\", \"threshold\": \"\"}, \"return\": {\"operation\": \"abstain\", \"input\": \"A\", \"field\": \"none\", \"guards\": [], \"k\": 0, \"group_by\": \"none\", \"m"
+   },
+   {
+    "id": "L2::unanswerable_0221#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"template\": \"abstain\", \"question_type\": \"unanswerable\", \"operation\": \"abstain\", \"answer_field\": \"none\", \"variables\": [{\"var_id\": \"A\", \"kind\": \"record_set\", \"role\": \"contract_records\", \"filters\": [], \"depends_on\": []}], \"relations\": [], \"comparison\": {\"operator\": \"none\", \"threshold\": \"\"}, \"return\": {\"operation\": \"abstain\", \"input\": \"A\", \"field\": \"none\", \"guards\": [], \"k\": 0, \"group_by\": \"none\", \"m"
+   },
+   {
+    "id": "L2::bridge_join_0385#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"template\": \"abstain\", \"question_type\": \"count\", \"operation\": \"count\", \"answer_field\": \"none\", \"variables\": [{\"var_id\": \"A\", \"kind\": \"record_set\", \"role\": \"contract_records\", \"filters\": [], \"depends_on\": []}], \"relations\": [], \"comparison\": {\"operator\": \"none\", \"threshold\": \"\"}, \"return\": {\"operation\": \"count\", \"input\": \"A\", \"field\": \"none\", \"guards\": [], \"k\": 0, \"group_by\": \"none\", \"metric\": \"no"
+   },
+   {
+    "id": "L2::extended_ops_0881#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"template\": \"abstain\", \"question_type\": \"compare_two\", \"operation\": \"compare\", \"answer_field\": \"none\", \"variables\": [{\"var_id\": \"A\", \"kind\": \"record_set\", \"role\": \"contract_records\", \"filters\": [{\"slot\": \"year\", \"operator\": \"eq\", \"value\": \"2024\"}, {\"slot\": \"buyer\", \"operator\": \"eq\", \"value\": \"Wessex Water Services Ltd\"}], \"depends_on\": []}, {\"var_id\": \"B\", \"kind\": \"record_set\", \"role\": \"contract_"
+   }
+  ]
+ },
+ "Qwen/Qwen3-8B": {
+  "n": 100,
+  "json_parse_ok": 100,
+  "plan_shape_ok": 100,
+  "parse_rate": 1.0,
+  "shape_rate": 1.0,
+  "content_ok": 0,
+  "content_rate": 0.0,
+  "shape_kinds": {
+   "graph_plan": 100
+  },
+  "failures": [
+   {
+    "id": "L2::unanswerable_1428#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Leeds and York Partnership NHS Foundation Trust, trading as North of England NHS Commercial Procurement Collaborative (\\\"NOE CPC\\\")\", \"value_type\": \"entity\"}], \"field_text\": \"contract involving Leeds and York Partnership NHS Foundation Trus"
+   },
+   {
+    "id": "L2::unanswerable_1865#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier is awarded contract\", \"operator\": \"eq\", \"value\": \"NEC Software Solutions UK Limited\", \"value_type\": \"entity\"}], \"field_text\": \"contract/award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"var_id\": \"b1a1"
+   },
+   {
+    "id": "L2::unanswerable_1560#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Middlesbrough Council\", \"value_type\": \"entity\"}], \"field_text\": \"contract/award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"var_id\": \"b1a1\", \"op\": \"select\", \"de"
+   },
+   {
+    "id": "L2::unanswerable_1859#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"Aspens Services Ltd\", \"value_type\": \"entity\"}], \"field_text\": \"contract awards\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"id\": \"a2\", \"op\": \"select\", \"inputs\": [\"a1\"], \"args\": {\"filters\""
+   },
+   {
+    "id": "L2::unanswerable_1808#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier is awarded contract\", \"operator\": \"eq\", \"value\": \"AECOM Limited\", \"value_type\": \"entity\"}], \"field_text\": \"contract/award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"var_id\": \"b1a1\", \"op\": \"select\", \""
+   },
+   {
+    "id": "L2::unanswerable_1488#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Derby City Council\", \"value_type\": \"entity\"}], \"field_text\": \"contract/award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"var_id\": \"b1a1\", \"op\": \"select\", \"depen"
+   },
+   {
+    "id": "L2::unanswerable_1730#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"London Borough of Hounslow\", \"value_type\": \"entity\"}], \"field_text\": \"contract/award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"var_id\": \"b1a1\", \"op\": \"select\""
+   },
+   {
+    "id": "L2::unanswerable_1593#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier_name\", \"operator\": \"eq\", \"value\": \"THAMES WATER UTILITIES LIMITED\", \"value_type\": \"entity\"}], \"field_text\": \"contract awarded to supplier\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"var_id\": \"b1a1\", \"op\": \"se"
+   },
+   {
+    "id": "L2::unanswerable_1623#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Luton Council\", \"value_type\": \"entity\"}], \"field_text\": \"contract/award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"id\": \"b1a1\", \"op\": \"select\", \"inputs\": [\"a1\"], \"args"
+   },
+   {
+    "id": "L2::unanswerable_1487#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Belfast City Council\", \"value_type\": \"entity\"}], \"field_text\": \"contract/award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"var_id\": \"b1a1\", \"op\": \"select\", \"dep"
+   },
+   {
+    "id": "L2::unanswerable_1336#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"procurement category\", \"operator\": \"eq\", \"value\": \"goods\", \"value_type\": \"category\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2031\", \"value_type\": \"year\"}, {\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Joycele Services\", \"value_type\": \"entity\"}], \"fie"
+   },
+   {
+    "id": "L2::unanswerable_1241#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2031\", \"value_type\": \"year\"}, {\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"Wallington Cars and Couriers Ltd\", \"value_type\": \"entity\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"thres"
+   },
+   {
+    "id": "L2::unanswerable_1066#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Transport for Greater Manchester\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"33600000\", \"value_type\": \"cpv\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \""
+   },
+   {
+    "id": "L2::unanswerable_1346#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"Equans Regeneration Ltd\", \"value_type\": \"entity\"}, {\"field_text\": \"procurement category\", \"operator\": \"eq\", \"value\": \"goods\", \"value_type\": \"category\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2031\", \"value_type\": \"year\"}], \"field_"
+   },
+   {
+    "id": "L2::unanswerable_1238#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"Capita Business Services Limited\", \"value_type\": \"entity\"}, {\"field_text\": \"procurement category\", \"operator\": \"eq\", \"value\": \"goods\", \"value_type\": \"category\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2031\", \"value_type\": \"year\"}]"
+   },
+   {
+    "id": "L2::unanswerable_1032#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Pembrokeshire County Council\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"33600000\", \"value_type\": \"cpv\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", "
+   },
+   {
+    "id": "L2::unanswerable_1305#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"tender title\", \"operator\": \"eq\", \"value\": \"BARCHESTER HEALTHCARE HOMES LTD Longueville Court\\u0019s goods contract\", \"value_type\": \"text\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2031\", \"value_type\": \"year\"}, {\"field_text\": \"procurement category\", \"operator\": \"eq\", \"va"
+   },
+   {
+    "id": "L2::unanswerable_1265#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2031\", \"value_type\": \"year\"}, {\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"The Human Support Group Limited\", \"value_type\": \"entity\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"thresh"
+   },
+   {
+    "id": "L2::unanswerable_0867#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Hertfordshire County Council\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"33600000\", \"value_type\": \"cpv\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", "
+   },
+   {
+    "id": "L2::unanswerable_1171#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"tender_title\", \"operator\": \"eq\", \"value\": \"Smart Cabs\\u0019s goods contract\", \"value_type\": \"text\"}, {\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2031\", \"value_type\": \"year\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"thr"
+   },
+   {
+    "id": "L2::unanswerable_0259#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Cumbria, Northumberland, Tyne and Wear NHS Foundation Trust\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"K10 Vision Limited\", \"value_type\": \"entity\"}], \"field_text\": \"\", \"bind_f"
+   },
+   {
+    "id": "L2::unanswerable_0445#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"input\": \"b1a1\"}, {\"var_id\": \"b1a1\", \"depends_on\": [\"c1b1\"], \"operation\": \"filter_records\", \"input\": \"c1b1\", \"filters\": [{\"field\": \"supplier is awarded contract\", \"value\": \"WPC Software Ltd\"}, {\"field\": \"buyer publishes contract\", \"value\": \"Coventry City Council\"}]}, {\"var_id\": \"c1b1\", \"depends_on\": [], \"operation\": \"se"
+   },
+   {
+    "id": "L2::unanswerable_0086#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Milton Keynes Council\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Emiran HealthCare\", \"value_type\": \"entity\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"compara"
+   },
+   {
+    "id": "L2::unanswerable_0077#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"filters\": {\"buyer\": \"West Northamptonshire Council\", \"supplier\": \"24x7 Northants Ltd\"}, \"relations\": [\"supplier is awarded contract\"]}, {\"var_id\": \"b1a1\", \"depends_on\": [\"a1\"], \"operation\": \"select\", \"fields\": [\"award_title\", \"tender_title\", \"tender_category\"]}, {\"var_id\": \"c1b1\", \"depends_on\": [\"b1a1\"], \"operation\":"
+   },
+   {
+    "id": "L2::unanswerable_0487#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"name\": \"contract_records\", \"description\": \"Contract records for KENT COUNTY COUNCIL to Prestige Guarding Limited\", \"depends_on\": [], \"filters\": [{\"field\": \"buyer\", \"operator\": \"eq\", \"value\": \"KENT COUNTY COUNCIL\"}, {\"field\": \"supplier\", \"operator\": \"eq\", \"value\": \"Prestige Guarding Limited\"}], \"relations\": []}], \"return\": {\"input\": \"a1\", \"operation\": \"abstain\", \"me"
+   },
+   {
+    "id": "L2::unanswerable_0786#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Ministry of Defence\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Central Management Catalogue Agency (UK) Ltd\", \"value_type\": \"entity\"}], \"field_text\": \"\", \"bind_field_text\""
+   },
+   {
+    "id": "L2::unanswerable_0332#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier_name\", \"operator\": \"eq\", \"value\": \"Roche Diagnostics Limited\", \"value_type\": \"entity\"}, {\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"HealthTrust Europe LLP (HTE) acting on behalf of the South Midlands Pathology Network (University Hospitals Coventry and Warwickshire N"
+   },
+   {
+    "id": "L2::unanswerable_0410#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Northern Ireland Housing Executive\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Ulster University\", \"value_type\": \"entity\"}], \"field_text\": \"contract awarded records\", \"bind"
+   },
+   {
+    "id": "L2::unanswerable_0221#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"name\": \"contract_records\", \"description\": \"Contract records involving NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD as buyer and The Disabilities Trust as supplier\", \"depends_on\": [], \"filters\": [{\"field\": \"buyer\", \"operator\": \"eq\", \"value\": \"NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD\"}, {\"field\": \"supplier\", \"operator\": \"eq\", \"value\": \"T"
+   },
+   {
+    "id": "L2::unanswerable_0342#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"South Yorkshire Police\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Oracle Corporation UK Limited\", \"value_type\": \"entity\"}, {\"field_text\": \"reliable supplier listing\", \"operator\": "
+   },
+   {
+    "id": "L2::extended_ops_1242#L2a#neg",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"North East and North Cumbria Integrated Care Board\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2022\", \"value_type\": \"year\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\""
+   },
+   {
+    "id": "L2::extended_ops_0498#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"North Lanarkshire Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2025\", \"value_type\": \"year\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \""
+   },
+   {
+    "id": "L2::extended_ops_1632#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Gloucestershire County Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2025\", \"value_type\": \"year\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", "
+   },
+   {
+    "id": "L2::extended_ops_0930#L2a#neg",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"answer_field_text\": \"\"}, {\"var_id\": \"b1a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"UNIVERSITY OF EXETER\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"va"
+   },
+   {
+    "id": "L2::extended_ops_0324#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Surrey County Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"thre"
+   },
+   {
+    "id": "L2::extended_ops_0450#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Belfast Health and Social Care Trust\", \"value_type\": \"entity\"}, {\"field_text\": \"high-level procurement category\", \"operator\": \"eq\", \"value\": \"goods\", \"value_type\": \"category\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2024\","
+   },
+   {
+    "id": "L2::extended_ops_0156#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Coventry City Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2025\", \"value_type\": \"year\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshol"
+   },
+   {
+    "id": "L2::extended_ops_1536#L2a#neg",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"East Of England NHS Collaborative Hub c/o West Suffolk NHS Foundation Trust\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2022\", \"value_type\": \"year\"}, {\"field_text\": \"procurement category\", \"operator\":"
+   },
+   {
+    "id": "L2::extended_ops_1152#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"answer_field_text\": \"\"}, {\"var_id\": \"b1a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Animal and Plant Health Agency\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\":"
+   },
+   {
+    "id": "L2::extended_ops_1770#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"answer_field_text\": \"\"}, {\"var_id\": \"b1a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Stoke on Trent City Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"e"
+   },
+   {
+    "id": "L2::bridge_join_1580#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"A\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Liverpool University Hospitals NHS Foundation Trust\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}], \"field_text\": \"notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\""
+   },
+   {
+    "id": "L2::bridge_join_0098#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Ministry of Housing, Communities & Local Government\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}], \"field_text\": \"procurement records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"co"
+   },
+   {
+    "id": "L2::bridge_join_1595#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Orkney Islands Council\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"in\", \"value\": \"CPV codes the council has used before\", \"value_type\": \"cpv\"}], \"field_text\": \"procurement notices\", \"bind_field_text\": \"\", \"metric_text\": \""
+   },
+   {
+    "id": "L2::bridge_join_0737#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Inverclyde Council\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}], \"field_text\": \"procurement records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold"
+   },
+   {
+    "id": "L2::bridge_join_1007#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"A\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Defence Science and Technology Laboratory\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}], \"field_text\": \"procurement notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": "
+   },
+   {
+    "id": "L2::bridge_join_0507#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier_name\", \"operator\": \"in\", \"value\": \"SE Trains Limited\", \"value_type\": \"entity\"}, {\"field_text\": \"supplier_name\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}], \"field_text\": \"procurement records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\""
+   },
+   {
+    "id": "L2::bridge_join_0385#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"contract notices\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}, {\"field_text\": \"multiple suppliers\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record"
+   },
+   {
+    "id": "L2::bridge_join_1826#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"A\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"London Borough of Enfield\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"unknown\"}], \"field_text\": \"procurement notice\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": "
+   },
+   {
+    "id": "L2::bridge_join_1830#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"A\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"London Borough of Tower Hamlets\", \"value_type\": \"entity\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"id\": \"B\", \"op\": \"distinct\", \"inputs\": [\"A\"], \"args\": {\"fi"
+   },
+   {
+    "id": "L2::bridge_join_1477#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"supplier / awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Medtronic Limited\", \"value_type\": \"entity\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}, {\"id\": \"b1\", \"op\": \"count"
+   },
+   {
+    "id": "L1::factoid_1467_tender_category",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Milton Keynes Council\", \"value_type\": \"entity\"}, {\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"Peach Care Services\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"85300000\", \"value_type\": \"cpv\"}, {"
+   },
+   {
+    "id": "L1::factoid_1792_tender_category",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"60000000\", \"value_type\": \"cpv\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2026\", \"value_type\": \"year\"}, {\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Neath Port Talbot County Borough Council\", \"value_type\": \"ent"
+   },
+   {
+    "id": "L1::factoid_1093_value_source",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"NHS England\", \"value_type\": \"entity\"}, {\"field_text\": \"supplier / awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"IntraHealth\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2023\""
+   },
+   {
+    "id": "L2::naturalized_1176#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Bedford Borough Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2026\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"85300000\", \"value_type\": \"cpv\"}, {\"field_te"
+   },
+   {
+    "id": "L1::factoid_2052_tender_category",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Merseytravel\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Halton Community Transport\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2022"
+   },
+   {
+    "id": "L1::factoid_2333_value_source",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"London Borough of Camden\", \"value_type\": \"entity\"}, {\"field_text\": \"supplier / awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Single Homeless Project\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"e"
+   },
+   {
+    "id": "L1::factoid_1528_value_source",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"NHS Birmingham and Solihull ICB\", \"value_type\": \"entity\"}, {\"field_text\": \"supplier / awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Restful Homes (Solihull) LTD\", \"value_type\": \"entity\"}, {\"field_text\": \"high-level pr"
+   },
+   {
+    "id": "L1::factoid_2773_value_source",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"NHS CAMBRIDGESHIRE AND PETERBOROUGH INTEGRATED CARE BOARD\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"ABBEY HEALTHCARE (CROMWELL) LTD\", \"value_type\": \"entity\"}, {\"field_tex"
+   },
+   {
+    "id": "L1::factoid_1302_tender_category",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"UK Hydrographic Office\", \"value_type\": \"entity\"}, {\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"Experis\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"75131000\", \"value_type\": \"cpv\"}, {\"field_text"
+   },
+   {
+    "id": "L1::factoid_0973_value_source",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"60000000\", \"value_type\": \"cpv\"}, {\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Sutton\", \"value_type\": \"entity\"}, {\"field_text\": \"supplier / awarded supplier\", \"operator\": \"eq\", \"value\": \"Achieving for Children\", \"value_type\": \"enti"
+   },
+   {
+    "id": "L2::extended_ops_1310#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"title\", \"operator\": \"eq\", \"value\": \"M365 Enterprise Agreement renewal of licenses\", \"value_type\": \"text\"}], \"field_text\": \"award records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"depends_on\": []}, {\"var_id\": \"b1a1\", \"op\": \"filter_records\", \"input"
+   },
+   {
+    "id": "L2::extended_ops_1652#L2a#dv",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"award title\", \"operator\": \"eq\", \"value\": \"DfC - Independent Review of licensing system including surrender principle\", \"value_type\": \"text\"}, {\"field_text\": \"award date signed\", \"operator\": \"gt\", \"value\": \"2025-05-01\", \"value_type\": \"date\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_t"
+   },
+   {
+    "id": "L2::extended_ops_0475#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"value\": \"\"}, {\"var_id\": \"b1a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"title\", \"operator\": \"eq\", \"value\": \"Student Assistance Services\", \"value_type\": \"text\"}, {\"field_text\": \"high-level procurement category\", \"operator\": \"eq\", \"value"
+   },
+   {
+    "id": "L2::extended_ops_0881#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}, {\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Wessex Water Services Ltd\", \"value_type\": \"entity\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"thresh"
+   },
+   {
+    "id": "L2::extended_ops_1339#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"value\": \"\", \"input\": \"b1a1\"}, {\"var_id\": \"b1a1\", \"depends_on\": [\"c1b1\"], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"title\", \"operator\": \"eq\", \"value\": \"Visitor and Functions Catering\", \"value_type\": \"text\"}, {\"field_text\": \"procurement category\", \"operator"
+   },
+   {
+    "id": "L2::extended_ops_1549#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"value\": \"\", \"input\": \"b1a1\"}, {\"var_id\": \"b1a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"title\", \"operator\": \"eq\", \"value\": \"Specialist Drama Education Services for HES Junior Tour Guides Programme\", \"value_type\": \"text\"}, {\"field_text"
+   },
+   {
+    "id": "L2::extended_ops_0649#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"value\": \"\", \"input\": \"b1a1\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, {\"var_id\": \"b1a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"tender_title\", \"operator\": \"eq\", \"value\": \"Power Capability Extension (PCE)\", \"value"
+   },
+   {
+    "id": "L2::extended_ops_1784#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"title\", \"operator\": \"eq\", \"value\": \"Supply of Electricity to Fermanagh and Omagh District Council\", \"value_type\": \"text\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"depends_on\": []}, {\"var_id\": \"b1a1\", \"op\": \"filter_records\", \"in"
+   },
+   {
+    "id": "L2::extended_ops_0884#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"title\", \"operator\": \"eq\", \"value\": \"Meningococcal group B vaccine (2022)\", \"value_type\": \"text\"}, {\"field_text\": \"award signed date\", \"operator\": \"gt\", \"value\": \"2025-05-01\", \"value_type\": \"date\"}], \"field_text\": \"\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\""
+   },
+   {
+    "id": "L2::extended_ops_1969#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"depends_on\": [\"b1a1\"], \"operation\": \"exists\", \"value_type\": \"boolean\", \"value\": \"\"}, {\"var_id\": \"b1a1\", \"depends_on\": [], \"operation\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"tender_title\", \"operator\": \"eq\", \"value\": \"NHS Education contract with Brunel University London\", \"value_type\": \"text\"}, {\"field_text\": \"tender_category\", \"operato"
+   },
+   {
+    "id": "L2::coverage_fixed_1423#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2022\", \"value_type\": \"year\"}, {\"field_text\": \"tender_cpv_id\", \"operator\": \"eq\", \"value\": \"03117120\", \"value_type\": \"cpv\"}, {\"field_text\": \"tender_category\", \"operator\": \"eq\", \"value\": \"goods\", \"value_type\": \"category\"}], \"field_text\": \"goods noti"
+   },
+   {
+    "id": "L2::coverage_fixed_1583#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2023\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"71312000\", \"value_type\": \"cpv\"}, {\"field_text\": \"procurement category\", \"operator\": \"eq\", \"value\": \"services\", \"value_type\": \"category\"}], \"field_text\": \"servi"
+   },
+   {
+    "id": "L1::count_year_category_1484",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}, {\"field_text\": \"tender_cpv_id\", \"operator\": \"eq\", \"value\": \"72610000\", \"value_type\": \"cpv\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\":"
+   },
+   {
+    "id": "L2::naturalized_0176#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2025\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"85111500\", \"value_type\": \"cpv\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"return"
+   },
+   {
+    "id": "L2::coverage_fixed_0346#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"71314100\", \"value_type\": \"cpv\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}], \"field_text\": \"services notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"r"
+   },
+   {
+    "id": "L2::naturalized_0065#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"79600000\", \"value_type\": \"cpv\"}], \"field_text\": \"contract notices\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"return"
+   },
+   {
+    "id": "L1::temporal_signed_count_0079",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}, {\"field_text\": \"tender_cpv_id\", \"operator\": \"eq\", \"value\": \"66512200\", \"value_type\": \"cpv\"}, {\"field_text\": \"tender_category\", \"operator\": \"eq\", \"value\": \"services\", \"value_type\": \"category\"}, {\"field_text\": \"has_sig"
+   },
+   {
+    "id": "L2::naturalized_1420#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2025\", \"value_type\": \"year\"}, {\"field_text\": \"tender_cpv_id\", \"operator\": \"eq\", \"value\": \"39160000\", \"value_type\": \"cpv\"}], \"field_text\": \"contract\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\":"
+   },
+   {
+    "id": "L2::coverage_fixed_0814#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"release_year\", \"operator\": \"eq\", \"value\": \"2022\", \"value_type\": \"year\"}, {\"field_text\": \"tender_cpv_id\", \"operator\": \"eq\", \"value\": \"75130000\", \"value_type\": \"cpv\"}, {\"field_text\": \"tender_category\", \"operator\": \"eq\", \"value\": \"services\", \"value_type\": \"category\"}], \"field_text\": \"contrac"
+   },
+   {
+    "id": "L1::temporal_signed_count_0351",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"98113000\", \"value_type\": \"cpv\"}, {\"field_text\": \"award date signed\", \"operator\": \"none\", \"value\": \"\", \"value_type\": \"date\"}], \"field_text\": \"contract notices\","
+   },
+   {
+    "id": "L1::factoid_1906_supplier_name",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"NHS England\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2023\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"85143000\", \"value_type\": \"cpv\"}, {\"field_text\": \"CPV la"
+   },
+   {
+    "id": "L1::factoid_0584_award_date_signed",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"THE CHANCELLOR MASTERS AND SCHOLARS OF THE UNIVERSITY OF CAMBRIDGE\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Ramboll UK Limited\", \"value_type\": \"entity\"}, {\"field_text\": "
+   },
+   {
+    "id": "L1::factoid_2550_buyer_name",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"79540000\", \"value_type\": \"cpv\"}, {\"field_text\": \"supplier\", \"operator\": \"eq\", \"value\": \"Wolfestone Translation Ltd\", \"value_type\": \"entity\"}, {\"field_text\": \"p"
+   },
+   {
+    "id": "L1::factoid_1354_award_date_signed",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Stoke on Trent City Council\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Armsons Barlow\", \"value_type\": \"entity\"}, {\"field_text\": \"award signed date\", \"operator\": \"eq\", \"value\":"
+   },
+   {
+    "id": "L1::factoid_2764_award_date_signed",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Warwickshire County Council\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Healthwatch Warwickshire C.I.C.\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operato"
+   },
+   {
+    "id": "L1::factoid_2835_buyer_name",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"inputs\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Constant Healthcare Ltd\", \"value_type\": \"entity\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"85000000\", \"value_type\": \"cpv\"}, {\"field_text\": \"procurement category\", \"operator\": \"eq\", \"value\": \"services\", \"value_type\": \"category\"}, "
+   },
+   {
+    "id": "L2::naturalized_0383#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Warwickshire County Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2023\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"98000000\", \"value_type\": \"cpv\"}, {\"fiel"
+   },
+   {
+    "id": "L2::naturalized_0056#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"85000000\", \"value_type\": \"cpv\"}, {\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"North Tyneside Council\", \"value_type\": \"entity\"}, {\"field_tex"
+   },
+   {
+    "id": "L2::naturalized_2031#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"Lincolnshire County Council\", \"value_type\": \"entity\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2026\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"60100000\", \"value_type\": \"cpv\"}], \"fiel"
+   },
+   {
+    "id": "L1::factoid_0389_award_date_signed",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"buyer organisation\", \"operator\": \"eq\", \"value\": \"NHS Shared Business Services Limited\", \"value_type\": \"entity\"}, {\"field_text\": \"awarded supplier / winner organisation\", \"operator\": \"eq\", \"value\": \"Addleshaw Goddard LLP\", \"value_type\": \"entity\"}, {\"field_text\": \"high-level procurement cat"
+   },
+   {
+    "id": "L2::extended_ops_1455#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"16000000\", \"value_type\": \"cpv\"}, {\"field_text\": \"value\", \"operator\": \"gt\", \"value\": \"0\", \"value_type\": \"money\"}], \"field_text\": \"contract\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"record_set\"}"
+   },
+   {
+    "id": "S3::minmax_argmax_09000000_2025",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"09000000\", \"value_type\": \"cpv\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2025\", \"value_type\": \"year\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"return"
+   },
+   {
+    "id": "S3::minmax_argmax_90500000_2024",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"90500000\", \"value_type\": \"cpv\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2024\", \"value_type\": \"year\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"return"
+   },
+   {
+    "id": "L2::extended_ops_1653#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"51620000\", \"value_type\": \"cpv\"}, {\"field_text\": \"service value\", \"operator\": \"gt\", \"value\": \"0\", \"value_type\": \"number\"}], \"field_text\": \"contract notice\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns"
+   },
+   {
+    "id": "S3::minmax_argmax_33000000_2023",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2023\", \"value_type\": \"year\"}, {\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"33000000\", \"value_type\": \"cpv\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"retu"
+   },
+   {
+    "id": "S3::minmax_argmax_33140000_2025",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"33140000\", \"value_type\": \"cpv\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2025\", \"value_type\": \"year\"}], \"field_text\": \"contract records\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"return"
+   },
+   {
+    "id": "L2::extended_ops_0501#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"33141770\", \"value_type\": \"cpv\"}, {\"field_text\": \"goods notices value\", \"operator\": \"gt\", \"value\": \"0\", \"value_type\": \"number\"}], \"field_text\": \"contract\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\""
+   },
+   {
+    "id": "L2::extended_ops_1197#L2a",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"98371000\", \"value_type\": \"cpv\"}, {\"field_text\": \"value\", \"operator\": \"gt\", \"value\": \"0\", \"value_type\": \"number\"}, {\"field_text\": \"procurement category\", \"operator\": \"eq\", \"value\": \"services\", \"value_type\": \"category\"}], \"field_text\": \"contract notice"
+   },
+   {
+    "id": "S3::minmax_argmax_77300000_2023",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"77300000\", \"value_type\": \"cpv\"}, {\"field_text\": \"published year\", \"operator\": \"eq\", \"value\": \"2023\", \"value_type\": \"year\"}], \"field_text\": \"contract\", \"bind_field_text\": \"\", \"metric_text\": \"\", \"comparator\": \"\", \"threshold\": \"\", \"k\": 0}, \"returns\": \"r"
+   },
+   {
+    "id": "S3::minmax_argmin_33140000_2023",
+    "kind": "shape_miss",
+    "raw": "{\"variables\": [{\"var_id\": \"a1\", \"op\": \"filter_records\", \"depends_on\": [], \"args\": {\"filters\": [{\"field_text\": \"CPV code\", \"operator\": \"eq\", \"value\": \"33140000\", \"value_type\": \"cpv\"}, {\"field_text\": \"release year\", \"operator\": \"eq\", \"value\": \"2023\", \"value_type\": \"year\"}, {\"field_text\": \"value amount\", \"operator\": \"gt\", \"value\": \"0\", \"value_type\": \"money\"}], \"field_text\": \"contract records\", \"bind_"
+   }
+  ]
+ }
+}
