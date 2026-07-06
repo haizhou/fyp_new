@@ -1,28 +1,80 @@
 {
- "questions": 3,
- "verified": 2,
- "verified_at_1": 0,
- "repair_gain": 2,
- "verified_and_oracle_match": 2,
- "errors": 0,
+ "questions": 9267,
+ "verified": 6860,
+ "verified_at_1": 4788,
+ "verified_and_oracle_match": 5605,
+ "answerable_n": 8555,
+ "answerable_verified_and_oracle": 5605,
  "per_bucket": {
-  "bridge_join": {
-   "n": 2,
+  "abstain_ambiguous": {
+   "n": 244,
+   "oracle_match": 235,
+   "verified": 9
+  },
+  "abstain_no_results": {
+   "n": 235,
+   "oracle_match": 234,
    "verified": 1
   },
+  "abstain_unsupported": {
+   "n": 233,
+   "verified": 84,
+   "oracle_match": 149
+  },
+  "boolean": {
+   "n": 382,
+   "verified": 296,
+   "oracle_match": 277
+  },
+  "bridge_join": {
+   "n": 1351,
+   "verified": 935,
+   "oracle_match": 337
+  },
+  "categorical": {
+   "n": 403,
+   "verified": 217,
+   "oracle_match": 124
+  },
+  "comparison": {
+   "n": 970,
+   "verified": 513,
+   "oracle_match": 429
+  },
+  "count": {
+   "n": 1790,
+   "verified": 1719,
+   "oracle_match": 1662
+  },
+  "factoid": {
+   "n": 1230,
+   "verified": 996,
+   "oracle_match": 947
+  },
+  "min_max": {
+   "n": 632,
+   "verified": 465,
+   "oracle_match": 465
+  },
+  "set": {
+   "n": 631,
+   "verified": 569,
+   "oracle_match": 373
+  },
+  "sum": {
+   "n": 802,
+   "verified": 762,
+   "oracle_match": 742
+  },
   "top_k": {
-   "n": 1,
-   "verified": 1
+   "n": 364,
+   "verified": 294,
+   "oracle_match": 249
   }
  },
+ "note": "RECOMPUTED FROM traces.jsonl 2026-07-07: original summary.json was clobbered by the Jul-5 3-question salvage invocation (data files untouched; see worklog). Full-harvest ground truth.",
  "teacher": {
   "step1": "gpt-5.4-nano",
-  "step2": "grok-4-1-fast-non-reasoning",
-  "step2_endpoint": "default",
-  "plan_temperature": 0.0,
-  "prompt_variant": "lean",
-  "schema_variant": "optional",
-  "max_repairs": 2,
-  "plan_samples": 2
+  "step2": "grok-4-1-fast-non-reasoning"
  }
 }

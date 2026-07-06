@@ -28,7 +28,7 @@ Rule: the thesis cites ONLY numbers from this table; each carries dataset, metri
 | FULLY-LOCAL Qwen (step1+dpo) | v2.2 | compare_v4(dev) | 260 | EM acc | 86.2% (224/260) | outputs/eval/matrix_v2/fully-local-qwen/compare_cicada.summary.json | 1 |  |
 | FULLY-LOCAL Llama (step1+sft) | v2.2 | compare_v4(dev) | 260 | EM acc | 84.2% (219/260) | outputs/eval/matrix_v2/fully-local-llama/compare_cicada.summary.json | 1 |  |
 | Teacher (nano+grok) | v2.2 | compare_v4(dev) | 260 | EM acc, 3 runs | mean 72.6% ± 1.1% (71.9%, 71.9%, 73.9%) | outputs/eval/matrix_v2/teacher* | 3 | noise floor |
-| Teacher harvest | harvest-cfg | train pool | 9267 | oracle-correct on answerable (DATA-ENGINE YIELD, not system acc) | 0.0% (2/8555) | data/qa/teacher_full_v1/summary.json | 1 | repair budget 2, temp per config |
+| Teacher harvest | harvest-cfg | train pool | 9267 | oracle-correct on answerable (DATA-ENGINE YIELD, not system acc) | 65.5% (5605/8555) [RECOMPUTED from traces 2026-07-07; summary.json had been clobbered by a 3-question salvage run] | data/qa/teacher_full_v1/traces.jsonl | 1 | repair budget 2 |
 | Qwen-SFT self-harvest r1 | harvest-cfg | train pool | 9267 | oracle-correct on answerable (DATA-ENGINE YIELD, not system acc) | 76.6% (6556/8555) | data/qa/rsft_qwen_r1/summary.json | 1 | repair budget 2, temp per config |
 | Llama-SFT self-harvest r1 | harvest-cfg | train pool | 9267 | oracle-correct on answerable (DATA-ENGINE YIELD, not system acc) | 78.1% (6685/8555) | data/qa/rsft_llama_r1/summary.json | 1 | repair budget 2, temp per config |
 
