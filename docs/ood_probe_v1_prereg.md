@@ -54,9 +54,20 @@ compare 的边类型只有 4 种:实体计数对、日期对轴、字段相等�
 
 ## 6. 评测矩阵与成本
 
-系统:fully-local-qwen、hybrid-qwen(dpo-v1)、fully-local-llama、hybrid-llama(sft)、教师 ×3 副本。
+系统 = **论文 headline 表中出现的全部系统 + 教师 ×3 副本**(外延定义,防真空洞:r2 学生
+届时已存在且大概率进 headline 表,矩阵按此定义自动包含它;任何进入 headline 表的后续系统同理)。
+当前已知成员:fully-local-qwen、hybrid-qwen(dpo-v1)、fully-local-llama、hybrid-llama(sft)、
+r2 学生(训练完成后)、教师 ×3。
 成本:学生本地免费;教师 3×600 ≈ 2,300 次 grok + nano ≈ 原收割成本的 ~1/5,可接受。
 队列:**hybrid final_test(裁决,最优先,已在跑)→ r2 恢复+训练 → 本 probe 试点→生成→评测**。
+
+**修订记录**:2026-07-06 数据生成前 amend——矩阵从枚举改为外延定义(纳入 r2);此后不再修订。
+
+## 6b. 生成器断言的实现约束(防"因空而过")
+
+N2 的新颖性断言**必须复用第 1 节普查的同一套"比较边类型重建"逻辑**(从 compare_params 的
+key 结构分类:sides/direction+pivot/threshold/空),禁止直接读 metric 字段——该字段全语料为空,
+读它会对任何值恒判 NOVEL(形式通过、实质未检)。生成器代码 import 普查模块共享实现,不另写捷径。
 
 ## 7. 报告承诺
 

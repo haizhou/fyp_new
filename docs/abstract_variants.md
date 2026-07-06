@@ -22,10 +22,17 @@ Step-2 同为 `qwen3_8b_cicada_dpo_v1`。McNemar 双侧 p<0.05 为界。
 
 ## 不受裁决影响的固定句(两版共用)
 
-- Student-vs-teacher: "+35/−5 discordant vs each of three teacher replicates, McNemar p≤2e-5" (DEV);
-  final_test 版本数字出来后替换。
-- 机制句(斜率,按模式措辞):"Across three teacher replicates, accuracy decays 6–12 points from
-  the iid to the hard-composite slice; the fully-local student shows no decay — with the SAME
-  planning checkpoint, attributable to the distilled understanding stage."
+- Student-vs-teacher 双层结构(两个集合各司其职,防混用):
+  "exceeds the teacher on the held-out test set (n=2,285, McNemar p=___, single teacher
+  replicate); robustness of this gap to provider nondeterminism was established on the
+  development set, where the student beats each of THREE teacher replicates (+35/−5, +34/−4,
+  +30/−5; p≤2e-5)."
+- parity 版补 CI:"Δ=__pt, 95% CI [__, __]"(配对差 CI 由不一致对数计算)——CI 窄本身就是
+  parity 的实证,比裸 "n.s." 硬。
+- 机制句(软化 + 模式措辞):"Across three teacher replicates, accuracy decays 6–12 points from
+  the iid to the hard-composite slice; the fully-local student shows **no measurable decay
+  (+0.8pt, n=136)** — with the SAME planning checkpoint, attributable to the distilled
+  understanding stage."
 - 命名纪律:正文一律 "hard-composite slice"(定义=难算子∪L2改写∪弃答类),不用 "OOD";
-  strict holdout 只有 1 个 test-only 模板族,进 limitations。
+  strict holdout 只有 1 个 test-only 模板族,进 limitations;组合泛化主张由 ood_probe_v1
+  (compositional OOD,预注册)承担。
