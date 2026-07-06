@@ -1,7 +1,20 @@
 # Abstract 措辞预案(final_test 配对裁决前写好,免得赶工硬拗)
 
 裁决实验:final_test (n=2,285, v4.1) 上 fully-local(本地 Step-1)vs hybrid(nano Step-1),
-Step-2 同为 `qwen3_8b_cicada_dpo_v1`。McNemar 双侧 p<0.05 为界。
+Step-2 同为 `qwen3_8b_cicada_dpo_v1`。
+
+## 裁决执行手册(全部出口预先有路,明早机械执行)
+
+设 Δ = acc(fully-local) − acc(hybrid),配对差 95% CI 由不一致对计算。
+1. **p<0.05 且 Δ>0** → 版本 A(superiority)。
+2. **n.s. 且 CI 下界 > −1.5pt** → 版本 B(parity,报 Δ 与 CI)。
+3. **n.s. 且 CI 下界 ≤ −1.5pt** → 版本 C(第三档):"comparable, direction favors ___"
+   ——不写 parity,只报方向与 CI。
+4. **p<0.05 且 Δ<0** → 版本 D(trade-off):"the fully-local system trades __ pt of accuracy
+   for zero marginal API cost and full data privacy"——完全不同措辞,亦站得住。
+教师配对**不阻塞**本裁决:树只依赖 fully-local vs hybrid;教师 final_test 晚到则 p 值后补,
+超教师句先按 DEV 三副本引用(已双层化)。
+Llama 分支与 Llama-r2 门槛见 worklog 决策树(r2:DEV 净收益 ≥ +2pt 或 bridge ≥15/20)。
 
 ## 版本 A:superiority(若 fully-local 显著胜出)
 

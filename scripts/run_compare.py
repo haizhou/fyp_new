@@ -78,7 +78,13 @@ def run_ours(rows, args):
 def run_cicada(rows, args):
     """The CURRENT production stack: nano Step-1 briefing + grok Step-2 graph planning
     (measured lean/optional config), deterministic compile + gated reflector (repair on,
-    structural resample) — identical to the teacher runner configuration."""
+    structural resample).
+
+    NOT identical to the teacher harvest configuration: the data engine (run_teacher.py)
+    runs --max-repairs 2, this EVAL protocol runs max_feedback_replans=1. Two deliberate
+    configs — every ladder rung is scored under the same 1-repair budget (matrix-internal
+    comparability), while harvest spends a bigger budget to maximise verified yield.
+    Cite them separately; do not describe eval numbers as "the harvest config"."""
     from procurement_graph.qa.benchmark.chat import ChatClient
     from procurement_graph.reasoning import ReasoningPipeline
     from procurement_graph.reasoning.kg_backend import RuntimeKGBackend
@@ -86,7 +92,10 @@ def run_cicada(rows, args):
     print("[compare/cicada] loading KG ...", flush=True)
     backend = RuntimeKGBackend.from_directory(ROOT / "data" / "kg")
     resolver = backend.org_resolver()
-    chat = ChatClient.from_env(temperature=0.0)
+    # fully-local mode: --step1-base-url points understanding at a local vLLM (no Azure/.env);
+    # --model then names the local Step-1 served model (e.g. cicada-qwen3-step1)
+    chat = (ChatClient(base_url=args.step1_base_url, api_key=args.step1_api_key, temperature=0.0)
+            if getattr(args, "step1_base_url", None) else ChatClient.from_env(temperature=0.0))
     plan_model = args.plan_model
     plan_chat = (ChatClient(base_url=args.plan_base_url, api_key=args.plan_api_key,
                             temperature=0.0)
@@ -104,13 +113,38 @@ def run_cicada(rows, args):
         except Exception as exc:  # noqa: BLE001 - live boundary
             return {**_slim(row), "predicted": None, "correct": False, "error": repr(exc)[:120]}
         return {**_slim(row), "predicted": _jsonable(pred), "correct": is_correct(pred, row)}
+    # Incremental spill: a 2,285-question run died at final-write once (nested Decimal) and lost
+    # everything; stream each result to a .partial file so a crash can never lose the run again.
     out = []
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    partial_path = out_dir / "compare_cicada.results.partial.jsonl"
+    done: dict[str, dict] = {}
+    if args.resume and partial_path.exists():
+        # Resume by ID DEDUP, not line count: a restart can race in-flight requests, producing
+        # duplicate or torn lines — keep the first valid record per id, skip only those ids.
+        for line in partial_path.read_text(encoding="utf-8").splitlines():
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                continue  # torn tail line from a killed run
+            rid = str(rec.get("id"))
+            if rid not in done:
+                done[rid] = rec
+        rows = [r for r in rows if str(r.get("id")) not in done]
+        out.extend(done.values())
+        print(f"[compare/cicada] resume: {len(done)} done, {len(rows)} remaining", flush=True)
+    partial = partial_path.open("a", encoding="utf-8")
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futs = [pool.submit(one, r) for r in rows]
         for i, f in enumerate(as_completed(futs), 1):
-            out.append(f.result())
+            rec = f.result()
+            out.append(rec)
+            partial.write(json.dumps(rec, ensure_ascii=False, default=str) + "\n")
+            partial.flush()
             if i % 25 == 0:
                 print(f"[compare/cicada] {i}/{len(rows)}", flush=True)
+    partial.close()
     return out
 
 
@@ -183,7 +217,16 @@ def _slim(row):
 
 
 def _jsonable(v):
-    return v if isinstance(v, (str, int, float, bool, type(None), list, dict)) else str(v)
+    # Deep conversion: money aggregates come off the frames as decimal.Decimal, and a Decimal
+    # NESTED in a list/dict passed the old shallow isinstance check — json.dumps then crashed at
+    # write time and lost a full 2,285-question final_test run. Convert containers recursively.
+    if isinstance(v, (str, int, float, bool, type(None))):
+        return v
+    if isinstance(v, list):
+        return [_jsonable(x) for x in v]
+    if isinstance(v, dict):
+        return {str(k): _jsonable(x) for k, x in v.items()}
+    return str(v)
 
 
 def summarize(results):
@@ -212,6 +255,10 @@ def main():
                     help="OpenAI-compatible endpoint for Step-2 only (local vLLM student); "
                          "Step-1 stays on the default endpoint")
     ap.add_argument("--plan-api-key", default="local")
+    ap.add_argument("--step1-base-url", default=None,
+                    help="OpenAI-compatible endpoint for Step-1 (fully-local mode); --model "
+                         "names the served Step-1 model. Unset = Azure nano via .env")
+    ap.add_argument("--step1-api-key", default="local")
     ap.add_argument("--workers", type=int, default=5)
     ap.add_argument("--rag-llm", choices=["on", "off"], default="on")
     ap.add_argument("--rag-mode", choices=["naive", "strong"], default="naive")
@@ -219,7 +266,11 @@ def main():
                     help="trace-aware reflector on our system (faithfulness check + bounded repair)")
     ap.add_argument("--top-k", type=int, default=0, help="0 = mode default (naive 10, strong 40)")
     ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--in", dest="in_path", default=str(COMPARE_SET))
+    ap.add_argument("--resume", action="store_true",
+                    help="cicada only: skip question ids already in the out-dir .partial file (id-dedup)")
+    # --questions is an alias for --in: the runbook/handoff commands use --questions, the
+    # original flag was --in. Same dest so either spelling works (last one on the CLI wins).
+    ap.add_argument("--in", "--questions", dest="in_path", default=str(COMPARE_SET))
     ap.add_argument("--out-dir", default=str(ROOT / "data" / "qa" / "eval" / "compare"))
     args = ap.parse_args()
 
@@ -236,14 +287,16 @@ def main():
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"compare_{label}.results.jsonl").write_text(
-        "\n".join(json.dumps(r, ensure_ascii=False) for r in results) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(r, ensure_ascii=False, default=str) for r in results) + "\n",
+        encoding="utf-8")
     summary = summarize(results)
     summary["label"] = label
     (out_dir / f"compare_{label}.summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\n[{label}] overall {summary['overall']['correct']}/{summary['overall']['total']} "
           f"({summary['overall']['accuracy']:.0%})")
     for cat, s in summary["by_category"].items():
-        print(f"  {cat:24s} {s['correct']:2d}/{s['total']:2d} ({s['accuracy']:.0%})")
+        # train-split rows carry no `category` (only train_bucket) -> key can be None
+        print(f"  {str(cat):24s} {s['correct']:2d}/{s['total']:2d} ({s['accuracy']:.0%})")
 
 
 if __name__ == "__main__":
