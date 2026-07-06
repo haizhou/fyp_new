@@ -49,3 +49,12 @@ Llama 分支与 Llama-r2 门槛见 worklog 决策树(r2:DEV 净收益 ≥ +2pt �
 - 命名纪律:正文一律 "hard-composite slice"(定义=难算子∪L2改写∪弃答类),不用 "OOD";
   strict holdout 只有 1 个 test-only 模板族,进 limitations;组合泛化主张由 ood_probe_v1
   (compositional OOD,预注册)承担。
+
+## r2 换 headline 规则(在 r2 任何 DEV 数字出现之前 commit;与 probe/llama-r2 门槛是两个不同决策)
+
+- **换 headline 门**(高):r2 在 DEV 上 ≥ fully-local champion **+3pt** 且 bridge 桶显著改善
+  (McNemar 对 champion 的 bridge 子集显著)→ 重跑 final_test 双臂(r2-fully-local + r2-hybrid),
+  headline 换 r2;矩阵按预注册外延定义自动纳入。
+- **增补行门**(低):不达上门但 ≥ +0pt → r2 作为矩阵增补行报告,headline 不动。
+- **负结果**:< 0pt → r2 如实报告为"自举第二轮收益递减",与 r1 的 +11pt 对照构成收敛曲线。
+- Llama-r2 门(既有):Qwen r2 DEV 净收益 ≥ +2pt 或 bridge ≥15/20 才在 Llama 上重复。
