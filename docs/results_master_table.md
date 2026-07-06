@@ -65,6 +65,19 @@ Strict-holdout probe available: 1 test-only template family (small n) — report
 Asymmetric dev->test decay: hybrid 83.5->78.0 (-5.5pt), fully-local 86.2->85.65 (-0.5pt) — denoising at scale.
 Pending fills: incl./excl. 19 cue-matched rows split; llama double-arm; r2 rung.
 
+
+### FINAL scoreboard incl. Llama arms (2026-07-07, all pairings McNemar p<1e-14)
+
+| System | final_test | vs teacher | vs own hybrid | dev->test decay |
+|---|---|---|---|---|
+| Teacher (1 replicate) | 69.76% | -- | -- | -- |
+| Llama hybrid (nano+sft) | 75.97% | +6.21 [+4.68,+7.74] | -- | -7.1pt |
+| Qwen hybrid (nano+dpo_v1) | 78.03% | +8.27 [+6.70,+9.85] | -- | -5.5pt |
+| Llama FULLY-LOCAL (step1+sft) | 83.33% | +13.57 [+11.81,+15.32] | +7.35 [+5.73,+8.97] | -0.9pt |
+| Qwen FULLY-LOCAL (step1+dpo_v1) | **85.65%** | **+15.89 [+14.07,+17.70]** | +7.61 [+6.10,+9.13] | **-0.5pt** |
+
+Four-point decay pattern: fully-local flat on both bases, hybrid steep on both bases -> denoising mechanism cross-base at n=2,285.
+
 ## Pending (filled as artifacts land)
 - final_test fully-local qwen (RUNNING)
 - r2 rung
