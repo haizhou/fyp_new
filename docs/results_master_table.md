@@ -53,6 +53,18 @@ Fully-local-vs-hybrid at scale: decided by final_test pairing (n=2,285), pending
 
 Strict-holdout probe available: 1 test-only template family (small n) — report in limitations.
 
+
+## FINAL_TEST headline block (2026-07-07, n=2,285, v4.1, eval protocol repair-1) — CONFIRMATORY SET
+
+| System | Acc | vs teacher (paired) | vs hybrid (paired) | Artifact |
+|---|---|---|---|---|
+| Teacher (nano+grok), 1 replicate | 69.76% (1594/2285) | — | — | outputs/eval/final_test/teacher_r1 |
+| Hybrid student (nano step1 + dpo_v1) | 78.03% (1783/2285) | +8.27pt, +263/-74, p<1e-15 | — | outputs/eval/final_test/hybrid_qwen_dpo |
+| FULLY-LOCAL student (step1_v1 + dpo_v1) | **85.65% (1957/2285)** | **+15.89pt, CI[+14.07,+17.70], +406/-43, p<1e-15** | +7.61pt, CI[+6.10,+9.13], +242/-68, p<1e-15 | outputs/eval/final_test/fully_local_qwen |
+
+Asymmetric dev->test decay: hybrid 83.5->78.0 (-5.5pt), fully-local 86.2->85.65 (-0.5pt) — denoising at scale.
+Pending fills: incl./excl. 19 cue-matched rows split; llama double-arm; r2 rung.
+
 ## Pending (filled as artifacts land)
 - final_test fully-local qwen (RUNNING)
 - r2 rung

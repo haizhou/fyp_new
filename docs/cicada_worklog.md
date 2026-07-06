@@ -1004,3 +1004,7 @@ Adjudication progress at write time: fully-local 437/2,285, hybrid 833/2,285, te
 **Decision-tree consequences (executed)**: Llama final_test double-arm approved by verdict-A branch -> fully-local-llama launched on GPU3 (zero API). Llama-hybrid arm follows on a free GPU. Llama-r2 still gated on Qwen-r2 DEV results (>= +2pt or bridge >= 15/20). Teacher final_test replicate continues (fills the same-set student-vs-teacher pairing; not blocking, per playbook).
 
 **Next**: teacher final_test completes -> same-set headline triple; r2 harvest (GPU2, ~2,100/9,267) -> export w/ factoid guard -> train -> DEV eval -> r2 gates; then ood_probe pilots.
+
+## 2026-07-07 - Same-set triple complete: teacher 69.76 / hybrid 78.03 / FULLY-LOCAL 85.65 on final_test; student beats teacher +15.89pt (p<1e-15)
+
+Teacher final_test replicate done (workers 4, ~overnight). Pairings on n=2,285: fully-local vs teacher +406/-43 (delta +15.89, CI [+14.07,+17.70]); hybrid vs teacher +263/-74 (+8.27). All three headlines now originate from ONE held-out set — the two-sets wording problem is gone; abstract A filled. Master table updated. Teacher final_test 69.76% is consistent with the DEV noise floor (72.6 +/- 1.1) given the harder natural mix.
