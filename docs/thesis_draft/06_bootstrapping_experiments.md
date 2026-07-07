@@ -271,6 +271,9 @@ on final_test.
 
 ## 6.8 The confirmatory scoreboard on final_test
 
+![Figure 6.1 — Held-out test set (n=2,285): the five-system scoreboard. Student stacks beat the teacher; the local briefing beats the cloud briefing. All pairwise McNemar p<1e-14. Render: docs/figures/F1_final_scoreboard.png](../figures/F1_final_scoreboard.png)
+
+
 Each base's hybrid champion and fully-local stack, together with a single teacher replicate,
 was evaluated exactly once on the frozen final_test set (n = 2,285, benchmark v4.1, evaluation
 protocol). All model selection preceded these runs; nothing was tuned afterwards.
@@ -280,6 +283,8 @@ protocol). All model selection preceded these runs; nothing was tuned afterwards
 95% intervals on the paired accuracy difference. Artifacts under `outputs/eval/final_test/`.**
 
 | System | Accuracy | Δ vs teacher [95% CI] | Δ vs own hybrid [95% CI] | dev → test decay |
+
+![Figure 6.2 — The four-point dev-to-test decay pattern: fully-local systems stay flat on both bases (−0.5 / −0.9 points) while hybrid systems drop sharply (−5.5 / −7.1). Solid lines: local briefing; dashed: cloud briefing. Render: docs/figures/F_decay_dev_to_test.png](../figures/F_decay_dev_to_test.png)
 |---|---|---|---|---|
 | Teacher (single replicate) | 69.76% (1,594/2,285) | — | — | — |
 | Llama hybrid (nano Step-1 + SFT) | 75.97% | +6.21 [+4.68, +7.74] | — | −7.1 pt |
