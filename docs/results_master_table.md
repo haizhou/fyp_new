@@ -48,6 +48,7 @@ Rule: the thesis cites ONLY numbers from this table; each carries dataset, metri
 | Qwen DPO-v1 vs teacher r1/r2/r3 | +35/-5, +34/-4, +30/-5 | 3e-7, 5e-7, 2e-5 | student >> teacher, robust to provider noise |
 | Qwen fully-local vs hybrid(dpo-v1) | +13/-6 | 0.167 | direction +, NOT individually significant |
 | Llama fully-local vs hybrid(sft) | +14/-11 | 0.690 | direction +, NOT individually significant |
+| CROSS (post-hoc): Llama-FL vs Qwen-hybrid, final_test | +252/-131, Δ=+5.30 CI[+3.62,+6.97] | 8.7e-10 | briefing quality dominates base capability; non-preregistered |
 
 Fully-local-vs-hybrid at scale: decided by final_test pairing (n=2,285), pending.
 
@@ -137,6 +138,20 @@ The verifier-gated self-improvement loop has a natural ceiling on this task. Hea
 (fully-local DPO, final_test 85.65%). r2 reported as a convergence data-point, not a new headline.
 Llama-r2: literal gate (bridge>=15/20) met on a technicality but the underlying gain is null;
 skipped: NOT because it would be null (Qwen convergence does not imply Llama convergence — DPO behaved oppositely across bases), but because the convergence claim is ALREADY established on the main base, single-base evidence suffices for it, and near deadline the 4 GPU-h has higher marginal value on ood_probe — pending user confirmation.
+
+
+## Promoted rows (2026-07-07 verification pass — draft v0.1 marker resolution)
+
+| Figure | Value | Primary source | Verification |
+|---|---|---|---|
+| Canonical organisations in KG | 131,502 | data/kg/nodes/org_nodes.parquet | [ARTIFACT-VERIFIED pandas count 2026-07-07] |
+| Contract-award records in KG | 215,221 | data/kg/nodes/contract_nodes.parquet | [ARTIFACT-VERIFIED pandas count; also kg_enrichment_plan.md] |
+| Dual-oracle agreement | 99.88% (14,752/14,770) | worklog 2026-07-04 + thesis_draft.md (legacy) §4.4 | [DOC-VERIFIED both sources] |
+| LLM-checker approves all rewrites (motivates mechanical checks) | 9,762/9,762 | thesis_draft.md (legacy) §2 | [DOC-VERIFIED; process fact, motivation-only] |
+| Bridge self-harvest verifier-blind stratum | verified 86.7% vs oracle-correct 52.3% (n=1,351) | worklog 2026-07-05 (computed from rsft_qwen_r1/traces.jsonl in-session) | [ARTIFACT-DERIVED] |
+| Median pairwise trigram-Jaccard of accepted L2 surfaces | 0.429 | thesis_draft.md (legacy) §4.5 | [DOC-VERIFIED; distributional evidence, not a diversity claim] |
+| OCDS release corpus size | 166,277 releases (2022-2026 five year-files) | ocds_data_analysis.md | [DOC-SOURCED; interim releases.parquet deleted] |
+| MoD under 77 distinct GB-FTS IDs (2024 sample) + money-semantics field survey | qualitative context | ocds_data_analysis.md | [DOC-SOURCED analysis document] |
 
 ## Pending (filled as artifacts land)
 - final_test fully-local qwen (RUNNING)
