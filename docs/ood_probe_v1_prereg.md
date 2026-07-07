@@ -114,3 +114,29 @@ language QUESTION through the EXACT fully-local pipeline entry used by final_tes
 (ReasoningPipeline.run / run_compare.py path, local Step-1 + Step-2), NOT a direct
 executor/decomposition call. A bypass "executable" does not count. This pre-empts a 4th gate bug:
 proving the PRODUCTION path supports a plan shape using a TEST-only path.
+
+
+## 9c. Oracle-consistency requirement (surfaced by the VOIDED bypass Part B; affects the 600-row double-verification)
+
+The abandoned hand-wired Part B (its 3/5-executable table is VOID — a test-only path, not the
+production entry; do not cite it) nonetheless surfaced a real oracle-consistency risk that WILL
+systematically mis-verify a batch of bridge/group questions in the 600-row generation unless
+fixed. Diagnosis-from-bypass is legitimate; VERDICT still requires the production entry.
+
+Two conventions where the second-implementation oracle (naive pandas) diverges from the runtime,
+observed live:
+- **Empty-string group handling** (B2): runtime correctly EXCLUDES the empty-supplier group
+  ['', 11035]; the naive pandas oracle counted it into top-1 -> false "not-sensible". The 600-row
+  oracle MUST replicate runtime's empty-string-group exclusion.
+- **Dedup key / multi-value expansion** (B3): boolean answer agreed (False) but the two sides'
+  raw counts differ 2.4x (runtime 7749/8683 vs oracle 18784/19718) — a coincidental
+  magnitude-ordering match, NOT logical agreement. Likely dedup-key difference (runtime dedups by
+  contract_node_id; oracle may row-count) or multi-value supplier_names list expansion. The 600-row
+  oracle MUST align its dedup key (contract_node_id) and multi-value handling with runtime.
+
+**Verdict rule for Part B production-entry rerun**: B2/B3 "not-sensible" from the bypass = "oracle
+convention PENDING ALIGNMENT", NOT "not executable". Re-judge sensible only AFTER the oracle's
+empty-string-group exclusion + dedup key are aligned with runtime. If, after alignment, B3's
+compare_gt two-subplan path STILL shows a genuine count discrepancy -> that is a real runtime bug
+-> drop B3 to a 4-template probe per §9a. If it was oracle convention -> fix oracle, B3 stays.
+This oracle-alignment step is a prerequisite for the whole 600-row double-verification, not just B3.
