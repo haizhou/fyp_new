@@ -92,3 +92,25 @@ least one gate bug. Pre-empt it:
 - Novelty-assertion gate specifically: audit 10 by confirming each asserted-NOVEL template's
   reconstructed structural signature is genuinely absent from the printed corpus inventory, and
   10 asserted-PRESENT (existing families) correctly flag as present — both directions.
+
+
+## 9. Amendments 2026-07-07 (pre-full-run, user-mandated)
+
+**9a. N2 is the weakest novelty — annotate, do not silently rely on it.** B1/B2/B3/N1 are novel at
+the COARSE-CELL level (op,bridged,group_by) — strong. N2 (filtered_sum_compare) collides with the
+existing comparison coarse-cell AND the `sides` compare-side-type; its novelty rests ONLY on the
+filter-slot axis ("filtered-aggregate-sum edge not previously seen"). Rules: (a) keep N2 but the
+thesis must state "N2's novelty is filter-slot-axis only, weaker than the other four; read its
+decay separately"; (b) if the Part-B production-entry pilot shows N2 problematic, drop to 4
+templates (3 bridge + temporal_argmax) per the §4 degradation path. Decision deferred to Part B.
+
+**9b. Executability pilot MUST use the production entry, not a hand-wired path.** The executor's
+native op set does NOT include `compare` (grounding.py _SUPPORTED): B3's compare compiles via the
+decomposition combine="compare_gt" two-subplan path; B2's rank_top_k compiles to top_k; B1/N1's
+group-by argmax compiles to top_k k=1. So §4's answer is not "executes Y/N" but "executes THROUGH A
+NON-TRIVIAL COMPILE REWRITE" — and whether that rewrite is faithful cannot be judged by an agent
+that assembles its own executor call. MANDATE: Part B runs each template as a hand-written natural-
+language QUESTION through the EXACT fully-local pipeline entry used by final_test
+(ReasoningPipeline.run / run_compare.py path, local Step-1 + Step-2), NOT a direct
+executor/decomposition call. A bypass "executable" does not count. This pre-empts a 4th gate bug:
+proving the PRODUCTION path supports a plan shape using a TEST-only path.
