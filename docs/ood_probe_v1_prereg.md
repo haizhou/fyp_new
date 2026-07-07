@@ -26,7 +26,7 @@ compare 的边类型只有 4 种:实体计数对、日期对轴、字段相等�
 | B2 | bridge_top_k | (rank_top_k, **bridged**, group=supplier_name) | **NOVEL**✓ | top_k_buyers_cpv:**直连 eq 过滤**+group=buyer_name,无 in_subquery(已核 gold_plan) |
 | B3 | bridge_compare_2x | (compare, **bridged**, 边=桥接计数×2) | **NOVEL**✓ | comparison:边为实体(直连计数),非桥接子计划 |
 | N1 | temporal_argmax | (argmax, 非桥, group=release_year) | **NOVEL**✓ | temporal_count(count 无 argmax)/ min_max(无分组) |
-| N2 | filtered_sum_compare | (compare, 非桥, 边=**过滤聚合 sum**×2) | **NOVEL**✓(边类型轴,非空字段反身) | comparison(边=实体计数)/ additive_sum(sum 无比较) |
+| N2 | filtered_sum_compare | (compare, 非桥, side_type=**sides**=既有型!, filter-slot 轴新) | NOVEL 仅 filter-slot 轴(距离 1.0,最弱) | comparison(同粗胞+同 side_type,仅 filter 组合不同) |
 
 断言验证脚本:worklog 2026-07-06 记录的普查代码;生成器将内置同一断言,任何生成行签名命中既有集合即拒绝。
 
@@ -140,3 +140,15 @@ empty-string-group exclusion + dedup key are aligned with runtime. If, after ali
 compare_gt two-subplan path STILL shows a genuine count discrepancy -> that is a real runtime bug
 -> drop B3 to a 4-template probe per §9a. If it was oracle convention -> fix oracle, B3 stays.
 This oracle-alignment step is a prerequisite for the whole 600-row double-verification, not just B3.
+
+
+## 9d. N2 novelty CORRECTION (pilot finding 2026-07-07)
+
+Reconstruction disproves §2's claim that N2 is novel on the compare-side-type axis. N2's
+compare_side = "sides" = one of the EXISTING four types; its coarse cell (compare,False,None) is
+PRESENT; novelty rests ONLY on the filter-slot combination, distance 1.0 to nearest (family
+comparison). N2 is the weakest template by a clear margin — weaker than §9a admitted. Decision
+(pick before full generation): (a) KEEP N2, thesis states "N2 novel on filter-slot axis only,
+marginal (d=1.0); read separately, treat as a soft control"; or (b) DROP to 4 templates (3 bridge
++ N1 temporal_argmax — N1 IS coarse-cell novel and fills the non-bridge-control role N2 was meant
+to serve). Recommendation leans (b) for a clean compositional-novelty story, but deferred to user.
