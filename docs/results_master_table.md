@@ -102,6 +102,23 @@ Bound: every headline moves <=0.21pt; rankings and significance unchanged. (Delt
 
 Three-layer separation: JSON SYNTAX is free (all 100%), structural SHELL is near-free (99-100%, but degenerate/empty for the base — 2-var no-filter shells), CONTENT-valid planning (question_type + >=1 grounded filter) is ENTIRELY acquired by fine-tuning (0 -> 94 -> 99). Supports the control-variable claim: guided decoding at eval time enforces the near-free shell, so ladder accuracy deltas isolate the learned content. [artifact outputs/eval/schema_valid_diagnostic.json; instrument twice-verified: JSON extractor fence/brace-fair, shape gate spot-checked and split into wellformed+content after base emitted empty shells.]
 
+
+### r2 (bootstrap round 3) — SUPPLEMENTARY ROW per pre-committed gate (Δ<+3pt, n.s.)
+
+| Metric | r2 | fully-local DPO champion | verdict |
+|---|---|---|---|
+| DEV (compare_v4) | 86.5% (225/260) | 86.2% (224/260) | +0.4pt, McNemar +3/-2 p=1.0 |
+| bridge_join bucket | 15/20 | 14/20 | +1, p=1.0 (n.s.) |
+| harvest answerable yield | 86.3% | (r1 76.6%) | yield keeps rising... |
+| harvest bridge yield | 75% | (r1 52%) | ...but training gain saturates |
+
+**Bootstrap convergence**: r1 gave +11pt over teacher at harvest AND translated to the ladder;
+r2 harvest yield still climbs (answerable 86.3%, bridge 75%) but the eval gain is +0.4pt (n.s.).
+The verifier-gated self-improvement loop has a natural ceiling on this task. Headline UNCHANGED
+(fully-local DPO, final_test 85.65%). r2 reported as a convergence data-point, not a new headline.
+Llama-r2: literal gate (bridge>=15/20) met on a technicality but the underlying gain is null;
+skipped (would cost ~4 GPU-h to replicate a non-significant result) — pending user confirmation.
+
 ## Pending (filled as artifacts land)
 - final_test fully-local qwen (RUNNING)
 - r2 rung
