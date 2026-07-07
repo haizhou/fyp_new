@@ -100,15 +100,27 @@ Four-point decay pattern: fully-local flat on both bases, hybrid steep on both b
 Bound: every headline moves <=0.21pt; rankings and significance unchanged. (Deltas negative: the cue rows were mostly answered correctly by ALL systems.)
 
 
-### Schema-valid diagnostic — RETRACTED pending re-score (2026-07-07)
+### Schema-valid diagnostic (no guided decoding, n=100 DEV, DUAL-METRIC, raws scanned 2026-07-07)
 
-The 0/94/99 content-rate reading was an INSTRUMENT ARTIFACT: the content gate searched for
-filters only at variables[].filters, but the untrained base emits grounded filters at
-variables[].args.filters (a different but valid self-invented schema, with REAL entities —
-"Middlesbrough Council" etc.). So base=0 measured "does not match the trained schema's filter
-LOCATION", not "cannot plan". Re-running with a schema-agnostic content gate (deep filter
-search). NO diagnostic number is citable until that completes. Third instrument flaw caught
-pre-publication (after JSON-extractor over-count and shape-gate over-count).
+| Model | JSON-parse | grounded-any-schema | target-contract-conformant |
+|---|---|---|---|
+| Qwen3-8B (untrained base) | 100 | **98** | **3** |
+| cicada-qwen3-sft | 100 | 98 | 98 |
+| cicada-qwen3-dpo | 100 | 99 | 99 |
+
+Verified by opening 10 random base raws (not trusting the gate): the base emits question-grounded
+plans with REAL entities (Wessex Water, NHS England, real CPV/years) but in a self-invented schema
+(op:filter_records, args.filters, id/inputs) — NOT the compiler's contract. Conclusion: fine-tuning
+does NOT teach planning ability (the base already extracts entities and builds filter structures) —
+it teaches CONFORMANCE TO THE SPECIFIC EXECUTABLE CONTRACT (target 3 -> 98/99). Guided decoding at
+eval time enforces exactly this contract, so the accuracy ladder isolates planning QUALITY within
+the contract, not the ability to emit it. Honesty caveats: (1) diagnostic stored only failures, so
+trained-arm PASSES were not individually scanned — the claim rests on the base arm's verified
+grounded-but-off-schema pattern; (2) 1 base abstain via return.operation (not question_type) was
+under-counted as "empty" — the 3-vs-98 direction is insensitive. This diagnostic had THREE prior
+opposite-signed gate flaws (extractor over-count / shape over-count / content under-count), each
+caught by spot-check — the audit trail is itself an eval-methodology contribution.
+artifact: docs/artifacts/schema_valid_diagnostic.json.
 
 ### r2 (bootstrap round 3) — SUPPLEMENTARY ROW per pre-committed gate (Δ<+3pt, n.s.)
 
