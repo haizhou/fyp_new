@@ -14,7 +14,7 @@
 签名 = `(answer_operation, bridged := ∃constraint.op=in_subquery, group_by 轴, 比较边类型, 过滤槽组合)`,
 由 `gold_plan` 扁平 spec 程序化重建(非 family 名——family 名断言是反身的,已弃用)。
 
-普查(train ∪ final_test ∪ dev_tune ∪ dev_select,12,828 行):**50 个结构签名**;粗胞
+普查(train ∪ final_test ∪ dev_tune ∪ dev_select,**12,779 行** — 4 split;12,828 是含 dev_smoke 的 5-split 总数,§1 原标签误用了后者,2026-07-07 更正):**38 个结构签名**(原记 50,见 §9d 更正);粗胞
 `(op, bridged, group_by)` 仅 12 个:桥接只存在 count/sum 两种;分组只存在非桥接 rank_top_k(buyer_name);
 compare 的边类型只有 4 种:实体计数对、日期对轴、字段相等、数值阈值(逐家族核对表见 worklog)。
 
@@ -152,3 +152,25 @@ comparison). N2 is the weakest template by a clear margin — weaker than §9a a
 marginal (d=1.0); read separately, treat as a soft control"; or (b) DROP to 4 templates (3 bridge
 + N1 temporal_argmax — N1 IS coarse-cell novel and fills the non-bridge-control role N2 was meant
 to serve). Recommendation leans (b) for a clean compositional-novelty story, but deferred to user.
+
+
+## 9d. Traceability corrections (2026-07-07, ood_probe pilot Part A)
+
+- **Signature count 50 -> 38 (outcome b, annotate not match).** The original "50" in the
+  2026-07-06 worklog census was an UNCOMMITTED ad-hoc count — no census code survives in any git
+  blob. Faithful reconstruction of the §1 five-tuple gives **38 signatures / 12 coarse cells**; a
+  12-variant definition sweep found NONE hitting 50 (closest +answer_field=49, +generalization_
+  class=47, neither a §1 axis). The four independently-checkable §1 landmarks reproduce EXACTLY
+  (12 coarse cells; bridging only in count/sum; exactly 4 compare edge-types; group_by only
+  rank_top_k(buyer_name)). Corrected number = 38. Novelty assertions unaffected (they only need
+  5 templates ∉ the set). Scratch: scratchpad/sig_recon.py, novelty_audit.py.
+- **Census scope 12,828 -> 12,779.** The §1 label said 12,828 for the 4-split census, but 12,828
+  is the 5-split total (includes dev_smoke 49); the 4 splits = 12,779. Corrected.
+- **N2 framing correction (my instruction error, agent correctly caught).** A mid-run instruction
+  asked to confirm N2 as a FIFTH compare-side-type; the faithful classifier and committed §9a both
+  show N2's edge IS the existing `sides` type — N2 is novel ONLY on the filter-slot axis (weakest
+  of the five). The agent reported the honest finding and refused to re-engineer N2 to fit the
+  aspirational framing — the correct call. §9a stands; N2 stays as the weakest-novelty non-bridge
+  control with the explicit discount.
+- **Novelty gate audit: 10/10 correct** (5 asserted-NOVEL templates absent, 5 asserted-PRESENT
+  families present) — both directions.
