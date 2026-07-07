@@ -92,16 +92,15 @@ Four-point decay pattern: fully-local flat on both bases, hybrid steep on both b
 Bound: every headline moves <=0.21pt; rankings and significance unchanged. (Deltas negative: the cue rows were mostly answered correctly by ALL systems.)
 
 
-### Schema-valid diagnostic (no guided decoding, n=100 stratified DEV, dual-gate)
+### Schema-valid diagnostic — RETRACTED pending re-score (2026-07-07)
 
-| Model | JSON-parse | well-formed shell | CONTENT-valid |
-|---|---|---|---|
-| Qwen3-8B (untrained base) | 100% | 100% | **0%** |
-| cicada-qwen3-sft | 100% | 99% | 94% |
-| cicada-qwen3-dpo | 100% | 100% | 99% |
-
-Three-layer separation: JSON SYNTAX is free (all 100%), structural SHELL is near-free (99-100%, but degenerate/empty for the base — 2-var no-filter shells), CONTENT-valid planning (question_type + >=1 grounded filter) is ENTIRELY acquired by fine-tuning (0 -> 94 -> 99). Supports the control-variable claim: guided decoding at eval time enforces the near-free shell, so ladder accuracy deltas isolate the learned content. [artifact outputs/eval/schema_valid_diagnostic.json; instrument twice-verified: JSON extractor fence/brace-fair, shape gate spot-checked and split into wellformed+content after base emitted empty shells.]
-
+The 0/94/99 content-rate reading was an INSTRUMENT ARTIFACT: the content gate searched for
+filters only at variables[].filters, but the untrained base emits grounded filters at
+variables[].args.filters (a different but valid self-invented schema, with REAL entities —
+"Middlesbrough Council" etc.). So base=0 measured "does not match the trained schema's filter
+LOCATION", not "cannot plan". Re-running with a schema-agnostic content gate (deep filter
+search). NO diagnostic number is citable until that completes. Third instrument flaw caught
+pre-publication (after JSON-extractor over-count and shape-gate over-count).
 
 ### r2 (bootstrap round 3) — SUPPLEMENTARY ROW per pre-committed gate (Δ<+3pt, n.s.)
 
@@ -117,7 +116,7 @@ r2 harvest yield still climbs (answerable 86.3%, bridge 75%) but the eval gain i
 The verifier-gated self-improvement loop has a natural ceiling on this task. Headline UNCHANGED
 (fully-local DPO, final_test 85.65%). r2 reported as a convergence data-point, not a new headline.
 Llama-r2: literal gate (bridge>=15/20) met on a technicality but the underlying gain is null;
-skipped (would cost ~4 GPU-h to replicate a non-significant result) — pending user confirmation.
+skipped: NOT because it would be null (Qwen convergence does not imply Llama convergence — DPO behaved oppositely across bases), but because the convergence claim is ALREADY established on the main base, single-base evidence suffices for it, and near deadline the 4 GPU-h has higher marginal value on ood_probe — pending user confirmation.
 
 ## Pending (filled as artifacts land)
 - final_test fully-local qwen (RUNNING)

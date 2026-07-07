@@ -77,6 +77,25 @@ def _extract_json(raw: str):
     return None
 
 
+def _has_grounded_filter(g):
+    """Schema-agnostic: is there ANY filter (at variables[].filters OR variables[].args.filters
+    OR nested anywhere) carrying a non-empty value? The untrained base emits args.filters — a
+    location-specific gate scored it 0 despite real grounded content."""
+    found = []
+    def walk(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k == "filters" and isinstance(v, list):
+                    found.extend(x for x in v if isinstance(x, dict))
+                else:
+                    walk(v)
+        elif isinstance(o, list):
+            for x in o:
+                walk(x)
+    walk(g)
+    return any(str(f.get("value", "")).strip() for f in found)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-url", default="http://localhost:8011/v1")
@@ -96,8 +115,7 @@ def main() -> int:
 
     report: dict[str, dict] = {}
     for model in args.plan_models:
-        parse_ok = shape_ok = content_ok = 0
-        shape_kinds: dict[str, int] = {}
+        parse_ok = target_ok = grounded_ok = 0
         fails: list[str] = []
         for i, r in enumerate(rows):
             q = str(r["question"])
@@ -122,34 +140,32 @@ def main() -> int:
                 continue
             parse_ok += 1
             g = obj.get("graph_plan") if isinstance(obj.get("graph_plan"), dict) else obj
-            kind = None
-            content = False
+            is_abstain = isinstance(g, dict) and str(g.get("question_type", "")) in {"unanswerable", "ambiguous"}
+            # METRIC 1 target-conformant: EXACT contract the compiler consumes
+            # (variables[].filters location + return present), or a valid abstain
+            target = False
             if isinstance(g, dict):
                 vs = g.get("variables") if isinstance(g.get("variables"), list) else []
-                if vs and isinstance(g.get("return"), dict):
-                    kind = "graph_plan"
-                    # CONTENT gate: non-degenerate = has question_type AND >=1 variable carries
-                    # >=1 filter (base model emits empty 2-var shells that pass well-formedness)
-                    nfilt = sum(len(v.get("filters") or []) for v in vs if isinstance(v, dict))
-                    if str(g.get("question_type", "")).strip() and nfilt >= 1:
-                        content = True
-                elif str(g.get("question_type", "")) in {"unanswerable", "ambiguous"}:
-                    kind = "abstain"; content = True
-                elif _is_intent_program(g):
-                    kind = "intent_echo"; content = True
-            if kind:
-                shape_ok += 1
-                shape_kinds[kind] = shape_kinds.get(kind, 0) + 1
-            if content:
-                content_ok += 1
-            else:
-                fails.append({"id": r["id"], "kind": "shape_miss", "raw": json.dumps(obj)[:400]})
+                strict_filt = sum(len(v.get("filters") or []) for v in vs if isinstance(v, dict))
+                if vs and isinstance(g.get("return"), dict) and (strict_filt >= 1 or is_abstain):
+                    target = True
+                elif is_abstain:
+                    target = True
+            # METRIC 2 grounded-any: planning content in ANY schema (schema-agnostic)
+            grounded = is_abstain or (isinstance(g, dict) and _has_grounded_filter(g))
+            if target:
+                target_ok += 1
+            if grounded:
+                grounded_ok += 1
+            if not (target or grounded):
+                fails.append({"id": r["id"], "kind": "empty", "raw": json.dumps(obj)[:600]})
+            elif not target:
+                fails.append({"id": r["id"], "kind": "grounded_but_off_schema", "raw": json.dumps(obj)[:600]})
             if (i + 1) % 25 == 0:
                 print(f"[{model}] {i+1}/{len(rows)}", flush=True)
-        report[model] = {"n": len(rows), "json_parse_ok": parse_ok, "plan_shape_ok": shape_ok,
-                         "parse_rate": parse_ok / len(rows), "shape_rate": shape_ok / len(rows), "content_ok": content_ok, "content_rate": content_ok / len(rows),
-                         "shape_kinds": shape_kinds, "failures": fails}
-        print(f"[{model}] parse {parse_ok}/{len(rows)}  shape {shape_ok}/{len(rows)}")
+        report[model] = {"n": len(rows), "json_parse_ok": parse_ok,
+                         "target_conformant": target_ok, "grounded_any": grounded_ok, "failures": fails}
+        print(f"[{model}] parse {parse_ok}  target-schema {target_ok}  grounded-any {grounded_ok}  (/{len(rows)})")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=1), encoding="utf-8")
     print("wrote", args.out)
