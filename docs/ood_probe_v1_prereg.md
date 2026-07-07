@@ -73,3 +73,22 @@ key 结构分类:sides/direction+pivot/threshold/空),禁止直接读 metric 字
 
 无论落在哪个分支:五模板逐一报绝对值+CI;桥/非桥分开;与 hard-composite 切片并排;
 不合并、不挑选、不重跑。若试点导致模板降级,降级本身入论文 limitation。
+
+
+## 8. Gate self-audit (MANDATORY, added 2026-07-07 after 3 consecutive diagnostic gate bugs)
+
+Track record: the schema diagnostic had three opposite-signed gate flaws (extractor over-counted
+failures, shape gate over-counted successes, content gate under-counted the base) — each caught
+only by after-the-fact spot-check. This probe has the DENSEST gate logic in the project
+(novelty-assertion gate, oracle gate, executability gate), so by that base rate it will have at
+least one gate bug. Pre-empt it:
+
+- **Before any full run**, each gate is applied to 10 hand-labelled examples (known expected
+  verdict) and the gate's decision must match human judgment on all 10; mismatch -> fix gate,
+  re-audit, THEN full run.
+- **Random-10 raw dump for every rate**: `scripts/dump_raws.py` prints 10 DETERMINISTIC-random
+  decisions (passes AND failures, not failures-only) with full raw + verdict fields. Any
+  rate-type number entering a table/figure requires a human to have scanned its random-10 first.
+- Novelty-assertion gate specifically: audit 10 by confirming each asserted-NOVEL template's
+  reconstructed structural signature is genuinely absent from the printed corpus inventory, and
+  10 asserted-PRESENT (existing families) correctly flag as present — both directions.

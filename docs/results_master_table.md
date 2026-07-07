@@ -1,5 +1,13 @@
 # Master results table (single source of truth for every citable number)
 
+
+> **IRON RULE (2026-07-07, after 3 gate bugs):** every RATE-type / gate-decided number here
+> must have had 10 deterministic-random raws (passes AND failures) human-scanned before entry,
+> via `scripts/dump_raws.py`. End-to-end EM numbers (five-pairing matrix) are oracle-double-
+> verified and exempt; gate-judged numbers (schema diagnostic, ood_probe, gain decomposition)
+> are NOT exempt. A suspiciously clean/terrible number is treated as an instrument fault until
+> its raws are opened.
+
 Rule: the thesis cites ONLY numbers from this table; each carries dataset, metric, pipeline version, artifact path.
 
 - Benchmark arithmetic: **12,828** = train 9,267 + dev_tune 556 + dev_select 671 + dev_smoke 49 + final_test 2,285. compare_set_v4 (260) ⊂ final_test.
