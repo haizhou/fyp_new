@@ -1,0 +1,80 @@
+\section{Chapter 1 --- Introduction}\label{sec:chapter-1-introduction}
+
+\section{Task and motivation}\label{sec:task-and-motivation}
+
+Every year the United Kingdom publishes hundreds of thousands of contract-award notices. These notices describe how public money is spent: which authority bought what, from which supplier, for how much, and under which procurement category. This dissertation studies natural-language question answering over a knowledge graph built from 215,221 such contract-award records (artifact-verified count; results table, promoted rows). A journalist, auditor, or council officer should be able to ask "Which supplier received the most cleaning contracts from London boroughs in 2022?". They should receive either an answer whose every step is traceable to specific records in the graph, or an explicit refusal to answer when the question is ambiguous, unsupported by the schema, or matched by no records at all.
+
+In this domain the second half of that requirement matters as much as the first. Questions about public spending carry an accountability weight that most question-answering settings do not. A fluent but fabricated total, or a confidently named supplier who never held the contract, is worse than no answer. Such an answer can flow into reporting and decision-making with the borrowed authority of the underlying official data. The system studied here, CICADA, is therefore built around a single non-negotiable constraint: an answer is only ever produced by deterministic execution against the knowledge graph. Where the system cannot support an answer, it must abstain.
+
+Large language models are the obvious choice for the language-understanding half of this task. The largest cloud-hosted models can indeed perform it to a useful standard. However, using a cloud model on public-sector data raises three linked objections. It is costly, because every query adds marginal API cost that grows with usage instead of amortising. It is uncontrollable, because the provider may change, deprecate, or nondeterministically vary the model under a fixed application; we measure this variability directly in this work. It is also non-private, because the queries, and any internal data joined against them, must leave the organisation's infrastructure. A local system built from small open-weight models would resolve all three objections at once, if it could be made competent enough.
+
+\section{The trust dilemma, and why retrieval augmentation is not enough}\label{sec:the-trust-dilemma-and-why-retrieval-augm}
+
+The task therefore sits on a trust dilemma. Language models can read the question but answer unverifiably: nothing in a free-form generated response separates a genuine aggregation over the data from a plausible confabulation. Query executors answer verifiably but cannot read: a database engine will faithfully compute whatever it is asked, but turning an ambiguous English question into the right query is exactly the hard part. Any credible architecture must couple the two, and trust is either established or quietly lost at the coupling point.
+
+The most common coupling today is retrieval-augmented generation (RAG). Relevant records are retrieved into the model's context window, and the model composes an answer over them. For this task RAG fails structurally, not incidentally. Procurement questions are dominated by exhaustive computation: counts, sums, rankings, and multi-hop joins whose correct answer depends on \emph{all} matching records, not a representative sample. No top-k retrieval window can hold "every contract awarded by every London borough in 2022". A language model asked to aggregate over a truncated window will produce an answer that is wrong in a way no reader can detect. Our measurements support this. On our 260-question development set under the v1 pipeline, a naive RAG baseline achieved 31.5\% (82/260) and a strengthened RAG baseline 28.8\% (75/260). Under the same v1 pipeline and on the same development set, a completely untrained 8B model, given only the executable-plan scaffolding described in Chapter 5, reached 61.5\% (160/260). (Under the revised v2.2 pipeline this zero-shot scaffolding floor rises to 70.4\% on the same development set.) The lesson is that the scaffolding, which forces the model to emit a checkable, executable plan rather than a free-form answer, is worth more than retrieval before any training has taken place.
+
+Scaffolding alone, however, still leaves a gap of ten to twenty accuracy points against what the task demands. Closing that gap is where a second dilemma appears. The classical route to a competent small model is distillation from a large one: the cloud teacher labels training data, and the student imitates. But classical distillation assumes a \emph{trusted} teacher, and on this task the teacher is not trustworthy. As Chapter 6 shows, the cloud teacher pipeline itself answers only around seven in ten held-out questions correctly. Imitating an untrusted teacher transfers its errors along with its competence. The central move of this dissertation is to show that teacher trust can be replaced by something the task itself provides: \emph{partial verifiability}. A large and precisely characterisable region of the failure space is mechanically checkable. The checks ask whether a plan compiles, whether its entities ground in the graph, whether it executes, whether its structure matches its stated intent, and, at training time only, whether its answer agrees with an independent oracle. Supervision can be drawn only from that region, discarding everything the checks cannot vouch for, regardless of which model produced it.
+
+\section{The one-sentence thesis}\label{sec:the-one-sentence-thesis}
+
+The dissertation defends a single sentence:
+
+\begin{quote}
+\textbf{Supervision flows only from the verifiable region, yet the learned competence extends beyond it.}
+\end{quote}
+
+The first clause is a statement of construction. Every training example used anywhere in this work has passed a deterministic compile--ground--execute--verify chain. During training-data harvest only, it has also passed an agreement check against an independently computed oracle answer. The oracle \emph{filters} candidate examples; it never \emph{authors} them: no gold plan or gold answer is ever copied into the training data. Whatever cannot be projected onto structure and execution receives no supervision at all, because no mechanical check can certify it. This residue is chiefly the purely semantic question of whether a plan means what the question means.
+
+The second clause is the empirical surprise, and the mechanism behind the headline results. If the student merely memorised the verifiable region, its competence should stop at the projection line. It should perform well where the checks reach and collapse where they do not. It does not. We contrast a development-set i.i.d. slice (n=103) with a \emph{hard-composite} slice (n=136). The hard-composite slice combines hard operators, second-level paraphrase, and abstention cases; this difficulty composite appears in both training and test with disjoint plans and novel surfaces. On this contrast the cloud teacher's accuracy decays by between 6 and 12 points across three replicates (--10.3, --6.1, --12.5), while the fully-local student shows no measurable decay (+0.8 points, n=136). The student trained only on verifier-passed data generalises \emph{past} the region the verifier can see, where the far larger teacher degrades. This is the mechanism answer to the question "why is partial verifiability enough": the capability learned from verifiable supervision is wider than the coverage of the signal that taught it.
+
+\section{Approach overview: the three-layer structure}\label{sec:approach-overview-the-three-layer-struct}
+
+The system design that carries this thesis has three layers. Chapter 5 treats them fully; we summarise them here.
+
+\textbf{The hard-verification layer.} Every property along the semantic chain from question to answer that \emph{can} be projected onto structure or execution \emph{is} projected, and pinned by a deterministic check. The executor's behaviour is pinned to the plan graph by compilation and execution. The plan graph is pinned to the intermediate briefing by structural comparison in code. Slots, entities, literals, numbers, roles, and cue words are cross-checked between briefing and question. We state this precisely: these checks do not verify everything, and this dissertation never claims that they do. Everything hard-verifiable is hard-verified, and the residue is squeezed to a minimum. The checks shrink the blind region layer by layer; they never eliminate it.
+
+\textbf{The abstention layer.} The unprojectable residue, chiefly whether the plan's meaning matches the question's meaning, forms a blind region. The system's answer to the blind region is calibrated refusal. Abstention is a first-class output. The benchmark contains three families of abstention traps (ambiguous questions, schema-unsupported questions, empty-result questions), and these serve as the completeness test of this layer rather than as decoration.
+
+\textbf{The learning layer.} Signal flowing out of the verifiable region drives distillation and bootstrapping. Teacher outputs are filtered rather than trusted, student outputs are self-harvested through the same filter, and the filtered pool trains both stages of the stack. The learned competence then covers part of the blind region, which is the one-sentence thesis restated as an engineering loop.
+
+\section{Contributions}\label{sec:contributions}
+
+The dissertation makes four contributions, referred to throughout as the four pillars.
+
+\textbf{Pillar 1 --- the bootstrap closed loop (Chapter 6).} Three instantiations of learning from the verifiable region. We filter an untrusted cloud teacher's outputs into clean supervision. We run a self-harvest round in which the student, generating and filtering its own training data, overtakes the teacher that taught it. We then apply a denoising distillation to the first pipeline stage (understanding/briefing), which lets the entire stack run locally. Together these steps bootstrap both stages of a neuro-symbolic system past both of its cloud teachers, over a 12,828-question benchmark (9,267 train / 556 dev-tune / 671 dev-select / 49 dev-smoke / 2,285 final test).
+
+\textbf{Pillar 2 --- gain decomposition (Chapters 5--6).} A separation of the hard-verification layer's contribution from the learning layer's. The zero-shot scaffolding floor measures what deterministic checking and repair buy before any training. The training ladder above it measures what verifier-filtered learning adds. The development-set ladder establishes that the decomposition exists; all confirmatory claims are carried by the final test set.
+
+\textbf{Pillar 3 --- DPO near-miss toxicity (Chapter 7).} A mechanism-explained negative result. Using verifier-passing-but-wrong outputs as preference-learning negatives seems natural, but it can suppress the very competencies the positives teach. The contrast between subtractive preference suppression and additive distillation explains when each is safe.
+
+\textbf{Pillar 4 --- benchmark methodology (Chapter 4).} The abstention layer's test apparatus and the credibility foundation under every number in this dissertation. It uses dual-implementation oracles whose agreement is measured rather than assumed, and plan-level split isolation so that no test plan is seen in training. It also follows a strict development/confirmatory discipline in which model selection and pipeline fixes are derived only from development data.
+
+\section{Results preview}\label{sec:results-preview}
+
+The confirmatory evaluation is a five-system pairing on the held-out final test set (n=2,285, v4.1 benchmark, evaluation protocol with repair budget 1). It covers the cloud teacher, two hybrid students (cloud understanding stage, local planning stage), and two fully-local students (both stages local 8B LoRA adapters), on two independent base models.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Contributions of this dissertation: the four evidence pillars supporting the partial-verifiability thesis.}
+\label{tab:01_introduction_1}
+\begin{tabular}{ll}
+\toprule
+System & Final-test accuracy \\
+\midrule
+Teacher (cloud, 1 replicate) & 69.76\% (1594/2285) \\
+Llama-3.1-8B hybrid & 75.97\% \\
+Qwen3-8B hybrid & 78.03\% \\
+Llama-3.1-8B fully local & 83.33\% \\
+Qwen3-8B fully local & \textbf{85.65\% (1957/2285)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+Every adjacent and non-adjacent pairing in this scoreboard is significant at McNemar $p<10^{-14}$. The headline result is that the fully-local Qwen3-8B stack exceeds its own cloud teacher by \textbf{+15.89 points} (95\% CI [+14.07, +17.70], discordant pairs +406/--43, $p<10^{-15}$). The result replicates on a second base model: the fully-local Llama-3.1-8B stack reaches 83.33\% (+13.57 points over the teacher, CI [+11.81, +15.32]). Because the teacher was run as a single replicate on the final test set, we check the robustness of the student--teacher gap to provider nondeterminism separately on the development set. There the student beats each of three independent teacher replicates (discordant pairs +35/--5, +34/--4, +30/--5; p $\leq$ 2e-5). The fully-local stack achieves this at zero marginal API cost, on a single local GPU, with no data leaving the machine.
+
+\section{Dissertation structure}\label{sec:dissertation-structure}
+
+Chapter 2 surveys the four literatures the work sits between, and draws the dividing line against its nearest neighbours on filter strength and blind-region handling. Chapter 3 describes the procurement data and the construction of the knowledge graph. Chapter 4 presents the benchmark and its integrity apparatus (Pillar 4). Chapter 5 presents the three-layer system and the deterministic check chain, and measures the scaffolding floor (Pillar 2, verification half). Chapter 6 presents the bootstrap experiments, covering teacher filtering, self-harvest, and denoising distillation, and ends with the five-system scoreboard above (Pillars 1 and 2, learning half). Chapter 7 analyses the DPO near-miss pathology and the mechanism evidence for the one-sentence thesis (Pillar 3). Chapter 8 concludes with limitations, including the LLM-generated character of the benchmark surfaces and the boundaries of the strict-holdout evidence, and with directions for moving more of the blind region across the projection line.

@@ -1,0 +1,51 @@
+\documentclass[10pt]{article} % For LaTeX2e
+\usepackage[preprint]{tmlr}
+% If accepted: \usepackage[accepted]{tmlr}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{multirow}
+
+\graphicspath{{figures/}}
+
+\title{Partial Verifiability Is Enough: Bootstrapping a Fully-Local
+Knowledge-Graph Question-Answering Planner Past Its Cloud Teachers}
+
+\author{\name Anonymous Author \email uceeh01@ucl.ac.uk \\
+      \addr Department of Electronic and Electrical Engineering\\
+      University College London}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\def\month{07}
+\def\year{2026}
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\input{sections/00_abstract}
+\end{abstract}
+
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_data_kg}
+\input{sections/04_benchmark}
+\input{sections/05_system}
+\input{sections/06_experiments}
+\input{sections/07_analysis}
+\input{sections/08_conclusion}
+
+\bibliography{main}
+\bibliographystyle{tmlr}
+
+\appendix
+\input{sections/99_appendix}
+
+\end{document}

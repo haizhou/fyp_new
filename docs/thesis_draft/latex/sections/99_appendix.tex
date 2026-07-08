@@ -1,0 +1,38 @@
+\section{Reproducibility and number-provenance audit}\label{app:audit}
+
+Every number cited in this paper traces to a single master results table, in which each entry
+carries its dataset, metric, pipeline version, and an artifact path on disk. Headline figures
+(the five-system scoreboard, the development-set ladders, the teacher noise floor, the decay
+figures, and the schema diagnostic) were machine-verified against that table: a numeric-token
+comparison across all chapters confirmed identical values, precision, and dataset labels. A full
+per-sentence provenance audit of secondary figures is still in progress.
+
+\begin{table}[h]
+\centering\small
+\caption{Resolution of the eight provenance markers left by the drafting pass. All eight figures
+verified in their primary sources; none required correction.}
+\label{tab:audit}
+\begin{tabular}{lll}
+\toprule
+Figure & Primary source & Disposition \\
+\midrule
+215{,}221 contract records & KG parquet (recount) & promoted \\
+131{,}502 canonical organisations & KG parquet (recount) & promoted \\
+99.88\% dual-oracle agreement (14{,}752/14{,}770) & audit log & promoted \\
+9{,}762/9{,}762 LLM-checker approvals & legacy analysis & promoted (motivation only) \\
+Bridge stratum: 86.7\% verified vs 52.3\% correct & harvest traces & promoted \\
+0.429 median trigram-Jaccard & legacy analysis & promoted (distributional) \\
+166{,}277 OCDS releases & analysis document & doc-sourced (interim file deleted) \\
+GB-FTS identifier fragmentation survey & analysis document & doc-sourced \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Instrument verification discipline.} Three consecutive, opposite-signed flaws were
+found in the gates of our own schema diagnostic (an extractor that over-counted failures, a
+shape gate that over-counted successes, and a content gate that under-counted the untrained
+baseline), each caught by opening raw outputs rather than trusting the aggregate rate. The
+project therefore adopted a standing rule: any rate-type, gate-decided number must have ten
+deterministically-sampled raw decisions (passes and failures) inspected by a human before it
+enters a table or figure. A suspiciously clean number is treated as an instrument fault until
+its raw outputs have been read.
