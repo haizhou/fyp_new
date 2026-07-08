@@ -119,6 +119,10 @@ def main() -> int:
                     help="Step-2 sampling temperature. Teacher runs stay 0.0 (deterministic); "
                          "RSFT self-harvest needs >0 (e.g. 0.7 with --plan-samples 4) so "
                          "rejection sampling explores beyond what greedy decoding already solves.")
+    ap.add_argument("--step1-base-url", default=None,
+                    help="OpenAI-compatible endpoint for Step-1 (fully-local harvest); "
+                         "--step1-model names the served model. Unset = Azure nano via .env")
+    ap.add_argument("--step1-api-key", default="local")
     args = ap.parse_args()
 
     from procurement_graph.qa.benchmark.chat import ChatClient
@@ -141,7 +145,8 @@ def main() -> int:
 
     backend = RuntimeKGBackend.from_directory(ROOT / "data" / "kg")
     resolver = backend.org_resolver()
-    chat = ChatClient.from_env(temperature=0.0)
+    chat = (ChatClient(base_url=args.step1_base_url, api_key=args.step1_api_key, temperature=0.0)
+            if args.step1_base_url else ChatClient.from_env(temperature=0.0))
     if args.plan_base_url:
         plan_chat = ChatClient(base_url=args.plan_base_url, api_key=args.plan_api_key,
                                temperature=args.plan_temperature)

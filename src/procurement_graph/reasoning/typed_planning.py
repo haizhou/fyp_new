@@ -392,6 +392,9 @@ _CATEGORY_TEXT = re.compile(
 _UNSUPPORTED_CUES = (
     "evaluation score", "marked as reliable", "reliable", "fairness", "payment terms",
     "social value", "delivery performance", "bidder count", "bidder counts", "bidders",
+    # v2 additions from the compare_v4 abstain_unsupported misses: fields the KG does not carry,
+    # phrased in ways the original cues missed.
+    "invoice", "payment date", "fair terms", "on time", "delivered on schedule",
 )
 _MONTH_NAMES = {
     "01": ("january", "jan"),
@@ -1945,9 +1948,47 @@ def _answer_field_from_semantic(field: str, graph: dict[str, Any], input_id: str
     return slot or "supplier"
 
 
+_RECORD_COUNT_RE = re.compile(
+    r"how many (?:contract |procurement |award )?(?:notices|contracts|records|awards)\b")
+
+
+def _count_target_is_entity_set(question_low: str, raw_graph: dict[str, Any]) -> bool:
+    """True when a 'how many notices/records/...' question's return edge counts an entity_set
+    variable — the count-intermediate-set misread the verifier cannot see."""
+    if not _RECORD_COUNT_RE.search(question_low):
+        return False
+    ret = raw_graph.get("return") if isinstance(raw_graph.get("return"), dict) else {}
+    if str(ret.get("operation") or "").casefold() not in {"count", "count_records", "count_distinct"}:
+        return False
+    vars_by_id = {str(v.get("var_id")): v for v in (raw_graph.get("variables") or ())
+                  if isinstance(v, dict)}
+    target = vars_by_id.get(str(ret.get("input") or ""))
+    return target is not None and str(target.get("kind") or "").casefold() == "entity_set"
+
+
+def _fastpath_veto(question: str, raw_graph: dict[str, Any]) -> list[str]:
+    """Targeted veto for the intent-program fast path (v2.1): ONLY the two verifier-invisible
+    traps, never the full surface-fidelity battery (false-positives on compiled graphs)."""
+    low = " ".join(question.casefold().split())
+    issues: list[str] = []
+    qtype = str(raw_graph.get("question_type") or "").casefold()
+    if qtype not in {"unanswerable", "ambiguous"} and any(c in low for c in _UNSUPPORTED_CUES):
+        issues.append("unsupported_cue_requires_unanswerable")
+    if _count_target_is_entity_set(low, raw_graph):
+        issues.append("count_target_is_entity_set_for_record_question")
+    return issues
+
+
 def plan_consistency_check(question: str, payload: dict[str, Any]) -> ConsistencyVerdict:
     """Deterministic surface-fidelity check: question -> typed plan, BEFORE any KG access."""
     issues: list[str] = []
+    # v2: keep a handle on the RAW graph before normalisation flattens it — the count-target
+    # check below needs variable kinds and the return edge.
+    raw_graph: dict[str, Any] | None = None
+    if isinstance(payload.get("graph_plan"), dict):
+        raw_graph = payload["graph_plan"]
+    elif isinstance(payload.get("variables"), (list, tuple)) and isinstance(payload.get("return"), dict):
+        raw_graph = payload
     payload = _normalise_planner_payload(payload, question)
     low = " ".join(question.casefold().split())
     qtype = str(payload.get("question_type", ""))
@@ -1971,6 +2012,12 @@ def plan_consistency_check(question: str, payload: dict[str, Any]) -> Consistenc
         cue = next((c for c in _BRIDGE_CUES if c in low), "")
         if cue:
             issues.append(f"bridge_cue_requires_bridge_join:{cue}")
+    # v2: count-target check. "how many notices/contracts/records" must count RECORDS; a return
+    # edge counting an entity_set variable is the count-intermediate-set misread (the dominant
+    # verifier-invisible bridge failure: pred=30 CPV codes where oracle=1,439 notices). Precise
+    # trigger only — questions asking "how many cpv codes/suppliers" don't match the regex.
+    if raw_graph is not None and _count_target_is_entity_set(low, raw_graph):
+        issues.append("count_target_is_entity_set_for_record_question")
     # Singular-interrogative x set-return is handled DETERMINISTICALLY at normalise time (T10 in
     # graph_planning rewrites distinct_set -> select so run-time uniqueness adjudicates); a veto
     # here would also kill legitimately-unique cases the rewrite keeps alive.
@@ -2571,19 +2618,31 @@ class TypedLLMPlanner:
         if _is_intent_program(understanding):
             payload = {"intent_program": understanding}
             candidate = compile_typed_plan(question, payload, org_resolver=self.org_resolver)
-            teacher = {"understanding": ("cached" if understanding_source == "cached"
-                                         else (self.understanding_model or self.model)) if self.two_step else "",
-                       "plan": "deterministic_intent_compiler",
-                       "understanding_source": understanding_source}
-            raw_response = {"understanding": understanding,
-                            "typed_plan": payload,
-                            "teacher": teacher,
-                            "schema_context": schema_context,
-                            "plan_review": {},
-                            "understanding_raw": _chat_result_trace(understanding_result),
-                            "typed_plan_raw": {}}
-            raw_response.update(candidate.raw_response or {})
-            return (replace(candidate, raw_response=raw_response),)
+            # v2.1: the intent-program FAST PATH must not bypass the two verifier-invisible
+            # semantic traps (unsupported-cue -> hallucinated answer; count-of-entity_set for a
+            # record question). v2.0 ran the FULL plan_consistency_check here, but its
+            # surface/atom checks are calibrated for RAW planner payloads and false-positive on
+            # COMPILED graphs (teacher compare_v4 dropped 70.0 -> 66.5, answerable booleans
+            # flipping to null). The gate is now exactly the two targeted checks.
+            fastpath_ok = True
+            if candidate.status == "planned":
+                rawg = getattr(getattr(candidate, "graph_plan", None), "raw_graph_plan", None)
+                if isinstance(rawg, dict) and _fastpath_veto(question, rawg):
+                    fastpath_ok = False
+            if fastpath_ok:
+                teacher = {"understanding": ("cached" if understanding_source == "cached"
+                                             else (self.understanding_model or self.model)) if self.two_step else "",
+                           "plan": "deterministic_intent_compiler",
+                           "understanding_source": understanding_source}
+                raw_response = {"understanding": understanding,
+                                "typed_plan": payload,
+                                "teacher": teacher,
+                                "schema_context": schema_context,
+                                "plan_review": {},
+                                "understanding_raw": _chat_result_trace(understanding_result),
+                                "typed_plan_raw": {}}
+                raw_response.update(candidate.raw_response or {})
+                return (replace(candidate, raw_response=raw_response),)
 
         system, user = typed_plan_messages(question, understanding=understanding,
                                            schema_context=schema_context,

@@ -1,0 +1,46 @@
+# LLaMA-Factory SFT config — CICADA Step-1 UNDERSTANDING student (Llama-3.1-8B, QLoRA)
+# Cross-base twin of qwen3_8b_step1_sft_qlora.yaml — identical data & hyperparameters,
+# only base model and chat template differ. Same dataset dir: the exported sharegpt JSON is
+# model-agnostic (the chat template is applied at training time).
+# Enables the fully-local Llama stack: one vLLM instance = Llama base + step1 + step2 adapters.
+
+### model
+model_name_or_path: NousResearch/Meta-Llama-3.1-8B-Instruct
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+quantization_bit: 4
+bf16: true
+flash_attn: sdpa            # no cu130 flash-attn wheel on this node
+
+### dataset
+dataset_dir: data/training/llamafactory_step1_v1
+dataset: cicada_step1_sft
+eval_dataset: cicada_step1_sft_val
+template: llama3
+cutoff_len: 6144
+overwrite_cache: true
+preprocessing_num_workers: 2
+
+### training
+output_dir: outputs/llama31_8b_cicada_step1_v1
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4   # effective batch 16
+learning_rate: 1.0e-4
+num_train_epochs: 3
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+max_grad_norm: 1.0
+logging_steps: 10
+save_steps: 200
+eval_strategy: steps
+eval_steps: 200
+plot_loss: true
+gradient_checkpointing: true
+report_to: none

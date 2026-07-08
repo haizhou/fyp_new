@@ -1,0 +1,9 @@
+{
+ "cicada_dpo_merged": {
+  "total": 1079,
+  "sources": {
+   "teacher_full_v1 (off-policy: teacher errors)": 390,
+   "rsft_qwen_r1 (on-policy: student errors)": 689
+  }
+ }
+}

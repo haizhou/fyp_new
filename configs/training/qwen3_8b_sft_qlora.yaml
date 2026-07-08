@@ -17,7 +17,7 @@ lora_alpha: 128
 lora_dropout: 0.05
 quantization_bit: 4            # QLoRA (nf4) -> fits 1x24GB
 bf16: true
-flash_attn: fa2
+flash_attn: sdpa            # flash-attn has no cu130 wheel + node has no nvcc; SDPA uses H100 flash kernels
 
 ### dataset
 dataset_dir: data/training/llamafactory_v1
@@ -31,8 +31,8 @@ preprocessing_num_workers: 8
 
 ### training
 output_dir: outputs/qwen3_8b_cicada_sft_v1
-per_device_train_batch_size: 2
-gradient_accumulation_steps: 8   # effective batch 16
+per_device_train_batch_size: 4   # H100, kept modest to bound Qwen 151936-vocab logits.float() upcast (was 2 under A100-24G assumption); effective batch unchanged
+gradient_accumulation_steps: 4   # effective batch 16 (4x4) — cross-base/cross-rung control preserved
 learning_rate: 1.0e-4
 num_train_epochs: 3
 lr_scheduler_type: cosine

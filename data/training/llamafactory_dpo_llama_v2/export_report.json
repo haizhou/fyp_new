@@ -1,0 +1,22 @@
+{
+ "cicada_dpo_v2_llama": {
+  "total": 406,
+  "curation": "same recipe as qwen v2 pool",
+  "composition": {
+   "bridge_join": 100,
+   "set": 100,
+   "categorical": 63,
+   "factoid": 63,
+   "count": 24,
+   "boolean": 20,
+   "comparison": 20,
+   "top_k": 12,
+   "sum": 3,
+   "min_max": 1
+  },
+  "sources": {
+   "llama_r1": 380,
+   "teacher": 26
+  }
+ }
+}

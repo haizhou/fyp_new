@@ -1,0 +1,30 @@
+{
+ "plan_sft": {
+  "train": 3019,
+  "val": 65,
+  "family_capped_out": 2452,
+  "bucket_capped_out": 1294,
+  "families": 28,
+  "abstain_kept": 280,
+  "abstain_total": 598,
+  "bucket_composition": {
+   "count": 400,
+   "min_max": 400,
+   "comparison": 396,
+   "bridge_join": 343,
+   "set": 300,
+   "sum": 300,
+   "factoid": 262,
+   "top_k": 195,
+   "boolean": 150,
+   "categorical": 58
+  }
+ },
+ "repair_sft": {
+  "train": 3169,
+  "val": 79
+ },
+ "dpo": {
+  "pairs": 689
+ }
+}

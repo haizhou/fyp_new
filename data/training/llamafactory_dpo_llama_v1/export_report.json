@@ -1,0 +1,9 @@
+{
+ "cicada_dpo_merged": {
+  "total": 1083,
+  "sources": {
+   "teacher_full_v1 (off-policy)": 390,
+   "rsft_llama_r1 (on-policy)": 693
+  }
+ }
+}

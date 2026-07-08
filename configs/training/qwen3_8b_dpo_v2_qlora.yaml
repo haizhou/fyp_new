@@ -1,0 +1,49 @@
+# LLaMA-Factory DPO-v2 config — recipe-fix ablation for the Qwen DPO rung.
+# Diagnosis (worklog 2026-07-06): DPO-v1 regressed bridge_join 16->11 while the pair pool was
+# 71% bridge+set (hard negatives concentrate there; pairs were never bucket-capped) and
+# pref_ftx=0 left chosen generation unanchored (likelihood displacement).
+# Two recipe fixes, everything else identical to DPO-v1:
+#   1. pair pool bucket-capped at 150 (data/training/llamafactory_dpo_qwen_v2, 607 pairs)
+#   2. pref_ftx 0.1 — 10% chosen-NLL anchor mixed into the preference loss
+
+### model
+model_name_or_path: Qwen/Qwen3-8B
+adapter_name_or_path: outputs/qwen3_8b_cicada_rsft_v1
+trust_remote_code: true
+
+### method
+stage: dpo
+do_train: true
+overwrite_output_dir: true
+finetuning_type: lora
+lora_target: all
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+quantization_bit: 4
+bf16: true
+flash_attn: sdpa
+pref_beta: 0.1
+pref_loss: sigmoid
+pref_ftx: 0.1
+
+### dataset
+dataset_dir: data/training/llamafactory_dpo_qwen_v2
+dataset: cicada_dpo
+template: qwen3
+enable_thinking: false
+cutoff_len: 6144
+overwrite_cache: true
+
+### training
+output_dir: outputs/qwen3_8b_cicada_dpo_v2
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8   # effective batch 16
+learning_rate: 5.0e-6
+num_train_epochs: 3   # v2 pool is on-policy-hard (init margin -17 vs base-ref); 25 steps undertrained
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+logging_steps: 10
+save_steps: 100
+gradient_checkpointing: true
+report_to: none

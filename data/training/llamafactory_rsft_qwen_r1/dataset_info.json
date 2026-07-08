@@ -1,0 +1,37 @@
+{
+ "cicada_plan_sft": {
+  "file_name": "cicada_plan_sft.json",
+  "formatting": "sharegpt",
+  "columns": {
+   "messages": "conversations",
+   "system": "system"
+  }
+ },
+ "cicada_plan_sft_val": {
+  "file_name": "cicada_plan_sft_val.json",
+  "formatting": "sharegpt",
+  "columns": {
+   "messages": "conversations",
+   "system": "system"
+  }
+ },
+ "cicada_repair_sft": {
+  "file_name": "cicada_repair_sft.json",
+  "formatting": "sharegpt",
+  "columns": {
+   "messages": "conversations",
+   "system": "system"
+  }
+ },
+ "cicada_dpo": {
+  "file_name": "cicada_dpo.json",
+  "formatting": "sharegpt",
+  "ranking": true,
+  "columns": {
+   "messages": "conversations",
+   "system": "system",
+   "chosen": "chosen",
+   "rejected": "rejected"
+  }
+ }
+}

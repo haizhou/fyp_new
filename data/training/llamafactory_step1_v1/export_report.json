@@ -1,0 +1,12 @@
+{
+ "step1_sft": {
+  "train": 5091,
+  "val": 96,
+  "skipped_no_question": 0,
+  "sources": {
+   "data/qa/teacher_full_v1": 4479,
+   "data/qa/rsft_qwen_r1": 463,
+   "data/qa/rsft_llama_r1": 245
+  }
+ }
+}

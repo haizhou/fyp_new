@@ -1,0 +1,22 @@
+{
+ "cicada_dpo_v2": {
+  "total": 389,
+  "curation": "on-policy(r1) first cap 100/bucket; teacher fills scarce buckets to floor 30, qid-deduped; sha1 order",
+  "composition": {
+   "bridge_join": 100,
+   "set": 100,
+   "factoid": 56,
+   "categorical": 48,
+   "count": 36,
+   "boolean": 19,
+   "comparison": 16,
+   "top_k": 12,
+   "min_max": 1,
+   "sum": 1
+  },
+  "sources": {
+   "r1": 364,
+   "teacher": 25
+  }
+ }
+}

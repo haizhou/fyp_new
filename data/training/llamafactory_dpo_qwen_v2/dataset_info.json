@@ -1,0 +1,13 @@
+{
+ "cicada_dpo": {
+  "file_name": "cicada_dpo.json",
+  "formatting": "sharegpt",
+  "ranking": true,
+  "columns": {
+   "messages": "conversations",
+   "system": "system",
+   "chosen": "chosen",
+   "rejected": "rejected"
+  }
+ }
+}

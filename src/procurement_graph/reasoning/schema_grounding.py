@@ -201,12 +201,29 @@ def _rank_candidates(text: str, *, embedder: Any = None) -> list[GroundingCandid
     return sorted(by_slot.values(), key=lambda c: c.score, reverse=True)
 
 
+# Concept tokens the KG does NOT carry (mirrors typed_planning._UNSUPPORTED_CUES). A field text
+# naming one of these must never take the alias-substring shortcut: "invoice or payment date"
+# used to ground to the date slot at 0.9 via the bare "date" alias and the system answered the
+# award date instead of abstaining. (A v2.1 attempt scored substrings by token coverage instead;
+# real teacher-trace field texts are SENTENCES — 88% of them got rejected and teacher factoid
+# collapsed 17->9. Reverted to v1 permissiveness except for this explicit lexicon.)
+_UNSUPPORTED_FIELD_TOKENS = frozenset({
+    "invoice", "invoices", "payment", "payments", "delivery", "performance",
+    "reliable", "reliability", "bidder", "bidders", "fairness",
+})
+
+
 def _alias_score(text: str, alias: str) -> float:
     alias = " ".join(alias.casefold().split())
     if text == alias:
         return 1.0
-    if alias in text or text in alias:
+    if text in alias:
         return 0.9
+    if alias in text:
+        if _UNSUPPORTED_FIELD_TOKENS & set(re.findall(r"[a-z]+", text)):
+            pass  # fall through to token Jaccard: unsupported concept blocks the shortcut
+        else:
+            return 0.9
     text_tokens = set(text.split())
     alias_tokens = set(alias.split())
     if not text_tokens or not alias_tokens:
@@ -229,12 +246,20 @@ def _type_gate(slot: str, *, value: Any, value_type: str, op: str) -> bool:
         return False
     value_text = str(value or "").strip().casefold()
     if slot == "procurement_category":
+        # v2: an EMPTY value means lookup/return-field context ("what is the procurement
+        # category ...?") — there is nothing to validate, and rejecting here silently unmapped
+        # every categorical lookup's return field (the categorical-abstain bug: return field
+        # normalised to "none", plans abstained or returned the record id).
+        if not value_text:
+            return True
         # accept decorated category values ("services notice", "goods contracts") but never a
         # CPV-ish description ("IT-service contracts"): strip decoration words, then demand the
         # remainder BE a canonical category token
         cleaned = " ".join(_DECOR_RE.sub(" ", value_text).split())
         return cleaned in {"goods", "services", "service", "works", "work", "good"}
     if slot == "cpv_code":
+        if not value_text:  # v2: same lookup/return-field exemption as procurement_category
+            return True
         return value_text.isdigit() and 5 <= len(value_text) <= 8
     return True
 

@@ -21,12 +21,14 @@ lora_alpha: 128
 lora_dropout: 0.05
 quantization_bit: 4
 bf16: true
-flash_attn: fa2
+flash_attn: sdpa            # flash-attn unavailable (no cu130 wheel/nvcc); SDPA uses H100 flash kernels
 pref_beta: 0.1
 pref_loss: sigmoid
 
 ### dataset
-dataset_dir: data/training/llamafactory_v1
+# merged pool per runbook §4: teacher dpo_pairs (390, off-policy) + qwen_r1 self-harvest
+# pairs (689, on-policy) = 1,079; per-source counts in the dir's export_report.json
+dataset_dir: data/training/llamafactory_dpo_qwen_v1
 dataset: cicada_dpo
 template: qwen3
 enable_thinking: false         # train/serve consistency (no think blocks)
@@ -35,8 +37,8 @@ overwrite_cache: true
 
 ### training
 output_dir: outputs/qwen3_8b_cicada_dpo_v1
-per_device_train_batch_size: 1
-gradient_accumulation_steps: 16
+per_device_train_batch_size: 2   # H100; DPO holds chosen+rejected(+ref) so half the SFT micro-batch
+gradient_accumulation_steps: 8   # effective batch 16 (2x8)
 learning_rate: 5.0e-6
 num_train_epochs: 1
 lr_scheduler_type: cosine
