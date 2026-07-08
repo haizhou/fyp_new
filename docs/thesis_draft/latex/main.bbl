@@ -1,0 +1,181 @@
+\begin{thebibliography}{23}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Azar et~al.(2024)Azar, Guo, Piot, Munos, Rowland, Valko, and
+  Calandriello]{azar2024ipo}
+Mohammad~Gheshlaghi Azar, Zhaohan~Daniel Guo, Bilal Piot, Remi Munos, Mark
+  Rowland, Michal Valko, and Daniele Calandriello.
+\newblock A general theoretical paradigm to understand learning from human
+  preferences.
+\newblock In \emph{International Conference on Artificial Intelligence and
+  Statistics (AISTATS)}, 2024.
+
+\bibitem[Cao et~al.(2022)Cao, Shi, Pan, Nie, Xiang, Hou, Li, He, and
+  Zhang]{cao2022kqapro}
+Shulin Cao, Jiaxin Shi, Liangming Pan, Lunyiu Nie, Yutong Xiang, Lei Hou,
+  Juanzi Li, Bin He, and Hanwang Zhang.
+\newblock {KQA Pro}: A dataset with explicit compositional programs for complex
+  question answering over knowledge base.
+\newblock In \emph{Proceedings of the 60th Annual Meeting of the Association
+  for Computational Linguistics (ACL)}, 2022.
+
+\bibitem[Chen et~al.(2023)Chen, Lin, Sch{\"a}rli, and Zhou]{chen2023selfdebug}
+Xinyun Chen, Maxwell Lin, Nathanael Sch{\"a}rli, and Denny Zhou.
+\newblock Teaching large language models to self-debug.
+\newblock \emph{arXiv preprint arXiv:2304.05128}, 2023.
+
+\bibitem[Dong et~al.(2023)Dong, Xiong, Goyal, Zhang, Chow, Pan, Diao, Zhang,
+  Shum, and Zhang]{dong2023raft}
+Hanze Dong, Wei Xiong, Deepanshu Goyal, Yihan Zhang, Winnie Chow, Rui Pan,
+  Shizhe Diao, Jipeng Zhang, Kashun Shum, and Tong Zhang.
+\newblock {RAFT}: Reward ranked finetuning for generative foundation model
+  alignment.
+\newblock \emph{Transactions on Machine Learning Research}, 2023.
+
+\bibitem[Dubey et~al.(2019)Dubey, Banerjee, Abdelkawi, and
+  Lehmann]{dubey2019lcquad2}
+Mohnish Dubey, Debayan Banerjee, Abdelrahman Abdelkawi, and Jens Lehmann.
+\newblock {LC-QuAD} 2.0: A large dataset for complex question answering over
+  wikidata and {DBpedia}.
+\newblock In \emph{International Semantic Web Conference (ISWC)}, 2019.
+
+\bibitem[Gou et~al.(2024)Gou, Shao, Gong, Shen, Yang, Duan, and
+  Chen]{gou2024critic}
+Zhibin Gou, Zhihong Shao, Yeyun Gong, Yelong Shen, Yujiu Yang, Nan Duan, and
+  Weizhu Chen.
+\newblock {CRITIC}: Large language models can self-correct with
+  tool-interactive critiquing.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024.
+
+\bibitem[Gu et~al.(2023)Gu, Deng, and Su]{gu2023pangu}
+Yu~Gu, Xiang Deng, and Yu~Su.
+\newblock Don't generate, discriminate: A proposal for grounding language
+  models to real-world environments.
+\newblock In \emph{Proceedings of the 61st Annual Meeting of the Association
+  for Computational Linguistics (ACL)}, 2023.
+
+\bibitem[Gulcehre et~al.(2023)Gulcehre, Paine, Srinivasan, Konyushkova, Weerts,
+  Sharma, Siddhant, Ahern, Wang, Gu, Macherey, Doucet, Firat, and
+  de~Freitas]{gulcehre2023rest}
+Caglar Gulcehre, Tom~Le Paine, Srivatsan Srinivasan, Ksenia Konyushkova, Lotte
+  Weerts, Abhishek Sharma, Aditya Siddhant, Alex Ahern, Miaosen Wang, Chenjie
+  Gu, Wolfgang Macherey, Arnaud Doucet, Orhan Firat, and Nando de~Freitas.
+\newblock Reinforced self-training ({ReST}) for language modeling.
+\newblock \emph{arXiv preprint arXiv:2308.08998}, 2023.
+
+\bibitem[Huang et~al.(2024{\natexlab{a}})Huang, Chen, Mishra, Zheng, Yu, Song,
+  and Zhou]{huang2024intrinsic}
+Jie Huang, Xinyun Chen, Swaroop Mishra, Huaixiu~Steven Zheng, Adams~Wei Yu,
+  Xinying Song, and Denny Zhou.
+\newblock Large language models cannot self-correct reasoning yet.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024{\natexlab{a}}.
+
+\bibitem[Huang et~al.(2024{\natexlab{b}})Huang, Cheng, Huang, Shen, Xu, Zhang,
+  and Qu]{huang2024queryagent}
+Xiang Huang, Sitao Cheng, Shanshan Huang, Jiayu Shen, Yong Xu, Chaoyun Zhang,
+  and Yuzhong Qu.
+\newblock {QueryAgent}: A reliable and efficient reasoning framework with
+  environmental feedback based self-correction.
+\newblock In \emph{Proceedings of the 62nd Annual Meeting of the Association
+  for Computational Linguistics (ACL)}, 2024{\natexlab{b}}.
+
+\bibitem[Jiang et~al.(2023)Jiang, Zhou, Dong, Ye, Zhao, and
+  Wen]{jiang2023structgpt}
+Jinhao Jiang, Kun Zhou, Zican Dong, Keming Ye, Wayne~Xin Zhao, and Ji-Rong Wen.
+\newblock {StructGPT}: A general framework for large language model to reason
+  over structured data.
+\newblock \emph{Proceedings of EMNLP}, 2023.
+
+\bibitem[Kamath et~al.(2020)Kamath, Jia, and Liang]{kamath2020selective}
+Amita Kamath, Robin Jia, and Percy Liang.
+\newblock Selective question answering under domain shift.
+\newblock In \emph{Proceedings of the 58th Annual Meeting of the Association
+  for Computational Linguistics (ACL)}, 2020.
+
+\bibitem[Luo et~al.(2024{\natexlab{a}})Luo, E, Tang, Peng, Guo, Zhang, Ma,
+  Dong, Song, Lin, et~al.]{luo2024chatkbqa}
+Haoran Luo, Haihong E, Zichen Tang, Shiyao Peng, Yikai Guo, Wentai Zhang,
+  Chenghao Ma, Guanting Dong, Meina Song, Wei Lin, et~al.
+\newblock {ChatKBQA}: A generate-then-retrieve framework for knowledge base
+  question answering with fine-tuned large language models.
+\newblock \emph{Findings of the Association for Computational Linguistics
+  (ACL)}, 2024{\natexlab{a}}.
+
+\bibitem[Luo et~al.(2024{\natexlab{b}})Luo, Li, Haffari, and Pan]{luo2024rog}
+Linhao Luo, Yuan-Fang Li, Gholamreza Haffari, and Shirui Pan.
+\newblock Reasoning on graphs: Faithful and interpretable large language model
+  reasoning.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2024{\natexlab{b}}.
+
+\bibitem[Pal et~al.(2024)Pal, Karkhanis, Dooley, Roberts, Naidu, and
+  White]{pal2024smaug}
+Arka Pal, Deep Karkhanis, Samuel Dooley, Manley Roberts, Siddartha Naidu, and
+  Colin White.
+\newblock Smaug: Fixing failure modes of preference optimisation with
+  {DPO}-positive.
+\newblock \emph{arXiv preprint arXiv:2402.13228}, 2024.
+
+\bibitem[Pourreza \& Rafiei(2023)Pourreza and Rafiei]{pourreza2023dinsql}
+Mohammadreza Pourreza and Davood Rafiei.
+\newblock {DIN-SQL}: Decomposed in-context learning of text-to-{SQL} with
+  self-correction.
+\newblock \emph{Advances in Neural Information Processing Systems (NeurIPS)},
+  2023.
+
+\bibitem[Rafailov et~al.(2023)Rafailov, Sharma, Mitchell, Manning, Ermon, and
+  Finn]{rafailov2023dpo}
+Rafael Rafailov, Archit Sharma, Eric Mitchell, Christopher~D. Manning, Stefano
+  Ermon, and Chelsea Finn.
+\newblock Direct preference optimization: Your language model is secretly a
+  reward model.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2023.
+
+\bibitem[Rajpurkar et~al.(2018)Rajpurkar, Jia, and Liang]{rajpurkar2018squad2}
+Pranav Rajpurkar, Robin Jia, and Percy Liang.
+\newblock Know what you don't know: Unanswerable questions for {SQuAD}.
+\newblock In \emph{Proceedings of the 56th Annual Meeting of the Association
+  for Computational Linguistics (ACL)}, 2018.
+
+\bibitem[Singh et~al.(2024)Singh, Co-Reyes, Agarwal, et~al.]{singh2024restem}
+Avi Singh, John~D. Co-Reyes, Rishabh Agarwal, et~al.
+\newblock Beyond human data: Scaling self-training for problem-solving in
+  language models.
+\newblock \emph{Transactions on Machine Learning Research}, 2024.
+
+\bibitem[Wang et~al.(2024)Wang, Ren, Yang, Liang, Bai, Chai, Yan, Zhang, Yin,
+  Sun, and Li]{wang2024macsql}
+Bing Wang, Changyu Ren, Jian Yang, Xinnian Liang, Jiaqi Bai, Linzheng Chai,
+  Zhao Yan, Qian-Wen Zhang, Di~Yin, Xing Sun, and Zhoujun Li.
+\newblock {MAC-SQL}: A multi-agent collaborative framework for text-to-{SQL}.
+\newblock \emph{arXiv preprint arXiv:2312.11242}, 2024.
+
+\bibitem[Wang et~al.(2018)Wang, Tatwawadi, Brockschmidt, Huang, Mao, Polozov,
+  and Singh]{wang2018execguided}
+Chenglong Wang, Kedar Tatwawadi, Marc Brockschmidt, Po-Sen Huang, Yi~Mao,
+  Oleksandr Polozov, and Rishabh Singh.
+\newblock Robust text-to-{SQL} generation with execution-guided decoding.
+\newblock \emph{arXiv preprint arXiv:1807.03100}, 2018.
+
+\bibitem[Yuan et~al.(2023)Yuan, Yuan, Li, Dong, Lu, Tan, Zhou, and
+  Zhou]{yuan2023rft}
+Zheng Yuan, Hongyi Yuan, Chengpeng Li, Guanting Dong, Keming Lu, Chuanqi Tan,
+  Chang Zhou, and Jingren Zhou.
+\newblock Scaling relationship on learning mathematical reasoning with large
+  language models.
+\newblock \emph{arXiv preprint arXiv:2308.01825}, 2023.
+
+\bibitem[Zelikman et~al.(2022)Zelikman, Wu, Mu, and Goodman]{zelikman2022star}
+Eric Zelikman, Yuhuai Wu, Jesse Mu, and Noah~D. Goodman.
+\newblock {STaR}: Bootstrapping reasoning with reasoning.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2022.
+
+\end{thebibliography}

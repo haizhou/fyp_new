@@ -1,4 +1,4 @@
-\section{Chapter 6 --- Bootstrapping Experiments: Ladder, Yields, and the Five-Pairing Confirmation}\label{sec:chapter-6-bootstrapping-experiments-ladd}
+\section{Bootstrapping Experiments: Ladder, Yields, and the Five-Pairing Confirmation}\label{sec:chapter-6-bootstrapping-experiments-ladd}
 
 Chapter 5 built and hardened the pipeline. This chapter trains models inside it and measures
 the result. The claim is that the learning layer of the architecture works, and that it works
@@ -12,7 +12,7 @@ whole-pipeline outcome produce a fully-local two-stage system that runs without 
 model. The confirmatory evidence is a single held-out scoreboard on the frozen test set
 (n = 2,285): teacher 69.76\% < Llama hybrid 75.97\% < Qwen hybrid 78.03\% < Llama fully-local
 83.33\% < Qwen fully-local 85.65\%. Every adjacent and non-adjacent pairing is significant under
-McNemar's test at p < 10⁻¹⁴. Throughout, supervision flowed only from the verifiable region of
+McNemar's test at p < 10$^{-14}$. Throughout, supervision flowed only from the verifiable region of
 the task; the resulting systems still surpass the source of that signal.
 
 \section{Experimental design: two configurations, one metric discipline}\label{sec:experimental-design-two-configurations-o}
@@ -60,9 +60,9 @@ and base-to-base comparison is a data comparison rather than a hyperparameter co
 adapters are QLoRA fine-tunes (4-bit NF4 quantised base, LoRA rank 64, alpha 128, dropout
 0.05, all linear targets), trained with LLaMA-Factory in bf16 with SDPA attention, sequence
 cutoff 6,144 tokens, and an effective batch size of 16 in every stage. Stage-specific settings
-are as follows. SFT runs at learning rate 1$\times$10⁻⁴ for 3 epochs with cosine decay.
-Rejection-sampling SFT (RSFT) continues the SFT adapter at 5$\times$10⁻⁵ for 2 epochs. DPO continues
-the RSFT adapter at 5$\times$10⁻⁶ for 1 epoch with sigmoid preference loss and $\beta$ = 0.1
+are as follows. SFT runs at learning rate 1$\times$10$^{-4}$ for 3 epochs with cosine decay.
+Rejection-sampling SFT (RSFT) continues the SFT adapter at 5$\times$10$^{-5}$ for 2 epochs. DPO continues
+the RSFT adapter at 5$\times$10$^{-6}$ for 1 epoch with sigmoid preference loss and $\beta$ = 0.1
 (\texttt{configs/training/*.yaml}). The
 two bases are Qwen3-8B (served and trained without thinking blocks, matching its serving
 configuration) and Llama-3.1-8B-Instruct.
@@ -189,7 +189,7 @@ oracle-correct. Instead the band was converted into fuel: 1,051 hard negatives a
 \emph{on-policy} preference pairs, against the teacher round's 390. Even at 52.3\%, the student's
 bridge yield roughly doubles the teacher's (\textasciitilde{}25\% usable on the same bucket).
 
-Training on the self-harvest (RSFT: continuing the SFT adapter at 5$\times$10⁻⁵ for 2 epochs on
+Training on the self-harvest (RSFT: continuing the SFT adapter at 5$\times$10$^{-5}$ for 2 epochs on
 3,084 plan and 3,169 repair samples) produced a clear dissociation between loss and behaviour.
 Validation loss halved relative to the SFT rung (0.0065 terminal), yet development accuracy
 moved only from 81.2\% to 81.5\% on Qwen and from 83.1\% to 82.7\% on Llama. Under the flat
@@ -208,7 +208,7 @@ The DPO rung merges the two rounds of attempt-protocol pairs into a single prefe
 self-harvest, 1,079 pairs in total. The pool includes the oracle-gated wrong-answer-repair
 pairs, in which the chosen plan is the repaired one and the rejected plan is its
 verifier-passing-but-wrong predecessor. Training continues the RSFT adapter for a single epoch
-(68 steps) at 5$\times$10⁻⁶ with $\beta$ = 0.1.
+(68 steps) at 5$\times$10$^{-6}$ with $\beta$ = 0.1.
 
 On the development set, DPO lifts Qwen from 81.5\% to \textbf{83.5\%}, recovering the factoid bucket
 and making it the Qwen ladder's champion rung. On Llama the same procedure \emph{regresses} the
@@ -286,7 +286,7 @@ optimisation adds 2 points on one base and subtracts 5 on the other. Third, robu
 teacher nondeterminism. Because the cloud teacher is a live, nondeterministic service, we
 evaluated it three times, which defines a noise floor of 72.6\% $\pm$ 1.1. The Qwen DPO rung beats
 each of the three replicates individually (discordants +35/--5, +34/--4, +30/--5; McNemar
-p = 3$\times$10⁻⁷, 5$\times$10⁻⁷, 2$\times$10⁻⁵), so the development-set student--teacher gap cannot be an artifact
+p = 3$\times$10$^{-7}$, 5$\times$10$^{-7}$, 2$\times$10$^{-5}$), so the development-set student--teacher gap cannot be an artifact
 of catching the teacher on a bad run. This three-replicate robustness role is exactly what the
 development set contributes to the student-versus-teacher claim; the claim itself is settled
 on final\_test.
@@ -307,7 +307,7 @@ was evaluated exactly once on the frozen final\_test set (n = 2,285, benchmark v
 protocol). All model selection preceded these runs; nothing was tuned afterwards.
 
 **Table 6.3 --- Confirmatory five-system scoreboard (final\_test, n = 2,285, v4.1, repair budget
-1). All ten pairwise comparisons significant at McNemar p < 10⁻¹⁴. Confidence intervals are
+1). All ten pairwise comparisons significant at McNemar p < 10$^{-14}$. Confidence intervals are
 95\% intervals on the paired accuracy difference. Artifacts under \texttt{outputs/eval/final\_test/}.**
 
 \begin{table}[t]
@@ -359,7 +359,7 @@ to provider nondeterminism is established by the three-replicate analysis on the
 set (Section 6.7), and the two statements are kept deliberately separate. Second, on both
 bases the fully-local system beats its own cloud-hybrid counterpart by a nearly identical
 margin (+7.35 and +7.61 points). The claim that the development pairings could only suggest is
-confirmed here with p < 10⁻¹⁴ on both bases. Third, the effect of the distilled briefing stage
+confirmed here with p < 10$^{-14}$ on both bases. Third, the effect of the distilled briefing stage
 is strong enough that the weaker base with local briefings outranks the stronger base with
 cloud briefings (Llama fully-local 83.33\% vs Qwen hybrid 78.03\%). This is a post-hoc,
 non-preregistered observation; we note it here and take it up mechanistically in Chapter 7.
@@ -442,7 +442,7 @@ own evaluation accuracy. Verifier-gated self-harvest then out-yielded the teache
 11--13 points and converted its blind-region failures into preference-learning fuel. Step-1
 distillation through the whole-pipeline filter removed the final cloud dependency and, on the
 held-out confirmatory set, produced the ordering teacher < hybrid < fully-local on both bases,
-with every pairing significant at p < 10⁻¹⁴ and near-zero dev-to-test decay. A second
+with every pairing significant at p < 10$^{-14}$ and near-zero dev-to-test decay. A second
 self-harvest round located the ceiling of the loop: harvest yield keeps rising while training
 gain stops, which fixes the boundary of what verifier-gated bootstrapping can extract from
 this task. Supervision never left the verifiable region; the systems it trained did. Chapter 7
