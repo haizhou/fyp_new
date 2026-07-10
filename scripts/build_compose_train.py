@@ -228,6 +228,18 @@ class Sampler:
                       f"Answer as a number between 0 and 1."), "number"
 
     def r_setop(self):
+        if self.rng.random() < 0.3:
+            # cross-role union (the C4 pattern v2 regressed on): organisations
+            # appearing as a buyer OR as a first-listed supplier in one scope
+            f, c = self.filt()
+            tree = {"node": "setop", "op": "union",
+                    "left": {"node": "values", "of": f, "field": "buyer_name"},
+                    "right": {"node": "values", "of": f, "field": "supplier_name"}}
+            q = (f"organisations appear as a buyer or as a first-listed supplier "
+                 f"on contract notices {c}")
+            if self.rng.random() < 0.5:
+                return ({"node": "size", "of": tree}, f"How many distinct {q}?", "number")
+            return tree, f"Which distinct {q}?", "value_set"
         f1, c1 = self.filt()
         f2, c2 = self.filt()
         field = self.rng.choice(["buyer_name", "supplier_name"])

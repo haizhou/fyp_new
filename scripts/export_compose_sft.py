@@ -103,6 +103,9 @@ def main() -> None:
     ap.add_argument("--out-dir", default="data/training/llamafactory_compose_v1")
     ap.add_argument("--old-cap", type=int, default=150,
                     help="per-family cap for translated old-benchmark rows (0 disables)")
+    ap.add_argument("--order-twins", type=float, default=0.0,
+                    help="fraction of A rows duplicated with a reordered-clause surface")
+    ap.add_argument("--holdout-out", default="data/qa/compose_train_v1/holdout_B.jsonl")
     args = ap.parse_args()
 
     rng = random.Random(args.seed)
@@ -127,12 +130,30 @@ def main() -> None:
     old_rows = _old_task_rows(rng, args.old_cap) if args.old_cap else []
     abstain = _abstain_rows(rng, max(1, (len(a_rows) + len(old_rows)) // 20))
 
+    # order twins: same tree + answer, second surface with clause runs reversed
+    # (meaning-preserving, side-safe). Teaches order invariance pairwise.
+    twins = []
+    if args.order_twins > 0:
+        import re
+        cl = re.compile(r"(?<=notices )[^;?.]+(?:; [^;?.]+)+")
+        def reorder(q: str) -> str:
+            def flip(m):
+                return "; ".join(reversed(m.group(0).split("; ")))
+            return " than ".join(cl.sub(flip, side, count=1) for side in q.split(" than "))
+        for r in a_rows:
+            if rng.random() >= args.order_twins:
+                continue
+            q2 = reorder(r["question"])
+            if q2 != r["question"]:
+                twins.append({**r, "question": q2})
+
     def to_lf(row) -> dict:
         output = row.get("output") or {"tree": row["tree"]}
         return {"system": SYSTEM_PROMPT, "instruction": row["question"], "input": "",
                 "output": json.dumps(output, separators=(",", ":"))}
 
-    train = [to_lf(r) for r in a_rows] + [to_lf(r) for r in old_rows] + [to_lf(r) for r in abstain]
+    train = ([to_lf(r) for r in a_rows] + [to_lf(r) for r in twins]
+             + [to_lf(r) for r in old_rows] + [to_lf(r) for r in abstain])
     rng.shuffle(train)
     val = train[: max(16, len(train) // 50)]
     train = train[len(val):]
@@ -155,14 +176,14 @@ def main() -> None:
                "expected_status": "answerable", "answer_type": r["answer_type"],
                "oracle_answer": r["answer"], "compose_tree": r["tree"],
                "benchmark": "compose_train_v1_B"} for r in b_rows]
-    b_path = ROOT / "data/qa/compose_train_v1/holdout_B.jsonl"
+    b_path = ROOT / args.holdout_out
     with b_path.open("w") as fh:
         for r in b_eval:
             fh.write(json.dumps(r, default=str) + "\n")
 
     print(f"pool {len(rows)} rows / {len(shapes)} shapes")
     print(f"A(train): {len(a_rows)} rows / {len(a_shapes)} shapes "
-          f"(+{len(old_rows)} old-task translated, +{len(abstain)} abstain)")
+          f"(+{len(twins)} order twins, +{len(old_rows)} old-task translated, +{len(abstain)} abstain)")
     print(f"B(holdout): {len(b_rows)} rows / {len(b_shapes)} shapes -> {b_path}")
     print(f"train/val: {len(train)}/{len(val)} -> {out}")
     kw = sum(1 for r in b_rows if r["shape_signature"].startswith("keys_where"))
