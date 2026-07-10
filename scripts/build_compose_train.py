@@ -37,6 +37,14 @@ _spec.loader.exec_module(indep)
 ADD = {"field": "value_is_additive", "op": "eq", "value": True}
 
 
+def eqp(field, value):
+    return {"field": field, "op": "eq", "value": value}
+
+
+def flt(*preds):
+    return {"node": "filter", "where": list(preds)}
+
+
 def signature(tree) -> str:
     """Tree skeleton: node labels + ops, leaf literals stripped."""
     if isinstance(tree, dict):
@@ -114,6 +122,10 @@ class Sampler:
         if want_money:
             preds.append(dict(ADD))
             clauses.append("counting only additive contract values")
+        # v2: clause-order randomisation — the check-2 audit measured 97.9->53.2
+        # under meaning-preserving reorders, i.e. the v1 model anchored on the
+        # fixed rendering order. Randomising here teaches order invariance.
+        rng.shuffle(clauses)
         return preds, "; ".join(clauses)
 
     @staticmethod
@@ -134,7 +146,7 @@ class Sampler:
         recipes = [self.r_count, self.r_sum, self.r_exists, self.r_values, self.r_size,
                    self.r_groupby_argext, self.r_top, self.r_combine_counts,
                    self.r_combine_sums, self.r_vs_ratio, self.r_setop, self.r_keys_where,
-                   self.r_bind, self.r_extreme, self.r_nested_bind_agg]
+                   self.r_bind, self.r_extreme, self.r_nested_bind_agg, self.r_universal]
         return rng.choice(recipes)()
 
     def r_count(self):
@@ -232,16 +244,50 @@ class Sampler:
         return tree, f"Which {noun} {phr}?", "value_set"
 
     def r_keys_where(self):
-        f1, c1 = self.filt()
-        f2, c2 = self.filt()
         key = self.rng.choice(["buyer_name", "supplier_name"])
         noun = {"buyer_name": "buyers", "supplier_name": "first-listed suppliers"}[key]
+        if self.rng.random() < 0.5 and len(self.years) >= 2:
+            # same-anchor / different-year ELLIPTICAL variant — the exact content
+            # pattern the C5 probe exposed (model read the year as a threshold)
+            anchor_field = self.rng.choice(["tender_cpv_id", "tender_category"])
+            anchor = str(self.rng.choice(self.cpvs)) if anchor_field == "tender_cpv_id" \
+                else self.rng.choice(self.cats)
+            y1, y2 = self.rng.sample(self.years, 2)
+            f1 = flt(eqp(anchor_field, anchor), eqp("release_year", y1))
+            f2 = flt(eqp(anchor_field, anchor), eqp("release_year", y2))
+            label = f"CPV {anchor}" if anchor_field == "tender_cpv_id" else anchor
+            q = (f"Which {noun} published more {label} contract notices in {y1} than in {y2}? "
+                 f"Count one even if it published none in {y2}.")
+        else:
+            f1, c1 = self.filt()
+            f2, c2 = self.filt()
+            q = (f"Which {noun} have more contract notices {c1} than notices {c2}? "
+                 f"Include those with none in the second group.")
         g1 = {"node": "groupby", "of": f1, "key": key, "metric": "count"}
         g2 = {"node": "groupby", "of": f2, "key": key, "metric": "count"}
         tree = {"node": "keys_where", "op": "eq", "value": 1,
                 "of": {"node": "gcombine", "op": "gt", "left": g1, "right": g2}}
-        return tree, (f"Which {noun} have more contract notices {c1} than notices {c2}? "
-                      f"Include those with none in the second group."), "value_set"
+        return tree, q, "value_set"
+
+    def r_universal(self):
+        # relational division (C3): entities ALL of whose in-scope notices carry
+        # a per-notice flag -> everyone MINUS those with a counterexample
+        f, c = self.filt()
+        key = self.rng.choice(["buyer_name", "supplier_name"])
+        noun = {"buyer_name": "buyers", "supplier_name": "first-listed suppliers"}[key]
+        flag, phrase = self.rng.choice([
+            ("has_award_signed_date", "a recorded award signing date"),
+            ("has_contract_period", "a recorded contract period"),
+            ("value_is_additive", "an additive (award- or contract-sourced) value"),
+        ])
+        everyone = {"node": "values", "of": f, "field": key}
+        offenders = {"node": "values",
+                     "of": {"node": "filter",
+                            "where": list(f["where"]) + [{"op": "not", "pred": eqp(flag, True)}]},
+                     "field": key}
+        tree = {"node": "setop", "op": "difference", "left": everyone, "right": offenders}
+        return tree, (f"Among {noun} that appear on contract notices {c}, which had {phrase} on "
+                      f"every single one of those notices? One notice without it disqualifies."), "value_set"
 
     def r_bind(self):
         f_inner, c_inner = self.filt()

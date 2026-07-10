@@ -110,8 +110,11 @@ def main() -> None:
     shapes = sorted({r["shape_signature"] for r in rows})
 
     def held_out(sig: str) -> bool:
-        if sig.startswith("keys_where"):
-            return True  # strict holdout: grouped-compare construction
+        # v2 strict construction holdout rotated: keys_where is now TRAINED
+        # (C5 lesson); setop.intersect held out instead — union/difference are
+        # demonstrated, intersect tests within-family construction transfer.
+        if sig.startswith("setop.intersect"):
+            return True
         h = int(hashlib.sha1(sig.encode()).hexdigest(), 16) % 1000
         return h < args.holdout_frac * 1000
 

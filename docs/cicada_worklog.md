@@ -1183,3 +1183,24 @@ Answer to the user's driving question ("什么训练方法可以让 qwen/llama �
 **Sanity checks (user-mandated)**: (1) leakage audit — exact-tree 0, exact-question 0, keys_where/gcombine nodes in training **0** (the 64.8% construction extrapolation is airtight); BUT 196/1730 B rows shared shape signatures with training via the OLD-TASK TRANSLATION channel (exporter only asserted pool-internal disjointness — audit gap found and closed). Leak-free recut **B_clean (n=1534): compose-v1 91.72% vs base 38.98%, discordants +814/-5**; leaked rows were easy (base 87.8%). keys_where slice all-clean, 64.8% unchanged. Checks 2 (paraphrase split), 3 (scrambled negative control), 4 (evaluator audit on model trees) queued.
 
 **pass@16 (temp 1.0, guided)**: C3 3/32 questions reachable (mean 0.66 hits), C5 13/40 (mean 1.25) — on-policy exploration CAN find both constructions -> RLVR has signal (GRPO-style, oracle-gated). Given few-shot already yields 100%, the cheap fix is demonstrations (SFT recipes / prompt examples); RLVR remains the methodological experiment (can RL discover what demonstration teaches) rather than the only path.
+
+## 2026-07-11 - COMPOSE-V2 JUDGED: order-randomised + recipe-completed retraining. B_clean 98.99% vs base 46.84% (+619/-0); intersect construction holdout 39/39; C3 32/32 & C5 40/40 fixed; order-sensitivity gap halved (44.7 -> 24.0pt) but not eliminated; one new narrowing side-effect found (C4)
+
+**v2 changes** (all data-level, no special-casing, per user decision — no C3/C5 "特训", RLVR shelved as optional): clause-order randomisation in question rendering; C5 same-anchor elliptical variant; r_universal as an ORDINARY 16th recipe; strict construction holdout ROTATED keys_where -> setop.intersect (union/difference demonstrated, intersect never). Pool v2: 8,000 rows / 659 shapes (seed 20260711). Export fix applied en route: leakage audit now runs PRE-training; B_clean_v2 (1,187 rows) defined upfront (182 old-task-channel shape collisions excluded before any eval; intersect verified 0-in-train). Also restored v1 holdout_B from git after an exporter-path collision overwrote it (exporter's B path was hardcoded to v1 — noted for cleanup).
+
+**Training**: fresh adapter, same light recipe (train 0.0175 / eval 0.0099, ~1h47m).
+
+**Results (guided, single call):**
+| eval | compose-v2 | reference |
+|---|---|---|
+| B_clean_v2 (1,187 unseen shapes, pre-audited) | **98.99%** (tree-valid 99.83%) | base 46.84%; discordants **+619/-0** |
+| setop.intersect strict construction holdout | **39/39 = 100%** | base 21/39 (within-family extrapolation: union+difference -> intersect) |
+| probe 324 | **88.58%** | v1-adapter 78.40; C3 **32/32** (was 0), C5 **40/40** (was 2/40) |
+| old-task retention (400) | **87.5%** | v1 87.0 — retained |
+| reorder perturbation (150, fully meaning-preserving transform, side-crossing re-verified 0) | orig 98.0 -> **74.0** | v1 adapter: 97.9 -> 53.2. Gap 44.7 -> 24.0pt: HALVED, not eliminated |
+| verbose / stem paraphrase | 98.0 / 99.3 | robust |
+| masked negative control | 10.67 | crashes as required |
+
+**New narrowing side-effect (honest ledger)**: C4 cross-role union regressed 40/40 -> 7/40. Autopsy: the "as a buyer OR as a first-listed supplier" phrasing never appears in any recipe surface; v1's success on it was base-generalisation luck, and v2's tighter recipe fit displaced it (model now drops the second role and counts buyers only). P2 monotonic control also slipped 6/6 -> 4/6. Lesson recorded: every rendering-distribution fix narrows somewhere else; the check battery (not the headline) is what catches it. Fix path for v3 if pursued: add a mixed-role union variant to r_setop + per-tree multi-order surface variants (attack the residual 24pt directly).
+
+**Where this leaves the track**: composition is taught and robust to wording (98/99), extends to never-demonstrated constructions both within-family (intersect 100%) and cross-family under demonstration (C3/C5 100% after recipes), retains old-task competence (87.5%), and the residual weaknesses are precisely characterised (24pt order gap; off-recipe role-union phrasing; P2 duo). All supervision remains program-authored + dual-verified, zero teacher calls, zero human labels; ~2 GPU-hours per iteration.
