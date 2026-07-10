@@ -1,0 +1,46 @@
+{
+ "arm": "composev3_oldtask",
+ "model": "cicada-qwen3-composev3",
+ "accuracy": 87.25,
+ "n": 400,
+ "correct": 349,
+ "tree_valid_rate": 89.0,
+ "by_band": {
+  "old_task": "349/400"
+ },
+ "by_family": {
+  "additive_sum": "23/23",
+  "argmax_value": "6/6",
+  "argmin_value": "9/9",
+  "boolean_exists": "25/25",
+  "boolean_field_equality": "21/21",
+  "buyer_cpv_set_count": "27/27",
+  "buyer_suppliers_sum": "23/23",
+  "comparison": "20/22",
+  "contract_factoid": "0/39",
+  "contrast_twin": "5/5",
+  "coverage_fixed_indirect": "9/9",
+  "coverage_fixed_natural": "10/10",
+  "coverage_fixed_realistic_user": "6/6",
+  "coverage_fixed_terse": "9/9",
+  "cpv_slice": "11/11",
+  "cpv_year_suppliers": "9/9",
+  "date_relation": "18/19",
+  "filtered_count": "10/10",
+  "min_max": "6/6",
+  "naturalized_count": "4/4",
+  "naturalized_factoid": "30/36",
+  "naturalized_sum": "20/20",
+  "numeric_threshold": "1/1",
+  "set_list": "7/9",
+  "supplier_buyers_count": "22/22",
+  "temporal_count": "6/6",
+  "top_k": "1/2",
+  "top_k_buyers": "2/2",
+  "top_k_buyers_cpv": "9/9"
+ },
+ "outcomes": {
+  "answered": 356,
+  "eval_failed": 44
+ }
+}
