@@ -1,0 +1,33 @@
+{
+ "arm": "teacher_grok",
+ "model": "grok-4-1-fast-non-reasoning",
+ "accuracy": 62.96,
+ "n": 324,
+ "correct": 204,
+ "tree_valid_rate": 75.31,
+ "by_band": {
+  "far": "40/112",
+  "mid": "85/120",
+  "near": "71/80",
+  "out_of_grammar": "8/12"
+ },
+ "by_family": {
+  "C1a_count_ratio": "11/40",
+  "C1b_sum_diff": "39/40",
+  "C2_supplier_difference": "38/40",
+  "C3_universal_buyers": "0/32",
+  "C4_role_union_count": "2/40",
+  "C5_grouped_compare": "35/40",
+  "N1_temporal_argmax": "34/40",
+  "N2_filtered_sum_compare": "37/40",
+  "P1_median_value": "6/6",
+  "P2_monotonic_trend": "2/6"
+ },
+ "outcomes": {
+  "abstain": 8,
+  "answered": 244,
+  "eval_failed": 15,
+  "invalid_tree": 17,
+  "unparseable": 40
+ }
+}

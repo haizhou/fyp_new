@@ -132,6 +132,8 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--concurrency", type=int, default=8)
     ap.add_argument("--max-tokens", type=int, default=1200)
+    ap.add_argument("--resume", action="store_true",
+                    help="keep prior non-api_error results; redo only api_error rows")
     args = ap.parse_args()
 
     from openai import OpenAI
@@ -147,14 +149,21 @@ def main() -> None:
 
     def ask(row: dict) -> dict:
         out = {"id": row["id"], "family": row["template_family"], "band": row["distance_band"]}
-        try:
-            resp = client.chat.completions.create(
-                model=args.model, temperature=0.0, max_tokens=args.max_tokens,
-                messages=[{"role": "system", "content": SYSTEM_PROMPT},
-                          {"role": "user", "content": row["question"]}])
-            raw = resp.choices[0].message.content or ""
-        except Exception as exc:
-            out.update(outcome="api_error", detail=str(exc)[:200], correct=False)
+        raw = None
+        for attempt in range(5):
+            try:
+                resp = client.chat.completions.create(
+                    model=args.model, temperature=0.0, max_tokens=args.max_tokens,
+                    messages=[{"role": "system", "content": SYSTEM_PROMPT},
+                              {"role": "user", "content": row["question"]}])
+                raw = resp.choices[0].message.content or ""
+                break
+            except Exception as exc:
+                last_exc = exc
+                import time
+                time.sleep(min(60, 5 * 2 ** attempt))
+        if raw is None:
+            out.update(outcome="api_error", detail=str(last_exc)[:200], correct=False)
             return out
         out["raw"] = raw[:4000]
         payload = _extract_json(raw)
@@ -188,11 +197,22 @@ def main() -> None:
                    answer=result["answer"], oracle=row["oracle_answer"])
         return out
 
-    with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
-        results = list(pool.map(ask, rows))
-
     out_dir = ROOT / "data/qa/compose_probe_v1"
     out_path = out_dir / f"eval_{args.arm}.jsonl"
+
+    kept: dict[str, dict] = {}
+    if args.resume and out_path.exists():
+        for line in out_path.open():
+            r = json.loads(line)
+            if r.get("outcome") != "api_error":
+                kept[r["id"]] = r
+        print(f"resume: keeping {len(kept)} prior results, redoing {len(rows) - len(kept)}")
+    todo = [r for r in rows if r["id"] not in kept]
+
+    with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
+        fresh = list(pool.map(ask, todo))
+    by_id = {**kept, **{r["id"]: r for r in fresh}}
+    results = [by_id[r["id"]] for r in rows]
     with out_path.open("w") as fh:
         for r in results:
             fh.write(json.dumps(r, default=str) + "\n")
