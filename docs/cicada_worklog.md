@@ -1130,3 +1130,18 @@ Artifacts: data/qa/compose_probe_v1/{probe.jsonl, eval_*.jsonl, summary_*.json};
 ## 2026-07-10 - SFT arm added (user question: does the lock-in come from DPO?): NO — the ladder is a dose curve. base 32.41% -> SFT 2.47% -> DPO 0.00%
 
 SFT-adapter arm under the identical protocol: 2.47% (8/324), tree-valid 16.67% (vs DPO 0.62%), unparseable 224 (vs 272). Raw-scanned: identical failure family — attributes misplaced into the filter object, old slot vocabulary (cpv_id), plus semantic construction errors (C3 answered with intersect instead of difference). Two genuine C1a ratio successes; and SFT abstains correctly on all 6 P1 median controls (learned abstention transfers!). Conclusion: contract lock-in originates AT SFT (where the 3->98 conformance imprinting happens; ~30 of the 32 points of base capability destroyed); DPO deepens it to total (tree-validity 16.7%->0.6%, consistent with likelihood-displacement narrowing). The user's "SFT might not be overfit" hypothesis is refuted by the dose curve, which is itself the cleaner finding: capability destruction tracks training dose along the very ladder that raised in-contract accuracy 70.4->83.5 on the dev set.
+
+## 2026-07-10 - Cross-base arms (user request): Llama base 0.00% / Llama-SFT 0.31% — lock-in replicates cross-base; the DESTRUCTION contrast is single-base (Qwen) because Llama's base has no capability to destroy
+
+Llama-3.1-8B (NousResearch mirror, same weights as training) under the identical protocol: base **0.00%** (tree-valid 13.9%; raw-scanned: stray-quote JSON errors + semantic misreads, e.g. N1 answered with an extremum record instead of the year); SFT adapter **0.31%** (1/324, tree-valid 1.9%). Final six-arm scoreboard:
+
+| arm | acc | tree-valid |
+|---|---|---|
+| teacher grok-4.1-fast | 62.96% | 75.3% |
+| base Qwen3-8B | 32.41% | 40.4% |
+| Qwen-SFT | 2.47% | 16.7% |
+| Qwen-DPO | 0.00% | 0.6% |
+| base Llama-3.1-8B | 0.00% | 13.9% |
+| Llama-SFT | 0.31% | 1.9% |
+
+Claim discipline (per the Llama-r2 precedent — single-base claims stated as such): (1) **lock-in replicates cross-base** — every fine-tuned model is ~0 on the open grammar, and tree-validity always DROPS with tuning (Qwen 40.4->16.7->0.6; Llama 13.9->1.9); (2) **the capability-destruction contrast (base >> tuned) is Qwen-only**, because zero-shot free-form tree emission is itself base-dependent (Qwen3 32.4% vs Llama 0% — consistent with the dev-ladder zero-shot gap 70.4 vs 60.0 and Qwen's stronger JSON discipline). Cross-base pattern that DOES hold: fine-tuning on the flat contract strictly reduces open-grammar format competence on both bases.
