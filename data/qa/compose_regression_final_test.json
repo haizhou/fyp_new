@@ -1,0 +1,154 @@
+{
+ "split": "final_test",
+ "match": 1823,
+ "mismatch": 0,
+ "skipped": 102,
+ "per_family": {
+  "boolean_exists": [
+   121,
+   0,
+   0
+  ],
+  "boolean_field_equality": [
+   0,
+   0,
+   102
+  ],
+  "comparison": [
+   106,
+   0,
+   0
+  ],
+  "date_relation": [
+   95,
+   0,
+   0
+  ],
+  "numeric_threshold": [
+   3,
+   0,
+   0
+  ],
+  "buyer_cpv_set_count": [
+   117,
+   0,
+   0
+  ],
+  "buyer_suppliers_sum": [
+   117,
+   0,
+   0
+  ],
+  "supplier_buyers_count": [
+   116,
+   0,
+   0
+  ],
+  "contract_factoid": [
+   170,
+   0,
+   0
+  ],
+  "naturalized_factoid": [
+   170,
+   0,
+   0
+  ],
+  "coverage_fixed_indirect": [
+   32,
+   0,
+   0
+  ],
+  "coverage_fixed_natural": [
+   32,
+   0,
+   0
+  ],
+  "coverage_fixed_realistic_user": [
+   31,
+   0,
+   0
+  ],
+  "coverage_fixed_terse": [
+   31,
+   0,
+   0
+  ],
+  "cpv_slice": [
+   31,
+   0,
+   0
+  ],
+  "filtered_count": [
+   31,
+   0,
+   0
+  ],
+  "naturalized_count": [
+   31,
+   0,
+   0
+  ],
+  "temporal_count": [
+   31,
+   0,
+   0
+  ],
+  "contrast_twin": [
+   30,
+   0,
+   0
+  ],
+  "min_max": [
+   35,
+   0,
+   0
+  ],
+  "set_list": [
+   32,
+   0,
+   0
+  ],
+  "additive_sum": [
+   100,
+   0,
+   0
+  ],
+  "naturalized_sum": [
+   100,
+   0,
+   0
+  ],
+  "top_k": [
+   15,
+   0,
+   0
+  ],
+  "top_k_buyers": [
+   18,
+   0,
+   0
+  ],
+  "top_k_buyers_cpv": [
+   95,
+   0,
+   0
+  ],
+  "argmin_value": [
+   41,
+   0,
+   0
+  ],
+  "argmax_value": [
+   31,
+   0,
+   0
+  ],
+  "cpv_year_suppliers": [
+   61,
+   0,
+   0
+  ]
+ },
+ "mismatches": []
+}

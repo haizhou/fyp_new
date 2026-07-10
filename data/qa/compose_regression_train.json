@@ -1,0 +1,233 @@
+{
+ "split": "train",
+ "match": 8239,
+ "mismatch": 2,
+ "skipped": 314,
+ "per_family": {
+  "boolean_exists": [
+   382,
+   0,
+   0
+  ],
+  "set_list": [
+   362,
+   0,
+   0
+  ],
+  "min_max": [
+   374,
+   2,
+   0
+  ],
+  "additive_sum": [
+   518,
+   0,
+   0
+  ],
+  "boolean_field_equality": [
+   0,
+   0,
+   314
+  ],
+  "buyer_cpv_set_count": [
+   518,
+   0,
+   0
+  ],
+  "buyer_suppliers_sum": [
+   516,
+   0,
+   0
+  ],
+  "category_buyers_count": [
+   1,
+   0,
+   0
+  ],
+  "comparison": [
+   301,
+   0,
+   0
+  ],
+  "contract_factoid": [
+   933,
+   0,
+   0
+  ],
+  "contrast_twin": [
+   20,
+   0,
+   0
+  ],
+  "coverage_fixed_indirect": [
+   150,
+   0,
+   0
+  ],
+  "coverage_fixed_natural": [
+   267,
+   0,
+   0
+  ],
+  "coverage_fixed_realistic_user": [
+   150,
+   0,
+   0
+  ],
+  "coverage_fixed_terse": [
+   140,
+   0,
+   0
+  ],
+  "cpv_slice": [
+   271,
+   0,
+   0
+  ],
+  "cpv_suppliers_other_cpv": [
+   1,
+   0,
+   0
+  ],
+  "date_relation": [
+   338,
+   0,
+   0
+  ],
+  "filtered_count": [
+   272,
+   0,
+   0
+  ],
+  "naturalized_count": [
+   267,
+   0,
+   0
+  ],
+  "naturalized_factoid": [
+   680,
+   0,
+   0
+  ],
+  "naturalized_sum": [
+   284,
+   0,
+   0
+  ],
+  "numeric_threshold": [
+   17,
+   0,
+   0
+  ],
+  "supplier_buyers_count": [
+   314,
+   0,
+   0
+  ],
+  "temporal_count": [
+   273,
+   0,
+   0
+  ],
+  "year_suppliers_next_year": [
+   1,
+   0,
+   0
+  ],
+  "top_k_buyers": [
+   48,
+   0,
+   0
+  ],
+  "top_k_buyers_cpv": [
+   316,
+   0,
+   0
+  ],
+  "argmin_value": [
+   103,
+   0,
+   0
+  ],
+  "argmax_value": [
+   153,
+   0,
+   0
+  ],
+  "cpv_year_suppliers": [
+   269,
+   0,
+   0
+  ]
+ },
+ "mismatches": [
+  {
+   "id": "L2::extended_ops_1755#L2a",
+   "family": "min_max",
+   "question": "Which contract stands out as the highest-value one among the services notices under CPV ?",
+   "oracle": "contract:ocds-h6vhtk-04eb42:1",
+   "result": {
+    "status": "ok",
+    "type": "VALUE",
+    "answer": "contract:ocds-h6vhtk-055ccf:038905-2025-1-1"
+   },
+   "tree": {
+    "node": "extreme",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "tender_category",
+       "op": "eq",
+       "value": "services"
+      },
+      {
+       "op": "not",
+       "pred": {
+        "field": "value_amount",
+        "op": "lte",
+        "value": 0
+       }
+      }
+     ]
+    },
+    "op": "argmax",
+    "field": "value_amount"
+   }
+  },
+  {
+   "id": "L2::extended_ops_1755#L2a#dv",
+   "family": "min_max",
+   "question": "In reviewing the services notices classified under CPV, which contract stands out as the highest-value one among them? Which contract stands out as the highest-value one among the services notices under CPV ?",
+   "oracle": "contract:ocds-h6vhtk-04eb42:1",
+   "result": {
+    "status": "ok",
+    "type": "VALUE",
+    "answer": "contract:ocds-h6vhtk-055ccf:038905-2025-1-1"
+   },
+   "tree": {
+    "node": "extreme",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "tender_category",
+       "op": "eq",
+       "value": "services"
+      },
+      {
+       "op": "not",
+       "pred": {
+        "field": "value_amount",
+        "op": "lte",
+        "value": 0
+       }
+      }
+     ]
+    },
+    "op": "argmax",
+    "field": "value_amount"
+   }
+  }
+ ]
+}
