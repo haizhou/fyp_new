@@ -1,0 +1,32 @@
+{
+ "arm": "base_qwen_guided",
+ "model": "Qwen/Qwen3-8B",
+ "accuracy": 49.38,
+ "n": 324,
+ "correct": 160,
+ "tree_valid_rate": 87.35,
+ "by_band": {
+  "far": "77/112",
+  "mid": "53/120",
+  "near": "28/80",
+  "out_of_grammar": "2/12"
+ },
+ "by_family": {
+  "C1a_count_ratio": "0/40",
+  "C1b_sum_diff": "40/40",
+  "C2_supplier_difference": "37/40",
+  "C3_universal_buyers": "0/32",
+  "C4_role_union_count": "40/40",
+  "C5_grouped_compare": "13/40",
+  "N1_temporal_argmax": "0/40",
+  "N2_filtered_sum_compare": "28/40",
+  "P1_median_value": "2/6",
+  "P2_monotonic_trend": "0/6"
+ },
+ "outcomes": {
+  "abstain": 2,
+  "answered": 277,
+  "answered_out_of_grammar": 6,
+  "invalid_tree": 39
+ }
+}

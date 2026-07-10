@@ -134,6 +134,9 @@ def main() -> None:
     ap.add_argument("--max-tokens", type=int, default=1200)
     ap.add_argument("--resume", action="store_true",
                     help="keep prior non-api_error results; redo only api_error rows")
+    ap.add_argument("--guided", action="store_true",
+                    help="supplementary protocol: enforce the recursive algebra schema "
+                         "via guided decoding (local vLLM arms only; breaks teacher symmetry)")
     args = ap.parse_args()
 
     from openai import OpenAI
@@ -149,13 +152,18 @@ def main() -> None:
 
     def ask(row: dict) -> dict:
         out = {"id": row["id"], "family": row["template_family"], "band": row["distance_band"]}
+        extra = {}
+        if args.guided:
+            from procurement_graph.compose.schema import algebra_json_schema
+            extra["response_format"] = {"type": "json_schema", "json_schema": {
+                "name": "algebra", "schema": algebra_json_schema(), "strict": True}}
         raw = None
         for attempt in range(5):
             try:
                 resp = client.chat.completions.create(
                     model=args.model, temperature=0.0, max_tokens=args.max_tokens,
                     messages=[{"role": "system", "content": SYSTEM_PROMPT},
-                              {"role": "user", "content": row["question"]}])
+                              {"role": "user", "content": row["question"]}], **extra)
                 raw = resp.choices[0].message.content or ""
                 break
             except Exception as exc:
