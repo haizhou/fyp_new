@@ -102,10 +102,15 @@ def _pred_mask(df: pd.DataFrame, pred: dict) -> pd.Series:
         return col.map(lambda c: any(needle in str(x).casefold() for x in _expand(c)))
     if op == "exists":
         return col.map(lambda c: any(x not in (None, "") for x in _expand(c)))
-    if op == "gte":
-        return pd.to_numeric(col, errors="coerce") >= value
-    if op == "lte":
-        return pd.to_numeric(col, errors="coerce") <= value
+    if op in ("gte", "lte"):
+        # evaluator v1.1: coerce numeric-string literals (shared convention)
+        if isinstance(value, str):
+            try:
+                value = float(value) if "." in value else int(value)
+            except ValueError:
+                pass
+        nums = pd.to_numeric(col, errors="coerce")
+        return nums >= value if op == "gte" else nums <= value
     raise EvalFail(f"unknown_pred_op:{op}")
 
 

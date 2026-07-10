@@ -137,7 +137,12 @@ def main() -> None:
     ap.add_argument("--guided", action="store_true",
                     help="supplementary protocol: enforce the recursive algebra schema "
                          "via guided decoding (local vLLM arms only; breaks teacher symmetry)")
+    ap.add_argument("--system-suffix", default="",
+                    help="path to text appended to the system prompt (few-shot boundary arms)")
     args = ap.parse_args()
+    global SYSTEM_PROMPT
+    if args.system_suffix:
+        SYSTEM_PROMPT = SYSTEM_PROMPT + Path(args.system_suffix).read_text()
 
     from openai import OpenAI
     api_key = os.getenv(args.api_key_env, "") if args.api_key_env else "local"

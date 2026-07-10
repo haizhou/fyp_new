@@ -1,0 +1,19 @@
+{
+ "arm": "bd_c3c5_fewshot",
+ "model": "cicada-qwen3-compose",
+ "accuracy": 100.0,
+ "n": 72,
+ "correct": 72,
+ "tree_valid_rate": 100.0,
+ "by_band": {
+  "far": "32/32",
+  "mid": "40/40"
+ },
+ "by_family": {
+  "C3_universal_buyers": "32/32",
+  "C5_grouped_compare": "40/40"
+ },
+ "outcomes": {
+  "answered": 72
+ }
+}

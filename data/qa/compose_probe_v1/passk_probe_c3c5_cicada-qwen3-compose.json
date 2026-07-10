@@ -1,0 +1,366 @@
+{
+ "k": 16,
+ "temp": 1.0,
+ "results": [
+  {
+   "id": "CP::C5_grouped_compare_0000",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0001",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0002",
+   "family": "C5_grouped_compare",
+   "hits": 1
+  },
+  {
+   "id": "CP::C5_grouped_compare_0003",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0004",
+   "family": "C5_grouped_compare",
+   "hits": 1
+  },
+  {
+   "id": "CP::C5_grouped_compare_0005",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0006",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0007",
+   "family": "C5_grouped_compare",
+   "hits": 2
+  },
+  {
+   "id": "CP::C5_grouped_compare_0008",
+   "family": "C5_grouped_compare",
+   "hits": 2
+  },
+  {
+   "id": "CP::C5_grouped_compare_0009",
+   "family": "C5_grouped_compare",
+   "hits": 1
+  },
+  {
+   "id": "CP::C5_grouped_compare_0010",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0011",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0012",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0013",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0014",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0015",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0016",
+   "family": "C5_grouped_compare",
+   "hits": 10
+  },
+  {
+   "id": "CP::C5_grouped_compare_0017",
+   "family": "C5_grouped_compare",
+   "hits": 1
+  },
+  {
+   "id": "CP::C5_grouped_compare_0018",
+   "family": "C5_grouped_compare",
+   "hits": 1
+  },
+  {
+   "id": "CP::C5_grouped_compare_0019",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0020",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0021",
+   "family": "C5_grouped_compare",
+   "hits": 1
+  },
+  {
+   "id": "CP::C5_grouped_compare_0022",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0023",
+   "family": "C5_grouped_compare",
+   "hits": 4
+  },
+  {
+   "id": "CP::C5_grouped_compare_0024",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0025",
+   "family": "C5_grouped_compare",
+   "hits": 12
+  },
+  {
+   "id": "CP::C5_grouped_compare_0026",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0027",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0028",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0029",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0030",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0031",
+   "family": "C5_grouped_compare",
+   "hits": 1
+  },
+  {
+   "id": "CP::C5_grouped_compare_0032",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0033",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0034",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0035",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0036",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0037",
+   "family": "C5_grouped_compare",
+   "hits": 13
+  },
+  {
+   "id": "CP::C5_grouped_compare_0038",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C5_grouped_compare_0039",
+   "family": "C5_grouped_compare",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0000",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0001",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0002",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0003",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0004",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0005",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0006",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0007",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0008",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0009",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0010",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0011",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0012",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0013",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0014",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0015",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0016",
+   "family": "C3_universal_buyers",
+   "hits": 7
+  },
+  {
+   "id": "CP::C3_universal_buyers_0017",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0018",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0019",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0020",
+   "family": "C3_universal_buyers",
+   "hits": 7
+  },
+  {
+   "id": "CP::C3_universal_buyers_0021",
+   "family": "C3_universal_buyers",
+   "hits": 7
+  },
+  {
+   "id": "CP::C3_universal_buyers_0022",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0023",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0024",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0025",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0026",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0027",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0028",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0029",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0030",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  },
+  {
+   "id": "CP::C3_universal_buyers_0031",
+   "family": "C3_universal_buyers",
+   "hits": 0
+  }
+ ]
+}

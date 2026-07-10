@@ -76,7 +76,15 @@ class RuntimeAlgebraEvaluator:
                 mask = ~mask
             return mask.fillna(False) if mask.dtype == object else mask
         series = self._field(pred["field"])
-        constraint = Constraint(field=pred["field"], op=op, value=pred.get("value"))
+        value = pred.get("value")
+        # evaluator v1.1: numeric range predicates coerce numeric-string literals
+        # (CPV ids are string-typed; "24000000" in a gte/lte is a numeric intent)
+        if op in ("gte", "lte") and isinstance(value, str):
+            try:
+                value = float(value) if "." in value else int(value)
+            except ValueError:
+                pass
+        constraint = Constraint(field=pred["field"], op=op, value=value)
         mask = _series_matches(series, constraint)
         if getattr(mask, "dtype", None) == object:
             mask = mask.fillna(False).astype(bool)
