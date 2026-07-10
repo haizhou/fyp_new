@@ -1,0 +1,43 @@
+# Compose-v1 SFT: FRESH adapter on the base (never continue the old flat-contract
+# adapters — their format prior is the documented lock-in). Light dose on purpose:
+# 2 epochs, same QLoRA shape as the main ladder for comparability.
+model_name_or_path: Qwen/Qwen3-8B
+trust_remote_code: true
+
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 64
+lora_alpha: 128
+lora_dropout: 0.05
+lora_target: all
+quantization_bit: 4
+quantization_method: bnb
+
+dataset_dir: data/training/llamafactory_compose_v1
+dataset: compose_sft_train
+eval_dataset: compose_sft_val
+template: qwen3
+cutoff_len: 4096
+overwrite_cache: true
+preprocessing_num_workers: 1
+
+output_dir: outputs/qwen3_8b_compose_sft_v1
+logging_steps: 10
+save_strategy: epoch
+plot_loss: true
+overwrite_output_dir: true
+report_to: none
+
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+num_train_epochs: 2.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.03
+bf16: true
+flash_attn: sdpa
+
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 100

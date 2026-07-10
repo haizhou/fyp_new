@@ -1153,3 +1153,23 @@ Recursive-schema guided decoding spike PASSED (vLLM/xgrammar handles $defs/$ref 
 Remaining semantic gaps (guided, both models): N1 grouped-argmax 0/40+0/40 (both emit the groupby table and omit the argext extremum wrapper); C3 relational division 0/32 everywhere (all 6 arms, all protocols); abstention on out-of-grammar degrades under guided (2/12 both — the schema makes answering easier than abstaining). These are the targets for the training line (synthetic-tree SFT with shape holdout, then RLVR), whose eval protocol will be GUIDED (production-realistic).
 
 Training-data engine written (scripts/build_compose_train.py): 15 composable recipes x random scope blocks (incl. NOT/OR decorations, in_expr bind/antijoin, nested bind+sum), compositional English rendering, dual-evaluator filtering, shape signatures for the A/B split. Smoke 60 rows / 47 distinct shapes, raw-scanned OK.
+
+## 2026-07-10 - COMPOSE-V1 TRAINED AND JUDGED: shape-diverse synthetic SFT TEACHES composition. B-holdout 92.66% vs base 44.51% (+838/-5, McNemar p~1e-241); never-demonstrated keys_where construction 64.8% vs 6.1%; old-task retention 87.0%; abstention 12/12
+
+**Training**: fresh QLoRA adapter on Qwen3-8B base (never the old flat-contract adapters), configs/training/qwen3_8b_compose_sft_qlora.yaml, 2 epochs on 9,740 rows (6,270 synthetic trees from 499 shapes + 3,631 old-benchmark questions translated into the algebra by the regression-validated converter + 37 abstain rows), train loss 0.0129 / eval 0.0088, ~1h50m on GPU3. Export bug fixed en route: the abstain-template space (~37 distinct questions) could never fill the 450-row quota — attempts-bounded now (was an infinite loop that burned 5h49m CPU).
+
+**Institutional note**: compose-track supervision is PROGRAM-AUTHORED + dual-evaluator-verified (plan-first synthesis), a different regime from the main ladder's filter-not-author bootstrap. Stated once, applies to the whole track.
+
+**Four evaluations (all guided decoding, single call, no repair):**
+| eval | compose-v1 | reference |
+|---|---|---|
+| B holdout (1,730 rows / 187 unseen shapes) | **92.66%** (tree-valid 99.94%) | base same rows 44.51%; discordant +838/-5, p~1.2e-241 |
+| probe 324 (same paper as the 6-arm experiment) | **78.40%** | base guided 49.38 / DPO guided 45.06 / teacher free 62.96 |
+| old-task retention (400-row final_test sample) | **87.0%** | old champion 85.65% (different protocol: two-step + repair; not directly comparable, magnitude = fully retained) |
+| out-of-grammar controls | **12/12 correct abstains** | was 2/12 pre-training under guided |
+
+**Per-shape-root on B**: every demonstrated-construct root at literally 100.0% (count/sum/exists/values/size/top/extreme/argext/combine.gt/diff/ratio/setop.union/intersect/difference — 1,369/1,369 across 16 roots); the strict construction holdout keys_where.eq (never in ANY training row) at **234/361 = 64.8%** vs base 6.1%.
+
+**The clean scientific boundary found**: (1) interpolative composition — novel recombinations of demonstrated constructs — is learned to ceiling; (2) construction-level extrapolation is REAL but SURFACE-SENSITIVE: keys_where succeeds 64.8% when question phrasing matches the training scope-clause style, but the same construction under the probe's different phrasing (C5) stays at 2/40, and C3 (relational division: undemonstrated construction + unfamiliar phrasing + not-pred semantics) stays 0/32. Composition transfer rides on surface familiarity — the next lever is RLVR (GRPO-style, oracle-gated reward on synthetic questions where reward hacking is closed by construction) and/or surface diversification of training rendering.
+
+Answer to the user's driving question ("什么训练方法可以让 qwen/llama 学会灵活组合"): shape-diverse, program-authored, dual-verified synthetic SFT in the open grammar, with old-task translation mixed in, taught an 8B model to compose at 92.7% on unseen shapes without losing old-task competence (87.0%) or the abstain channel (12/12) — in under 2 GPU-hours, no teacher calls anywhere in the training loop.

@@ -1,0 +1,31 @@
+{
+ "arm": "composev1_probe",
+ "model": "cicada-qwen3-compose",
+ "accuracy": 78.4,
+ "n": 324,
+ "correct": 254,
+ "tree_valid_rate": 86.42,
+ "by_band": {
+  "far": "80/112",
+  "mid": "82/120",
+  "near": "80/80",
+  "out_of_grammar": "12/12"
+ },
+ "by_family": {
+  "C1a_count_ratio": "40/40",
+  "C1b_sum_diff": "40/40",
+  "C2_supplier_difference": "40/40",
+  "C3_universal_buyers": "0/32",
+  "C4_role_union_count": "40/40",
+  "C5_grouped_compare": "2/40",
+  "N1_temporal_argmax": "40/40",
+  "N2_filtered_sum_compare": "40/40",
+  "P1_median_value": "6/6",
+  "P2_monotonic_trend": "6/6"
+ },
+ "outcomes": {
+  "abstain": 12,
+  "answered": 280,
+  "eval_failed": 32
+ }
+}
