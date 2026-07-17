@@ -98,6 +98,34 @@ Q: Which suppliers received contract notices from Leeds City Council in 2024?
 {"tree": {"node":"values","of":{"node":"filter","where":[{"field":"buyer_name","op":"eq","value":"Leeds City Council"},{"field":"release_year","op":"eq","value":2024}]},"field":"supplier_name"}}"""
 
 
+_GUARD_FIELDS = {"value_is_additive", "has_award_signed_date", "has_contract_period"}
+
+
+def _literals_faithful(tree, question: str) -> bool:
+    """Every user-facing literal in the tree must occur in the question text
+    (case-insensitive). Guard flags and computed in_expr memberships exempt."""
+    q = question.casefold()
+
+    def walk(node) -> bool:
+        if isinstance(node, dict):
+            if node.get("op") in ("eq", "in", "contains", "gte", "lte") and "value" in node:
+                if node.get("field") in _GUARD_FIELDS:
+                    return True
+                values = node["value"] if isinstance(node["value"], list) else [node["value"]]
+                for v in values:
+                    if isinstance(v, bool):
+                        continue
+                    if str(v).casefold() not in q:
+                        return False
+                return True
+            return all(walk(v) for v in node.values())
+        if isinstance(node, list):
+            return all(walk(v) for v in node)
+        return True
+
+    return walk(tree)
+
+
 def _extract_json(text: str):
     text = text.strip()
     if text.startswith("```"):
@@ -139,6 +167,10 @@ def main() -> None:
                          "via guided decoding (local vLLM arms only; breaks teacher symmetry)")
     ap.add_argument("--system-suffix", default="",
                     help="path to text appended to the system prompt (few-shot boundary arms)")
+    ap.add_argument("--old-benchmark-abstention", action="store_true",
+                    help="PRE-DECLARED mapping of old-benchmark abstention semantics: "
+                         "unsupported -> abstain only; ambiguous -> abstain OR runtime "
+                         "multiple_answers; no_results -> abstain OR empty/zero answer")
     args = ap.parse_args()
     global SYSTEM_PROMPT
     if args.system_suffix:
@@ -180,7 +212,8 @@ def main() -> None:
             return out
         out["raw"] = raw[:4000]
         payload = _extract_json(raw)
-        expected_abstain = row["expected_status"] == "unanswerable_out_of_grammar"
+        expected_abstain = row["expected_status"] != "answerable"
+        abstain_family = str(row["expected_status"])  # 'ambiguous' | 'no_results' | 'unsupported' | ...
         if payload is None:
             out.update(outcome="unparseable", correct=False)
             return out
@@ -198,7 +231,29 @@ def main() -> None:
             out.update(outcome="invalid_tree", detail=exc.reason, correct=False, tree=tree)
             return out
         if expected_abstain:
-            out.update(outcome="answered_out_of_grammar", correct=False, tree=tree)
+            # STRICT metric (primary): only an explicit abstain counts (handled above).
+            # SAFE metric (supplementary, faithfulness-gated): a runtime multi-answer
+            # or empty result counts ONLY if every literal in the tree traces to the
+            # question — the algebra version of the provenance gate. A wrong plan
+            # that fails by accident (over-filtering / wrong widening) scores 0.
+            out["correct"] = False
+            if args.old_benchmark_abstention:
+                result = ev.run(tree)
+                reason = str(result.get("reason", ""))
+                faithful = _literals_faithful(tree, row["question"])
+                if abstain_family == "ambiguous" and reason.startswith("multiple_answers") and faithful:
+                    out.update(outcome="faithful_multi_answer", correct=False, safe_correct=True, tree=tree)
+                    return out
+                if abstain_family == "no_results" and faithful and (
+                        reason == "no_results" or reason == "no_groups" or
+                        (result.get("status") == "ok" and result.get("answer") in (0, 0.0, False, []))):
+                    out.update(outcome="faithful_empty_result", correct=False, safe_correct=True, tree=tree)
+                    return out
+                if not faithful and (reason.startswith("multiple_answers") or reason in ("no_results", "no_groups")):
+                    out.update(outcome="unfaithful_accidental_failure", correct=False,
+                               safe_correct=False, tree=tree)
+                    return out
+            out.update(outcome="answered_out_of_grammar", correct=False, safe_correct=False, tree=tree)
             return out
         result = ev.run(tree)
         if result.get("status") != "ok":
@@ -240,8 +295,10 @@ def main() -> None:
         band[r["band"]][1] += 1
     total_c = sum(v[0] for v in fam.values())
     total_n = sum(v[1] for v in fam.values())
+    safe_c = sum(1 for r in results if r.get("correct") or r.get("safe_correct"))
     summary = {"arm": args.arm, "model": args.model,
                "accuracy": round(100 * total_c / max(1, total_n), 2),
+               "safe_accuracy": round(100 * safe_c / max(1, total_n), 2),
                "n": total_n, "correct": total_c,
                "tree_valid_rate": round(100 * valid_trees / max(1, total_n), 2),
                "by_band": {k: f"{v[0]}/{v[1]}" for k, v in sorted(band.items())},
