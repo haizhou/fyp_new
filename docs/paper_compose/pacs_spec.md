@@ -1,4 +1,4 @@
-# PACS — Procurement Analytics Challenge Set — specification v2.1 — FROZEN BEFORE GENERATION (2026-07-17; v2.1 size/naming amendment approved pre-generation)
+# PACS — Procurement Analytics Challenge Set — specification v2.2 — FROZEN BEFORE GENERATION (2026-07-17; v2.1 size/naming, v2.2 isolation-ledger amendments approved pre-generation)
 
 Decision (user review, 2026-07-17): the legacy 2,285 paired run is DEMOTED to backward
 compatibility (Set A). The paper's primary result comes from PACS (Set B). Sets C
@@ -119,6 +119,40 @@ series move to Sets C/D sections.
   B_anchor when built — checks compositional mechanism.
 - Companion suite D, Robustness & boundary: reorder/paraphrase/masked;
   out-of-grammar; abstention — checks shortcut resistance and limits.
+
+## Isolation ledger (v2.2) — what PACS may and may not share with training
+MAY share (task definition, not leakage): the procurement KG and schema; the
+operator language; the deterministic executor and dual-evaluator conventions;
+the task concepts; the buyer/supplier/year/CPV vocabulary space. Swapping these
+would confound compositional generalisation with new-entity/new-schema
+generalisation.
+MUST NOT share (checked mechanically, all-pairs, before PACS-test is sealed):
+identical question text; identical gold tree + parameter combination; rewrites
+of the same intent instance; template IDs, stems, or connector assets of the
+training renderer; naturalized PACS surfaces flowing back into training; any
+training shape inside the unseen subset; and PACS-test errors feeding recipes,
+prompts, checkpoint selection, or a v4.
+SEEN-vs-UNSEEN RULE: a question whose program skeleton, template, and reasoning
+path match a training instance with only anchors swapped (buyer/year/CPV) is
+SEEN by definition — never unseen.
+Every intent carries: intent_id, gold_tree_hash, shape_signature, template_id,
+surface_grammar_id, entity_anchor_signature, logical_signature. Build-time
+gates (generator refuses to seal PACS-test on any failure):
+exact-question overlap = 0; gold-tree-hash overlap = 0; intent/template overlap
+with training = 0; unseen-shape overlap with training shapes = 0; naturalized
+near-duplicate overlap = 0 (trigram-Jaccard threshold, ch4 machinery). For SEEN
+cells, shape_signature overlap is permitted but gold tree + literals + intent +
+surface must not approximate any training instance.
+PACS-dev usage: permitted for format checks, evaluator/scoring verification,
+three-channel pairing checks, and benchmark-construction bug fixes; NOT for new
+recipes, error-driven training data, fine-tuning, checkpoint selection, or
+iterative prompt tuning. Any model/prompt adjustment using PACS-dev must be
+declared in advance, after which only PACS-test can carry confirmatory results.
+Relation stated once: PACS does not depart from the training TASK; it departs
+from the training DATA DISTRIBUTION and the training RENDERER — the same
+capability system tested under independent task sampling and independent
+linguistic surfaces. PACS-test is generated, audited, and sealed AFTER model
+freeze and never feeds back.
 
 ## Model freeze rule
 The first official PACS results MUST come from the current frozen compose-v3
