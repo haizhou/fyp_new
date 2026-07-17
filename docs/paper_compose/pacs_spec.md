@@ -1,4 +1,4 @@
-# PACS — Procurement Analytics Challenge Set — specification v2 — FROZEN BEFORE GENERATION (2026-07-17)
+# PACS — Procurement Analytics Challenge Set — specification v2.1 — FROZEN BEFORE GENERATION (2026-07-17; v2.1 size/naming amendment approved pre-generation)
 
 Decision (user review, 2026-07-17): the legacy 2,285 paired run is DEMOTED to backward
 compatibility (Set A). The paper's primary result comes from PACS (Set B). Sets C
@@ -61,8 +61,8 @@ Primary metric: channel a. Reported alongside: b, and paired deltas a−c, b−c
 
 ## Split discipline — dev/test, written hard
 PACS is split at generation time by intent-instance (all three surfaces and all
-status variants of one instance stay together): **PACS-dev ~25%** and
-**PACS-test ~75%**. Binding rules: (1) each frozen system configuration may produce one complete
+status variants of one instance stay together): **PACS-dev ~20% (~220–270
+clusters)** and **PACS-test ~80% (~880–1,080 clusters)**. Binding rules: (1) each frozen system configuration may produce one complete
 confirmatory PACS-test result; technical reruns are permitted only when the
 previous run is incomplete because of documented infrastructure or software
 failure, and must use identical checkpoint, prompt, decoding, evaluator, and
@@ -72,13 +72,15 @@ model selection uses PACS-dev (or Sets C/D) only; (3) any post-hoc PACS-test
 re-evaluation requires a new versioned system and is reported as such. This
 extends the dissertation's dev/confirmatory discipline to the new benchmark.
 
-## Size and quotas
+## Size and quotas (v2.1)
 Quotas are defined over applicable family × depth cells. Exposure is a
 stratification label within each cell, NOT a second multiplicative quota. Each
-applicable cell contains at least 25 answerable intent instances, including at
-least 8 unseen-shape instances where constructible. Arithmetic: 7 × 3 × 25 = 525
-answerable instances; with status variants at ~20% of final rows, total ≈ 656 —
-inside the 600–1,000 target. Anchors varied; no anchor in more than 3 instances;
+applicable cell contains 40–50 answerable intent instances, including 15–20
+unseen-shape instances where constructible. Arithmetic: 21 cells × 40–50 =
+~840–1,050 answerable intents; plus ~250–300 status variants → PACS totals
+~1,100–1,350 intent clusters. Rationale: the benchmark is multi-axis
+(family × depth × exposure × surface × status); cell-level conclusions need
+cell-level n. Anchors varied; no anchor in more than 3 instances;
 entity/year/CPV/answer-size diversity enforced per cell.
 
 ## Statistical unit and analysis
@@ -109,11 +111,14 @@ depths, reported with per-depth breakdown in appendix) | naturalized channel b |
 abstention (status axis). Iteration curves, construction holdouts, and perturbation
 series move to Sets C/D sections.
 
-## Experiment sets
-- A Legacy Regression: 2,285 paired vs old champion (McNemar; retirement question)
-- B PACS: primary (this spec)
-- C Structural OOD: B_clean, rotated construction holdouts, B_anchor when built
-- D Robustness & boundary: reorder/paraphrase/masked; out-of-grammar; abstention
+## Experiment sets (paper naming: one PRIMARY BENCHMARK + three COMPANION EVALUATION SUITES)
+- PRIMARY BENCHMARK — B, PACS (this spec): the final comprehensive exam.
+- Companion suite A, Legacy Regression: 2,285 paired vs old champion (McNemar;
+  the retirement question) — checks old knowledge.
+- Companion suite C, Structural OOD: B_clean, rotated construction holdouts,
+  B_anchor when built — checks compositional mechanism.
+- Companion suite D, Robustness & boundary: reorder/paraphrase/masked;
+  out-of-grammar; abstention — checks shortcut resistance and limits.
 
 ## Model freeze rule
 The first official PACS results MUST come from the current frozen compose-v3
