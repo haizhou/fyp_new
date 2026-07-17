@@ -1,4 +1,4 @@
-# PACS — Procurement Analytics Challenge Set (specification v2, pre-registered before generation)
+# PACS — Procurement Analytics Challenge Set — specification v2 — FROZEN BEFORE GENERATION (2026-07-17)
 
 Decision (user review, 2026-07-17): the legacy 2,285 paired run is DEMOTED to backward
 compatibility (Set A). The paper's primary result comes from PACS (Set B). Sets C
@@ -47,8 +47,14 @@ Every row is ONE program rendered three ways; channel comparisons are within-row
 paired measurements:
 - a `canonical_independent`: second surface grammar, independently authored — no
   shared stems, connectors, or ordering policy with the training renderer;
-- b `naturalized`: LLM rewrite behind deterministic fidelity gates (entities,
-  numbers, logical slots, abstention cues verbatim-checked; ch4 gate machinery);
+- b `naturalized`: LLM rewrite behind deterministic fidelity gates. Literal
+  gates (entities, numbers, abstention cues verbatim; ch4 machinery) PLUS logic
+  gates: every gold tree exports a logical signature (operation kind, negation
+  flags, aggregation, comparison direction, quantifier, left/right scopes) and
+  the naturalized text must pass checks against it — operation-relation,
+  negation-preservation, comparison-direction, quantifier, and scope-side checks
+  (guards against both→either, only-A→A-or-B, greater→at-least, all→any,
+  dropped negation, swapped comparison sides);
 - c `training_renderer`: diagnostic column only, never a primary number.
 Primary metric: channel a. Reported alongside: b, and paired deltas a−c, b−c
 (per family and overall) as the surface-transfer measurement.
@@ -56,18 +62,34 @@ Primary metric: channel a. Reported alongside: b, and paired deltas a−c, b−c
 ## Split discipline — dev/test, written hard
 PACS is split at generation time by intent-instance (all three surfaces and all
 status variants of one instance stay together): **PACS-dev ~25%** and
-**PACS-test ~75%**. Binding rules: (1) PACS-test is evaluated once per final
-system configuration and never inspected row-wise before freeze of the paper's
-numbers; (2) every diagnostic, error analysis, renderer fix, recipe change, or
+**PACS-test ~75%**. Binding rules: (1) each frozen system configuration may produce one complete
+confirmatory PACS-test result; technical reruns are permitted only when the
+previous run is incomplete because of documented infrastructure or software
+failure, and must use identical checkpoint, prompt, decoding, evaluator, and
+scoring configuration (interruption cause recorded); PACS-test is never
+inspected row-wise before freeze of the paper's numbers; (2) every diagnostic, error analysis, renderer fix, recipe change, or
 model selection uses PACS-dev (or Sets C/D) only; (3) any post-hoc PACS-test
 re-evaluation requires a new versioned system and is reported as such. This
 extends the dissertation's dev/confirmatory discipline to the new benchmark.
 
 ## Size and quotas
-600–1,000 rows total (instances × status variants; ×3 surfaces stored per row).
-Per family: >= 60 answerable instances spread over depth×exposure cells (>= 12 per
-populated cell), >= 15 status-variant rows. Anchors varied; no anchor in more than
-3 instances; entity/year/CPV/answer-size diversity enforced per cell.
+Quotas are defined over applicable family × depth cells. Exposure is a
+stratification label within each cell, NOT a second multiplicative quota. Each
+applicable cell contains at least 25 answerable intent instances, including at
+least 8 unseen-shape instances where constructible. Arithmetic: 7 × 3 × 25 = 525
+answerable instances; with status variants at ~20% of final rows, total ≈ 656 —
+inside the 600–1,000 target. Anchors varied; no anchor in more than 3 instances;
+entity/year/CPV/answer-size diversity enforced per cell.
+
+## Statistical unit and analysis
+The unit of analysis is the gold intent instance (equivalently its gold program
+tree), NOT the rendered text row. The three surface channels are paired
+measurements of the same item; status variants derived from one intent belong to
+the same cluster. Consequences, binding: confidence intervals use intent-level
+cluster bootstrap; channel differences (canonical_independent − training_renderer,
+naturalized − training_renderer) are computed as within-intent paired deltas —
+channels are never counted as independent samples; answerable accuracy and
+status-recognition results are aggregated and reported separately.
 
 ## Generation protocol (per instance)
 1. Intent instantiated from the family archetype (KG-grounded parameter sampling).
@@ -75,8 +97,11 @@ populated cell), >= 15 status-variant rows. Anchors varied; no anchor in more th
    disagreement or degeneracy discards the instance.
 3. Status variants derived from the same instance where scheduled.
 4. Three surfaces rendered/gated as above.
-5. Audits: every template reviewed; >= 5% of instances human-read (user included);
-   iron rule (10 deterministic-random rows per acceptance gate) applies.
+5. Audits: every template reviewed; >= 5 naturalized instances human-read per
+   applicable family × depth cell, with elevated sampling for set operations,
+   negation, anti-joins, comparisons, universals, and ALL status types (user
+   included among readers); iron rule (10 deterministic-random rows per
+   acceptance gate) applies.
 
 ## Main table of the paper (PACS-test, channel a)
 Rows: F1–F7 + macro average. Columns: L1 | L2-seen | L3-seen | unseen (pooled
@@ -90,8 +115,14 @@ series move to Sets C/D sections.
 - C Structural OOD: B_clean, rotated construction holdouts, B_anchor when built
 - D Robustness & boundary: reorder/paraphrase/masked; out-of-grammar; abstention
 
+## Model freeze rule
+The first official PACS results MUST come from the current frozen compose-v3
+checkpoint (and the untrained base as control). No retraining or data iteration
+may be informed by PACS before those results are reported; shortfalls PACS
+exposes feed Discussion and future work, not a v4 trained against it.
+
 ## Build order
-1. USER APPROVES this v2 spec → freeze.
+1. Spec FROZEN (this version, user-approved).
 2. Family×depth tree templates (reuse algebra + dual evaluators).
 3. Independent surface grammar (second author-voice; no shared assets).
 4. Naturalization gates; generation; dev/test split; audits; freeze PACS v1.
