@@ -1,0 +1,139 @@
+# Learning to Compose Verifiable Programs for Public Procurement Analytics
+
+## 1 Introduction
+
+Public bodies in the United Kingdom publish hundreds of thousands of contract-award notices. Journalists, auditors, and council officers ask questions of this record that are analytical by nature: how much was spent, which supplier received the most awards, whether one year exceeded another, which buyers never disclosed a signing date. Answering such questions requires exact aggregation over all matching records, arithmetic between aggregates, temporal comparison, set reasoning across roles, and — because the record is imperfect — the ability to refuse when a question is ambiguous, unsupported by the schema, or matched by no records.
+
+Two standard tools fail this task in different ways. Retrieval-augmented language models cannot hold "every notice by every London borough" in a context window, and a fluent answer computed over a truncated sample is wrong in a way no reader can detect: on our development set, RAG baselines reached 31.5% and 28.8% under an early protocol where a scaffolded untrained 8B model already reached 61.5%. Fixed query programs — a planner that fills slots in a closed set of query patterns — answer exactly and auditable, and our earlier system built this way reaches 85.65% on a held-out procurement benchmark. But its analytical reach ends where its patterns end: a pilot study found that questions requiring a grouped temporal extremum or a per-side filtered sum comparison were not expressible at all, and the boundary was the pipeline's, not the model's.
+
+This paper studies the step between: a small, typed, *compositional* program algebra in which operators recombine freely, executed and verified deterministically, and a training method that teaches an 8-billion-parameter local model to use that freedom. The core claim is that composition over a verifiable operator grammar can be *taught* — cheaply, without teacher models or human labels — and measured honestly against structural holdouts and surface perturbations.
+
+We make three contributions. First, a task environment for procurement analytics: a typed operator language over an OCDS knowledge graph, a program-first question generator whose every answer is verified by two independent evaluator implementations, and an evaluation design with shape-level holdouts, rotated never-demonstrated construction holdouts, and perturbation batteries. Second, a training recipe — program-authored, dual-verified synthetic supervision with translated legacy questions mixed in — that takes a local model from 46.8% to 99.2% on held-out composition shapes while retaining legacy-task competence, in about two GPU-hours per iteration. Third, a measurement-guided iterative ablation across three data iterations, in which perturbation checks repeatedly caught what headline accuracy hid: a clause-order shortcut (reduced from a 44.7-point gap to 8.7 across iterations), a construction failure caused by demonstration absence rather than model capacity (two prompt examples take it from 0% to 100%), and a coverage regression invisible in every aggregate metric.
+
+## 2 Related Work
+
+**Public procurement data and knowledge graphs.** Open Contracting Data Standard (OCDS) releases underpin a growing line of procurement transparency tools and integration efforts. Most work targets data quality, entity resolution across noisy supplier identifiers, and dashboard-style analytics; question answering over procurement graphs with verified answers is comparatively unexplored. Our knowledge graph follows precision-first entity resolution and explicit money-semantics conventions (additive versus framework-ceiling values), because a verifier can only check what the data model makes explicit.
+
+**Executable KGQA and semantic parsing.** Modern KGQA maps questions to executable logical forms — SPARQL, S-expressions, or program languages such as KoPL — increasingly with LLM planners. Two design families differ in where authority sits: constrained generation restricts the model to enumerated candidates, while generate-then-check lets the model propose and validates afterwards. We follow the second family with a typed algebra whose recursive grammar is enforced at decoding time, so conformance is a decoding property and correctness checks concentrate on semantics.
+
+**Program-first generation and verification-guided learning.** KQA Pro demonstrated program-first benchmark construction: instantiate a program, execute it for the answer, then verbalise. BYOKG and FlexKBQA generate training data against a graph without human annotation; ExeSQL bootstraps text-to-SQL with execution-guided filtering; self-training lines (STaR, RFT, ReST) filter model outputs by a pass criterion. Our supervision regime is stricter in one specific way: training programs are *authored by the generator* and every answer must be reproduced by two independently implemented evaluators, so the training pool contains no unverified artifact at all. What the model must learn is the question-to-program mapping, not the answers.
+
+**Compositional generalisation.** GrailQA's i.i.d./compositional/zero-shot split taxonomy and the CFQ/SCAN line established that parsers fail on novel compositions even when the target language allows them, and that surface shortcuts can masquerade as compositional skill. We adopt structural holdouts at the shape level, rotate a never-demonstrated construction holdout each training iteration, and attack shortcuts directly with meaning-preserving perturbations — our clause-reorder battery is the instrument that caught the largest such shortcut in our own system.
+
+## 3 Task Construction and Evaluation Environment
+
+### 3.1 Procurement analytical questions
+
+We organise the task around seven analytical demands observed in procurement oversight: exhaustive retrieval (counts and lists over *all* matching records), aggregation (sums under money-semantics guards), arithmetic over aggregates (differences, ratios), temporal comparison (between years, against pivot dates), set reasoning (suppliers of one buyer but never another; organisations in either of two roles), relational composition (membership in a computed set as a filter — semijoins and anti-joins), and abstention (ambiguous, unsupported, and empty-result questions must be refused, not answered fluently).
+
+### 3.2 Data and knowledge graph
+
+The substrate is a typed knowledge graph built from UK OCDS releases (2022–2026): 215,221 contract-award nodes, 131,502 canonical organisations, CPV classification nodes, and evidence text nodes, flattened deterministically into one record per contract-award with first-party buyer/supplier scalars. Three properties matter for correctness. Entity resolution is conservative and audited (false merges corrupt every downstream aggregate). A per-record `value_is_additive` flag distinguishes summable award values from framework-agreement ceilings, making money aggregation a guarded operation. Every queryable property is a typed slot with a closed value space. The benchmark's answer oracles were validated by an independent second implementation at 99.88% agreement (14,752/14,770), with the 18 residuals characterised.
+
+### 3.3 A typed operator language
+
+The operator language is defined before any question is generated, because questions are born from programs. It is a recursive algebra of seventeen node types over five value types (record sets, value sets, group tables, scalars, booleans):
+
+- **Leaves.** `filter` selects records by a predicate list: field comparisons (`eq/in/contains/gte/lte/exists`), negation, disjunction, and `in_expr` — membership of a field in a *computed* value set, with a `negate` twin (semijoin and anti-join).
+- **Projections and reductions.** `values` (distinct projection), `count`, `sum` (guarded money), `exists`, `select` (unique lookup), `extreme` (extremum record), `size`.
+- **Grouping.** `groupby` (key plus count/sum metric), `argext` (extremum key), `top` (ranked k).
+- **Combinators.** `combine` over scalars (comparisons; difference, ratio, addition), `vcompare` (scalar against a literal, with date normalisation), `setop` (union, intersection, difference over value sets), `gcombine` (key-aligned arithmetic over two group tables), `keys_where` (thresholded key selection).
+
+A recursive type checker validates every tree (depth ≤ 16, ≤ 64 nodes) and returns typed diagnostics. The grammar is closed — every node type and enumeration is fixed — but the tree space is combinatorially open. Two independently implemented evaluators execute trees: a runtime evaluator sharing the production system's loading path, and a raw-Parquet evaluator that rebuilds the record universe with no shared code. Both enforce frozen conventions (identifier-level deduplication, empty-key exclusion, exact decimal money arithmetic, deterministic tie-breaks).
+
+The language subsumes the legacy system's fixed queries. A deterministic converter translates every legacy gold program into an algebra tree; on the held-out legacy test set both evaluators reproduce the frozen oracles at 100.00% of covered scope (1,823/1,823 each; one comparison family whose parameter exists only in surface text is excluded, as in the original oracle audit). The translation exercise surfaced three small legacy-benchmark defects (a metadata/oracle contradiction in seven ranking rows, row-order tie-breaks in six early oracles, one malformed question pair), each handled by a declared convention. This is the honest form of unification: one language, two generation eras, joined by a validated translation rather than by a retrofitted single generator.
+
+### 3.4 Program-first question generation
+
+Questions are generated program-first: sample a type-correct tree, ground it in the graph, execute it with *both* evaluators, discard on any disagreement or on degeneracy (empty scopes, knife-edge comparisons, oversized answers), then render the question compositionally — each node contributes an English clause. Sixteen recipes compose random filter scopes (one to three predicates with negation/disjunction decorations) under operation patterns spanning §3.1, including nested binds (aggregate over records whose supplier appears in a computed set) and relational division (universal quantification as everyone-minus-counterexamples). Rendering is deliberately a first-class concern: clause order is randomised per row, and later iterations add paired *order twins* — the same tree rendered under two clause orders — after an order shortcut was measured (§5.4). Every row carries a shape signature (node skeleton with literals stripped) used for split hygiene.
+
+Domain contact shaped the generator in two recorded ways: the planned universal-quantification property (procurement category) proved to be a deterministic function of CPV division in this corpus — the quantifier would have been vacuous — and was replaced by a genuinely varying disclosure flag; comparison anchors exclude years outside the corpus, where one side is trivially empty.
+
+### 3.5 Evaluation regions and audit
+
+Six evaluation regions, each answering a different question:
+
+1. **Legacy test set** (2,285 questions, frozen): backward compatibility, including 360 abstention rows in three families.
+2. **B_clean** — held-out shape set: whole shape signatures are excluded from training, a leakage audit *before training* removes any row whose shape re-entered through the legacy-translation channel, and the set is re-held-out at every iteration (1,534 / 1,187 / 1,199 rows across iterations).
+3. **Strict construction holdout** — one construction absent from *all* training rows, rotated per iteration (grouped comparison in v1; set intersection thereafter), providing a never-demonstrated cell at every stage.
+4. **Compositional probe** (324 rows): eight hand-designed families on a compositional-distance ladder plus twelve out-of-grammar controls (median, monotone trend) whose correct behaviour is abstention.
+5. **Perturbation battery**: meaning-preserving clause reorder, verbose and stem-substituted paraphrases, and a masked negative control (entities/years replaced by placeholders — accuracy must crash; if it does not, something leaks).
+6. **Scoring audit**: 300 model-emitted trees re-scored by the independent evaluator (300/300 verdict agreement), and a standing rule that ten deterministic-random raw outputs are read by a human before any gate-produced number is cited.
+
+**Claim discipline.** Once a construction enters the training recipes, its probe families stop counting as generalisation evidence and become coverage tracking. Generalisation claims cite only cells never demonstrated at measurement time — the rotated strict holdout and the re-held-out B set.
+
+### 3.6 Baselines, protocols, and metrics
+
+Systems compared: the legacy fixed planner (two-stage, with repair; 85.65% on the legacy test set), its cloud teacher, RAG baselines (early-protocol reference), untrained bases as zero-shot compositional planners, and trained compositional planners. All compositional evaluation uses a single call, temperature zero, no repair, and — as part of the method, justified in §5.4 — grammar-constrained decoding; a symmetric free-decoding protocol is also reported where teacher comparison requires it. Answerable rows score by type-aware match against dual-verified oracles. Abstention rows score under two declared metrics: *Status Exact Match* (primary: only an explicit abstain counts) and *Safe Semantic Outcome* (supplementary: a runtime multiple-answer or empty result also counts, but only if every literal in the emitted tree traces to the question — the faithfulness gate that blocks credit for accidentally-failing wrong plans).
+
+## 4 Verifiable Compositional Reasoning
+
+### 4.1 Question-to-program planning
+
+A single local model maps the question to one algebra tree in one call. The output space is constrained to the grammar by a recursive JSON schema enforced at decoding time; the model may alternatively emit an explicit abstention object with a reason. Constrained decoding is not a convenience but part of the method: §5.4 shows that free-decoded fine-tuned models fail on format grounds that repair cannot undo, while the same checkpoints under the schema expose intact semantics.
+
+### 4.2 Compile, ground, and execute
+
+The emitted tree is type-checked (typed diagnostics on failure), grounded against the graph's closed slot vocabulary, and executed by the runtime evaluator over the full record universe — never a retrieved sample. Execution conventions are frozen and shared with the independent evaluator: deduplication on record identifiers, empty group keys excluded, money summed in exact decimal arithmetic under the additive guard, deterministic tie-breaking.
+
+### 4.3 Verification, evidence, and abstention
+
+Correctness at training time is adjudicated only by dual-evaluator agreement against program-derived oracles; at test time the system's obligations are structural (valid tree, successful grounding and execution) plus calibrated refusal. Abstention is first-class: out-of-grammar questions have no valid tree, ambiguous lookups surface as multiple-answer outcomes, and empty results are answers only when every literal traces to the question — the faithfulness gate of §3.6, an algebra-level descendant of provenance-gated abstention in the legacy system.
+
+### 4.4 Verification-grounded supervision
+
+Training data is program-authored and dual-verified: no teacher model, no human labels, no unverified artifact. One training set mixes (i) synthetic tree/question pairs from the recipe generator (6,270–6,631 rows per iteration, from ~500 training shapes), (ii) legacy questions translated into the algebra by the validated converter (3,631 rows, capped at 150 per family to prevent template priors), (iii) a small abstention channel (37 out-of-grammar demonstrations), and, from the third iteration, (iv) order twins (2,403 rows). Fine-tuning is deliberately light — QLoRA, two epochs, roughly two GPU-hours — and always starts from the untouched base model, never from legacy-contract adapters whose format prior is the documented failure mode of §5.4.
+
+## 5 Experiments: From Fixed Queries to Operator Composition
+
+### 5.1 Research questions
+
+**RQ1** Does the compositional planner handle basic procurement queries as reliably as the fixed-query system it generalises? **RQ2** Can training teach composition that transfers to unseen operator combinations? **RQ3** Do the results depend on clause order or wording shortcuts? **RQ4** Does compositional extension preserve legacy competence, and where does capability end?
+
+### 5.2 Fixed-query foundation
+
+The legacy system establishes that verified program execution is learnable at all: a two-stage planner with deterministic repair reaches 85.65% on the frozen 2,285-question test set, exceeding its own cloud teacher (69.76%) with all pairings significant at McNemar p < 1e-14, replicated on a second base model. We treat this as the foundation, not the protagonist: it defines the legacy region and the backward-compatibility bar. [Pending: the paired full-test-set run of the compositional planner under the §3.6 protocol — per-item McNemar against the legacy champion, per-bucket breakdown, and cost metrics (calls, tokens, latency, failure taxonomy) — is queued behind a cluster driver fault; a 400-row sample already indicates parity (§5.5).]
+
+### 5.3 Compositional generalisation
+
+**Zero-shot floor.** With only a grammar description in the prompt, the untrained Qwen3-8B base solves 49.4% of the probe under constrained decoding; the cloud teacher, free-decoded, 64.8%. Universal quantification is at zero for every untrained arm under every protocol.
+
+**Trained composition.** The headline cells, all never-demonstrated at measurement time:
+
+| iteration | B_clean (unseen shapes) | base, same rows | discordants | strict construction holdout |
+|---|---|---|---|---|
+| v1 | 91.72% (n=1,534) | 38.98% | +814/−5 | grouped comparison: **64.8%** vs 6.1% |
+| v2 | 98.99% (n=1,187) | 46.84% | +619/−0 | intersection: **39/39** vs 21/39 |
+| v3 | **99.17%** (n=1,199, tree-valid 100.0%) | — | — | intersection: **19/19** (third round, still absent from training) |
+
+The intersection cell is the sharpest: a set operation never present in any training row, solved perfectly by composing its demonstrated siblings (union, difference), against a base that manages half. Shape-level leakage was audited before training in later iterations; v1's audit found 196 easy shapes re-entering through the legacy-translation channel and the leak-free recut is the number reported above. The probe's trained families sit at or near ceiling in v3 (98.77% overall) and, per the claim rule, count as coverage rather than generalisation.
+
+**What failure is made of.** Two probe families stayed near zero for v1 — universal quantification (0/32) and the probe's phrasing of grouped comparison (2/40) — despite the 64.8% holdout result on differently-phrased grouped comparisons. A factorial boundary experiment attributed the failure: rewriting probe questions into the training surface style changed nothing (1/40 — the surface hypothesis is refuted), while two worked examples in the prompt took both families to 100% (32/32, 40/40). The failures were demonstration absence, not capacity. Mechanisms are specific: the model resolves the comparative ellipsis "more in 2024 than in 2023" by using the second year as a numeric threshold, and constructs intersection instead of everyone-minus-counterexamples for "all of whose". A sampling probe (temperature 1.0, k=16) shows exploration reaches correct trees for 3/32 and 13/40 questions respectively — reinforcement learning against the dual-verified reward is viable, but demonstrations dominate it for coverage, so both constructions simply became ordinary recipes in the next iteration (32/32 and 40/40 thereafter, as coverage).
+
+### 5.4 Robustness, shortcuts, and data diagnostics
+
+**The format channel.** Free-decoded, the legacy-contract fine-tunes collapse on the open grammar (SFT 2.47%, DPO 0.00%) while their own untrained base scores 32.41% — a dose-response that reads as capability destruction. Constrained decoding inverts it: the DPO checkpoint recovers to 45.06% (base: 49.38%). Post-hoc bracket repair parses 224 of 272 malformed outputs and corrects zero — attribute placement is unrepairable after the fact — so only in-decode constraint separates format from semantics. Fine-tuning had imprinted the legacy contract deeply enough to overwrite free-form emission while leaving compositional semantics recoverable underneath; family-level profiles shifted rather than vanished (the tuned model gains ratio arithmetic, loses set machinery, relative to base).
+
+**The order shortcut.** Meaning-preserving clause reorder — the same question with scope clauses permuted, side-crossings excluded by construction — dropped v1 from 97.9% to 53.2% while wording paraphrases held (96.0/94.7%). The masked negative control crashes to 6–11% as required. The shortcut was then attacked as data: per-row order randomisation (v2) halved the gap (98.0 → 74.0), paired order twins (v3) nearly closed it (98.67 → 90.0). The series 44.7 → 24.0 → 8.7 points is the paper's clearest example of measurement-guided iteration: the battery measures a shortcut, one rendering variable changes, the same battery measures the response.
+
+**A regression only the battery saw.** v2's rendering fixes silently broke cross-role union: 40/40 → 7/40, invisible in every aggregate (v2's probe total *rose*). The phrase "as a buyer or as a supplier" appears in no recipe surface; v1 answered it through base-model generalisation, and v2's tighter fit displaced that inherited behaviour — the model silently drops the second role. A recipe variant restores it (40/40 in v3), as coverage. We report this as a standing property of synthetic-data iteration: every rendering fix narrows the distribution somewhere else, and a perturbation battery — not the headline metric — is the instrument that detects it. We name the overall process a *measurement-guided iterative ablation*: iterations change one or two identified data variables in response to a measured defect, but are not a controlled single-variable ablation, and we do not attribute gains to single causes where variables moved together.
+
+### 5.5 Backward compatibility and the capability boundary
+
+On a 400-row deterministic sample of the legacy test set, the v3 compositional planner scores 87.25% in a single call without repair — level with the legacy champion's 85.65% (different protocol; the paired full-set comparison under the §3.6 dual-metric protocol is pending, and no retirement claim is made before it). Retention held across all three iterations (87.0/87.5/87.25%), because legacy questions travel in the training mix as translated trees. Abstention on out-of-grammar controls reached 12/12 after the dedicated channel was added, with one residual slip (monotone-trend family, 4/6 in v2/v3). If the paired run confirms parity without key-bucket regressions, the supported conclusion is architectural: a single-stage grammar-constrained planner can replace the legacy multi-stage generative planning layer — the two-step planner, the decomposition compiler, and the rewrite transforms — while grounding, execution, verification, and evidence checks remain deterministic and unchanged.
+
+## 6 Discussion and Limitations
+
+**Operators are domain-driven; the boundary is explicit.** The seventeen node types were chosen to cover procurement oversight demands, not to maximise expressiveness; median and trend questions remain out of grammar deliberately, and the correct system behaviour — refusal — is trained and measured. What the model contributes is the question-to-program mapping; everything after the tree is deterministic machinery, so capability claims separate cleanly into model composition skill (B_clean, holdouts) and executor expressiveness (out-of-grammar).
+
+**Verification has a blind region.** Dual-evaluator agreement verifies answers relative to documented conventions, not ground truth; and at test time nothing checks that a valid, executable tree *means* the question. The faithfulness gate narrows this for abstention scoring, but plan-question semantic alignment in general remains the open seam, as in all generate-then-check systems.
+
+**Synthetic surfaces.** Training and evaluation questions are rendered from the same canonical grammar; unseen *shapes* are genuinely unseen, but the rendering idiom is shared, and the order-shortcut episode shows idiom matters. The residual 8.7-point reorder gap and the one abstention slip are open defects. The planned remedy is a dual-channel renderer: the deterministic canonical channel for training and core evaluation, plus an independent naturalisation channel (separately authored surface grammar, LLM paraphrase behind deterministic fidelity gates) for external surface testing — separating "did it learn the algebra" from "does it cross surface distributions".
+
+**Scope.** One domain, one schema, one KG; the recipe's portability is untested. The lock-in result is protocol-scoped: it demonstrates a format channel, not permanent capability loss. Legacy-comparison claims await the paired run.
+
+**Capability extension.** The natural third stage — beyond fixed programs (stage one) and learned composition over a fixed grammar (stage two) — is capability extension: detecting that a question exceeds the operator inventory and proposing a new primitive with its executor and verification obligations. Our out-of-grammar controls already measure the detection half; the proposal half is future work.
+
+## 7 Conclusion
+
+Procurement analytics needs answers that are computed, not narrated. We defined the task as programs in a typed, composable, verifiable operator language; generated supervision that is program-authored and doubly verified; and showed that a small local model learns to compose — to 99.2% on unseen shape holdouts, including perfect transfer to a construction never demonstrated in training — while retaining the legacy task and its abstention obligations, at a cost of two GPU-hours per iteration and no external calls. The measurement apparatus mattered as much as the method: structural holdouts with rotation, pre-training leakage audits, and perturbation batteries caught a format channel, an order shortcut, and a silent coverage regression that headline accuracy missed. The system's remaining limits are stated as measurements — an 8.7-point order residue, a shared rendering idiom, a pending paired comparison — and its next step is not more accuracy but a wider question: whether a planner that composes verified programs can also recognise, and eventually propose, the operators it lacks.
