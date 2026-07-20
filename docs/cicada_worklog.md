@@ -1378,3 +1378,29 @@ unsupported_field, 2 ambiguous, causal/future, field-vs-field grammar hole #39).
 AUTHORSHIP DISCLOSED: written by the co-developing agent at user request, without
 consulting training templates — hand-authored held-out probe, NOT external human
 evidence; user may replace/edit >=10 rows to upgrade independence. Gates Layer 2.
+
+## 2026-07-20 (cont. 4): probe E run 1 (harness-fixed) — FROZEN
+
+Run 1 with minimal prompt was VOIDED (harness defect: no operator catalog —
+unfair to base; RECORDS roots accepted; truncation conflated). Fixed harness:
+standard frozen SYSTEM_PROMPT + records-root rejection + truncation split.
+
+**Frozen results (v3 / base), 40 questions:**
+- answerable (31): tree_ok 28/29, but abstention discipline differs overall.
+- abstention battery (9): v3 5/9 vs base 4/9. BOTH arms fail the same three:
+  #35 temporal deixis ("last year" -> silently answered 31110), #36 ambiguous
+  council (summed the whole KG: 9.7e12), #39 field-vs-field grammar hole
+  (fabricated False instead of abstaining).
+- v3-specific findings: #12 abstained claiming average inexpressible (it IS
+  expressible: ratio(sum,count) — missing-demonstration bottleneck, again);
+  #16 Chinese surface -> type error (extreme on GROUPS); #40 answered the
+  biggest-contract question with a record ID, not the title (17-op procurement
+  planner has no row-preserving extremum — matches the WTQ census motivation
+  for extreme_rows); #6 top-spend ranking: manual tree pass CLEARED it — value_is_additive
+  gating present and correct; the 1e11 magnitudes are a data property.
+  #30 (supplier in EVERY year) manual pass: WRONG shape — used difference
+  over the pooled range instead of a per-year intersect chain (deep-composition
+  ceiling, as the probe intended).
+- empty-result probes #20/#21 both answered correctly ([] / 0) by v3.
+Layer-2 gate satisfied once manual scoring pass is recorded; user may still
+replace >=10 rows (edited rows rerun + documented).
