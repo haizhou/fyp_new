@@ -1579,3 +1579,18 @@ rows with >=1 redundant predicate 49.7%. Defines the IRREDUCIBLE SPLIT
 post-hoc dataset audit). PENDING (join bug to fix): v3 accuracy on
 irreducible vs reducible rows — the shortcut-inflation check; then paper
 gains "necessity-audited benchmark" claim + irreducible-split reporting.
+
+## 2026-07-21: learning curve x init control LANDS — curves OVERLAP; recipe-not-weights strengthened
+
+base-init: 100st 37.3 | 200 38.0 | 500 39.3 | 1000 40.7 (peak) | 2000 39.7
+(mild decline). v3init: 100 39.3 | 200 37.7 | 500 38.3; steps 1000/2000
+MISSING — training died at ~step 800 (quota squeeze during checkpoint saves;
+loss already 0.0017, fully converged; not re-run, disclosed). READINGS:
+(1) 100 steps (~1.6k examples) lifts 15%->37%: extreme sample efficiency,
+gain is nearly immediate. (2) Plateau from ~250 steps -> user's scenario 2:
+data-coverage bottleneck, NOT under-training; C-arm's 496-step 40.0% sits in
+the plateau band. (3) base-init and v3init curves OVERLAP (deltas within
++-2pt, sign-flipping): procurement WEIGHTS buy no measurable adaptation
+speed; combined with zero-shot p=0.557, the strongest evidence yet that THE
+RECIPE, NOT THE CHECKPOINT, IS THE PORTABLE OBJECT. Frozen step choice for
+final runs: 1000 (base-init peak; 500 within noise).
