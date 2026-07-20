@@ -136,6 +136,12 @@ def validate_expr(tree: Any, path: str = "$", state: dict | None = None) -> str:
         sub = validate_expr(tree.get("of"), path + ".of", state)
         _require(sub == "RECORDS", f"select_expects_RECORDS_got_{sub}", path)
         return "VALUE"
+    if node == "extreme_rows":
+        _require(tree.get("op") in {"argmax", "argmin"}, "extreme_rows_op_invalid", path)
+        _require(isinstance(tree.get("field"), str) and tree["field"], "extreme_rows_needs_field", path)
+        sub = validate_expr(tree.get("of"), path + ".of", state)
+        _require(sub == "RECORDS", f"extreme_rows_expects_RECORDS_got_{sub}", path)
+        return "RECORDS"
     if node == "extreme":
         _require(tree.get("op") in {"argmax", "argmin"}, "extreme_op_invalid", path)
         _require(isinstance(tree.get("field"), str) and tree["field"], "extreme_needs_field", path)

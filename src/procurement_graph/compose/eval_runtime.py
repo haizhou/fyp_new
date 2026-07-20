@@ -177,6 +177,19 @@ class RuntimeAlgebraEvaluator:
                 raise EvalError(f"multiple_answers:{len(distinct)}")
             return next(iter(distinct))
 
+        if node == "extreme_rows":
+            rows = self._eval(tree["of"])
+            field = tree["field"]
+            if field not in rows.columns:
+                raise EvalError(f"unknown_field:{field}")
+            numeric = pd.to_numeric(rows[field], errors="coerce")
+            rows = rows[numeric.notna()]
+            numeric = numeric.dropna()
+            if rows.empty:
+                raise EvalError("no_results")
+            target = numeric.max() if tree["op"] == "argmax" else numeric.min()
+            return rows[numeric == target]
+
         if node == "extreme":
             rows = self._eval(tree["of"])
             field = tree["field"]
