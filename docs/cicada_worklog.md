@@ -1237,3 +1237,18 @@ Decisive test: `python -m vllm.model_executor.models.registry < /dev/null` (same
 Smoking gun (user's foreground terminal run, outside the agent harness — also killing the sandbox hypothesis): the inspection subprocess "died with <Signals.SIGSEGV: 11>". Same-day dmesg: NVRM "RC watchdog: GPU is probably locked!", rpcSendMessage failures; GPU1 fully dead ("No CUDA GPUs are available"). Timeline: v3 training + all evals completed BEFORE the wedge; every serve attempt after dies at the first CUDA-heavy child (inspection or engine core), silently (segfault = no Python traceback). Light CUDA (small matmul, parent or spawn-child) still works — depth of driver-path touch differs. NOT fixable in userspace.
 ACTION REQUIRED (admin): reboot node malmo / reload NVIDIA driver; GPU1 needs attention (locked). After reboot, the queued pivotal experiment runs unchanged: serve compose-v3 (HF_HOME=/var/tmp/cicada/hf — home cache is the incomplete one), full final_test 2,285 with --old-benchmark-abstention dual metric, per-item saves, McNemar vs old champion, buckets, cost metrics.
 ~/.cache/vllm restored from .bak (debug artifact tidy-up).
+
+## 2026-07-18 - GENEVA MIGRATION + SET A PAIRED RESULT (the demoted pivotal): compose-v3 WINS answerable (87.38 vs 83.01, +237/-153, p=2.5e-05) but loses strict overall on the abstention channel; NO retirement claim per pre-registered protocol
+
+**Migration**: geneva.ee.ucl.ac.uk, 4x A100-80GB (GPU0 foreign, GPU1-3 ours). outputs -> ~/migrated_outputs (NFS home); weights re-downloaded to /var/tmp/cicada/hf; first serve + smoke 8/8 clean — malmo driver wedge left behind.
+
+**Set A (Companion suite A), full frozen final_test 2,285, dual-metric protocol (--old-benchmark-abstention), single call, guided, no repair, per-item saved (eval_setA_composev3_full.jsonl). Paired vs old champion per-item results (fully_local_qwen):**
+| scope | compose-v3 | old champion | discordants | McNemar p |
+|---|---|---|---|---|
+| answerable (1,925) | **87.38%** | 83.01% | **+237/-153** | **2.5e-05** |
+| all 2,285 STRICT | 75.80% | 85.65% | +237/-462 | 1.3e-17 |
+| all 2,285 SAFE (faithfulness-gated) | 83.72% | 85.65% | +237/-281 | 0.059 (n.s.) |
+
+**Reading (protocol-bound)**: on answerable questions the single-stage grammar-constrained planner significantly BEATS the two-stage+repair legacy stack (+4.37pt paired). The entire deficit is the abstention channel: strict abstention 13.9% (50/360) — the model answers with trees instead of explicitly abstaining (ambiguous families 0/60 strict; unsupported_field 6/60); the faithfulness-gated safe metric recovers 181 rows (faithful_multi 115, faithful_empty 66; unfaithful accidental failures 58 correctly given no credit). Per the pre-registered bar ("overall >= old AND no key-bucket regression") the retirement claim is NOT made: abstention is a key-bucket regression. Honest architectural statement: replaces the planning layer on answerable competence at lower cost (1 call vs 2-4), does not yet replicate the legacy abstention machinery (compose training carried only 37 abstain demos vs the legacy system's dedicated abstention layers). Model-freeze rule: this feeds Discussion, not a retrain.
+
+**PACS build in parallel**: generator driver written; smoke found + fixed a quota-starvation bug (unseen steering blocked seen intake; F7-L3 starved 0/180 — seen/unseen quotas decoupled, two-level decoration steering). Re-smoke healthy.
