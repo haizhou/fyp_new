@@ -94,7 +94,25 @@ Training data is program-authored and dual-verified: no teacher model, no human 
 
 The legacy system establishes that verified program execution is learnable at all: a two-stage planner with deterministic repair reaches 85.65% on the frozen 2,285-question test set, exceeding its own cloud teacher (69.76%) with all pairings significant at McNemar p < 1e-14, replicated on a second base model. We treat this as the foundation, not the protagonist: it defines the legacy region and the backward-compatibility bar. The paired full-test-set comparison under the §3.6 protocol is reported in §5.5: on answerable questions the compositional planner significantly exceeds the legacy champion; on explicit abstention it does not, and no retirement claim is made.
 
-### 5.3 Compositional generalisation
+### 5.3 Primary benchmark: PACS
+
+The Procurement Analytics Challenge Set (PACS) is the paper's primary evaluation: an intent-first benchmark of 1,153 intent clusters after audit (dev 20% / test 80%; test sealed with recorded hashes and evaluated once for the frozen v3 planner), organised by seven task families and three program depths, with seen/unseen shape exposure stratified within cells, an answerability-status axis crossing every family, and three paired surface channels per intent (independent canonical grammar as primary; gated LLM naturalization; training-renderer idiom as diagnostic only). A 93-row audit preceded acceptance of the numbers and found one real defect — boolean-False outcomes mislabelled as empty results (46 rows, relabelled with dual-verified oracles; the stored model trees were re-executed offline against corrected labels, raising the results: the model had answered 35 of 36 correctly).
+
+**PACS-test (channel a, strict): 78.31% overall; answerable 80.00% (584/730); status axis 71.9% Status Exact Match / 91.7% Safe Semantic Outcome (n=192). Naturalized channel b: 77.11% (−1.2, surface-robust). Untrained base on dev channel a: 41.1%.**
+
+| family | answerable accuracy |
+|---|---|
+| F1 spending & volume | 99% (103/104) |
+| F2 temporal change | 96% (123/128) |
+| F3 supplier concentration | **41% (46/112)** |
+| F4 cross-buyer comparison | 94% (115/122) |
+| F5 overlap & exclusion | 97% (100/103) |
+| F6 relational composition | **70% (78/112)** |
+| F7 disclosure & compliance | **39% (19/49)** |
+
+Depth: L1 98% / L2 65% / L3 79%. Exposure: seen 85.9% vs unseen 75.1% — a 10.8-point task-space unseen gap that the program-space holdouts of §5.4 (99.17%) never revealed. Dev-set autopsies (test remains row-uninspected) locate the three weak families mechanistically: F3 fails by computing top-k outside the bound buyer scope (bind-scope misread); F7 fails the universal quantifier under new verbalisations ("kept a perfect record"); F6 failures are dominated by type-composition near-misses (counting over the wrong value type, rejected by the checker). These three families — not aggregate accuracy — are the measured capability boundary of the system.
+
+### 5.4 Companion suite C: structural OOD (compositional generalisation)
 
 **Zero-shot floor.** With only a grammar description in the prompt, the untrained Qwen3-8B base solves 49.4% of the probe under constrained decoding; the cloud teacher, free-decoded, 64.8%. Universal quantification is at zero for every untrained arm under every protocol.
 
@@ -110,7 +128,7 @@ Each row's B_clean is that iteration's own re-held-out set (see §3.5) and rows 
 
 **What failure is made of.** Two probe families stayed near zero for v1 — universal quantification (0/32) and the probe's phrasing of grouped comparison (2/40) — despite the 64.8% holdout result on differently-phrased grouped comparisons. A factorial boundary experiment narrowed the cause: rewriting probe questions into the training surface style changed nothing (1/40 — this particular training-style surface rewrite did not explain the failure), while two worked examples in the prompt took both families to 100% (32/32, 40/40). The failures are consistent with a missing-demonstration bottleneck rather than an absolute capacity limit. Mechanisms are specific: the model resolves the comparative ellipsis "more in 2024 than in 2023" by using the second year as a numeric threshold, and constructs intersection instead of everyone-minus-counterexamples for "all of whose". A sampling probe (temperature 1.0, k=16) shows exploration reaches correct trees for 3/32 and 13/40 questions respectively — the non-zero sampling support suggests that verifier-rewarded exploration may be viable, but demonstrations dominate it for coverage, so both constructions simply became ordinary recipes in the next iteration (32/32 and 40/40 thereafter, as coverage).
 
-### 5.4 Robustness, shortcuts, and data diagnostics
+### 5.5 Companion suite D: robustness, shortcuts, and data diagnostics
 
 **The format channel.** Under free decoding, the legacy-contract fine-tunes appear to collapse on the open grammar: SFT reaches 2.47% and DPO 0.00%, compared with 32.41% for their own untrained base. Grammar-constrained decoding largely reverses this apparent collapse, restoring the DPO checkpoint to 45.06% against 49.38% for the base. Post-hoc bracket repair parses 224 of 272 malformed outputs and corrects zero — attribute placement is unrepairable after the fact — so in-decode constraint provides the clearest available diagnostic separation between format failure and recoverable semantic competence. Fine-tuning had imprinted the legacy contract deeply enough to overwrite free-form emission while leaving compositional semantics recoverable underneath; family-level profiles shifted rather than vanished (the tuned model gains ratio arithmetic, loses set machinery, relative to base).
 
@@ -118,7 +136,7 @@ Each row's B_clean is that iteration's own re-held-out set (see §3.5) and rows 
 
 **A regression only the battery saw.** v2's rendering fixes silently broke cross-role union: 40/40 → 7/40, invisible in every aggregate (v2's probe total *rose*). The phrase "as a buyer or as a supplier" appears in no recipe surface; the pattern is consistent with v1 inheriting the behaviour from the base model and v2's narrower recipe fit displacing it — the model silently drops the second role. A recipe variant restores it (40/40 in v3), as coverage. We report this as a caution for synthetic-data iteration: rendering fixes can narrow coverage elsewhere, and a perturbation battery — not the headline metric — is the instrument that detects it. We name the overall process a *measurement-guided iterative ablation*: iterations change one or two identified data variables in response to a measured defect, but are not a controlled single-variable ablation, and we do not attribute gains to single causes where variables moved together.
 
-### 5.5 Backward compatibility and the capability boundary
+### 5.6 Companion suite A: backward compatibility
 
 The paired comparison on the full frozen legacy test set (2,285 items, per-item, dual-metric protocol of §3.6) decomposes cleanly. On the 1,925 answerable questions the v3 compositional planner reaches **87.38% against the legacy champion's 83.01%** — a significant paired win (+237/−153 discordants, McNemar p = 2.5e-05) in a single call without repair, against a two-stage pipeline with a repair budget. On the 360 abstention rows the strict metric falls to 13.9%: the planner answers with trees where the legacy system's dedicated abstention machinery explicitly refuses (the faithfulness-gated safe metric recovers 181 of these as semantically safe outcomes — faithful empty results and surfaced ambiguities — while correctly denying credit to 58 unfaithful accidental failures). Overall this yields 75.80% strict / 83.72% safe against 85.65%; the safe-metric difference is not significant (+237/−281, p = 0.059). Retention held across all three iterations (87.0/87.5/87.25% on the 400-row sample), because legacy questions travel in the training mix as translated trees. Under the pre-registered bar — overall at least level with the legacy system AND no key-bucket regression — **no retirement claim is made**: explicit abstention is a key-bucket regression. The supported conclusion is narrower and, we think, more informative: the single-stage grammar-constrained planner replaces the multi-stage generative planning layer on *answerable* competence, at lower inference cost (one call versus two to four), while the legacy system's abstention layer remains genuinely better at refusing — a capability the compose training mix, which carried only 37 abstention demonstrations, never seriously taught. Under the model-freeze rule this finding feeds discussion rather than a retrained v4; the obvious remedy (a proper abstention channel in the training mix) is future work, and the boundary itself — answerable competence transfers, refusal behaviour does not come for free — is a result.
 
