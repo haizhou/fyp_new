@@ -1458,3 +1458,26 @@ arms. Built clean_eval_devfold.tsv: 300 (of 569) random-split-1-dev questions
 whose tables are in the 327-table dev fold — table-disjoint from ALL training
 pools (A and C). SFT-arm comparisons run there; second vLLM (port 8001, GPU2)
 serves base+composev3+wtq_C so GPU3 harvest is undisturbed.
+
+## 2026-07-20 (cont. 8): C-arm result — 40.0% on table-disjoint clean set, ABOVE its own supervision ceiling
+
+Clean dev-fold 300 (tables disjoint from all training pools), internal scoring:
+base 15.33 / v3 15.67 / **C (gold-program SFT) 40.00** / C+reflect 40.00.
+McNemar: C vs base 82:8 p=1.4e-16; C vs v3 80:7 p=8.3e-17.
+
+Three findings:
+1. **Light SFT transforms behavior**: invalid_tree 54->4, truncated ->0,
+   answered 140->280. 500 steps of format-consistent supervision closes the
+   format channel entirely (the compose-v1 story replays in the new domain).
+2. **Above-ceiling generalization**: the gold-translation ceiling on this
+   exact set is 98/300 = 32.7% (A&hit 95 + B&hit 3; 68 questions unannotated).
+   C scores 120 — **34 of its correct answers are on questions OUTSIDE the
+   translator-expressible subset** (nested-subquery / number-view / unannotated):
+   the planner composes algebra solutions the SQL translator could not derive.
+   Trained on translatable shapes, solves untranslatable ones — compositional
+   generalization reappearing in the transfer domain.
+3. **Reflect neutrality on mature planners replicates cross-domain**: C+reflect
+   = C (120/120 correct, +2 answered only), mirroring the main line's frozen
+   repair-off verdict; reflect pays only in cold-start (base +3.3 significant).
+Caveat for Discussion: C abstains 0/300 (all-answerable SFT atrophies the
+abstention head) — fine for WTQ scoring, relevant for safety-style deployments.
