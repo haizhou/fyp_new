@@ -1423,3 +1423,19 @@ empty result). Positioning: on the mature procurement planner the reflector is
 a small safe lift; whether to declare a reflect config for sealed PACS-test is
 the user's call. WTQ reflect arms (cold-start regime, 47% hard failures) still
 running — the contrast experiment.
+
+## 2026-07-20 (cont. 6): WTQ reflect arms — cold-start contrast lands
+
+WTQ dev 300, reflect<=2 (hard failures only; abstention/empty final):
+v3 18.67 -> 20.67 (+2.0pt); base 17.33 -> 20.67 (+3.33pt). Repair surface is
+an order of magnitude larger than on PACS: v3 invalid_tree 55->20, eval_failed
+59->45, answered 137->177. Truncation NOT repaired by "write shorter" feedback
+(28->28) — runaway generation needs a different lever. CONTRAST CONCLUSION:
+same reflector, same discipline — mature domain (PACS) small safe lift (+1.7,
+9/231 triggers); cold-start domain (WTQ) 2-3x larger relative lift with heavy
+trigger rate, and it lifts the UNTRAINED base most (arms converge at 20.67).
+Typed diagnostics are actionable feedback wherever failures are formal; the
+residual WTQ gap (~80%) is grounding/knowledge, not format.
+Paired McNemar: v3 fixed 6 / broke 0, p=0.0312; base fixed 10 / broke 0,
+p=0.0020 — BOTH SIGNIFICANT, zero regressions in either domain. v3 trigger
+rate 141/300 rows (34x1 + 107x2 rounds).
