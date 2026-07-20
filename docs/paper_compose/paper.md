@@ -98,7 +98,7 @@ The legacy system establishes that verified program execution is learnable at al
 
 The Procurement Analytics Challenge Set (PACS) is the paper's primary evaluation: an intent-first benchmark of 1,153 intent clusters after audit (dev 20% / test 80%; test sealed with recorded hashes and evaluated once for the frozen v3 planner), organised by seven task families and three program depths, with seen/unseen shape exposure stratified within cells, an answerability-status axis crossing every family, and three paired surface channels per intent (independent canonical grammar as primary; gated LLM naturalization; training-renderer idiom as diagnostic only). A 93-row audit preceded acceptance of the numbers and found one real defect — boolean-False outcomes mislabelled as empty results (46 rows, relabelled with dual-verified oracles; the stored model trees were re-executed offline against corrected labels, raising the results: the model had answered 35 of 36 correctly).
 
-**PACS-test (channel a, strict): 78.31% overall; answerable 80.00% (584/730); status axis 71.9% Status Exact Match / 91.7% Safe Semantic Outcome (n=192). Naturalized channel b: 77.11% (−1.2, surface-robust). Untrained base on dev channel a: 41.1%.**
+**PACS-test (channel a, strict): 78.31% overall; answerable 80.00% (584/730), intent-cluster bootstrap 95% CI [77.06, 82.92]; status axis 71.9% Status Exact Match / 91.7% Safe Semantic Outcome (n=192). Same-set references: untrained base 36.01% strict / 42.41% safe; lexical-retrieval RAG with a local 8B reader 21.90% on the answerable subset. Naturalized channel b: 77.11%; on the genuinely-rewritten subset (n=465) the paired naturalization cost is −2.37 points. Inference cost: one call per question, median 1.15 s, ≈1.3k tokens, versus the legacy pipeline's two to four calls across two stages.**
 
 | family | answerable accuracy |
 |---|---|
@@ -110,7 +110,7 @@ The Procurement Analytics Challenge Set (PACS) is the paper's primary evaluation
 | F6 relational composition | **70% (78/112)** |
 | F7 disclosure & compliance | **39% (19/49)** |
 
-Depth: L1 98% / L2 65% / L3 79%. Exposure: seen 85.9% vs unseen 75.1% — a 10.8-point task-space unseen gap that the program-space holdouts of §5.4 (99.17%) never revealed. Dev-set autopsies (test remains row-uninspected) locate the three weak families mechanistically: F3 fails by computing top-k outside the bound buyer scope (bind-scope misread); F7 fails the universal quantifier under new verbalisations ("kept a perfect record"); F6 failures are dominated by type-composition near-misses (counting over the wrong value type, rejected by the checker). These three families — not aggregate accuracy — are the measured capability boundary of the system.
+Depth: L1 98% / L2 65% / L3 79%. Exposure: seen 85.9% vs unseen 75.1% — an 11.5-point task-space unseen gap (cluster-bootstrap 95% CI [5.6, 17.2]) that the program-space holdouts of §5.4 (99.17%) never revealed. Dev-set autopsies (test remains row-uninspected) locate the three weak families mechanistically: F3 fails by computing top-k outside the bound buyer scope (bind-scope misread); F7 fails the universal quantifier under new verbalisations ("kept a perfect record"); F6 failures are dominated by type-composition near-misses (counting over the wrong value type, rejected by the checker). These three families — not aggregate accuracy — are the measured capability boundary of the system.
 
 ### 5.4 Companion suite C: structural OOD (compositional generalisation)
 
