@@ -30,7 +30,7 @@ sys.path.insert(0, str(ROOT / "scripts/wtq"))
 from loader import load_universe  # noqa: E402
 
 from procurement_graph.compose.algebra import AlgebraError, validate_tree  # noqa: E402
-from procurement_graph.compose.eval_runtime import RuntimeAlgebraEvaluator  # noqa: E402
+from wtq_eval import WTQEvaluator  # noqa: E402
 
 SQUALL = Path("/var/tmp/cicada/squall/squall-main/data/squall.json")
 
@@ -53,9 +53,14 @@ def resolve_col(tok: str, colmap: dict) -> str:
     idx, suffix = int(m.group(1)), m.group(2)
     if suffix not in (None, "number"):
         raise Skip(f"column_transform:{suffix}")
-    name = colmap.get(idx)
-    if name is None:
+    entry = colmap.get(idx)
+    if entry is None:
         raise Skip("column_index_out_of_range")
+    name, dtype = entry
+    if suffix == "number" and dtype != "number":
+        # Squall's per-cell numeric view over a column our loader types as
+        # text ("10,000 m", "75 000 000"): not materialized -> out of scope
+        raise Skip("number_view_on_text_column")
     return name
 
 
@@ -79,10 +84,9 @@ def ground(value, field, df):
     series = df[field].dropna()
     if series.dtype != object:  # numeric column: align literal type
         if isinstance(value, str):
-            try:
-                return float(value)
-            except ValueError:
-                return value
+            from loader import _to_num
+            n = _to_num(value)
+            return n if n is not None else value
         return value
     key = (id(df), field)
     if key not in _GROUND_CACHE:
@@ -230,10 +234,9 @@ def trans_select(toks, colmap, df, want_number=False) -> dict:
         rows = {"node": "extreme_rows", "of": base, "field": okcol,
                 "op": "argmax" if direction == "desc" else "argmin"}
         if len(agg) == 1:
-            field = resolve_col(agg[0], colmap)
             if want_number:
-                return {"node": "sum", "of": rows, "field": field}
-            return {"node": "select", "of": rows, "field": field}
+                raise Skip("scalar_extremum_in_arith")
+            return {"node": "select", "of": rows, "field": resolve_col(agg[0], colmap)}
         raise Skip("order_agg_shape")
 
     # ---- plain aggregates
@@ -248,17 +251,20 @@ def trans_select(toks, colmap, df, want_number=False) -> dict:
     if agg[:2] == ["sum", "("]:
         return {"node": "sum", "of": base, "field": resolve_col(agg[2], colmap)}
     if agg[:2] in (["max", "("], ["min", "("]):
+        if want_number:
+            raise Skip("scalar_extremum_in_arith")
         field = resolve_col(agg[2], colmap)
         rows = {"node": "extreme_rows", "of": base, "field": field,
                 "op": "argmax" if agg[0] == "max" else "argmin"}
-        if want_number:
-            return {"node": "sum", "of": rows, "field": field}
         return {"node": "select", "of": rows, "field": field}
     if agg[0] in ("avg", "abs", "julianday"):
         raise Skip(f"unsupported_agg:{agg[0]}")
     if len(agg) == 1:
         field = resolve_col(agg[0], colmap)
         if want_number:
+            # APPROXIMATION: SQL scalar subquery = one row's value; sum equals it
+            # only when the filter matches exactly one row. Differential audit
+            # classifies divergences as class B (translated, semantics differ).
             return {"node": "sum", "of": base, "field": field}
         return {"node": "values", "of": base, "field": field}
     if "distinct" in agg and len(agg) == 2:
@@ -349,7 +355,7 @@ def main() -> None:
         if csv_rel not in universes:
             try:
                 shim, catalog = load_universe(csv_rel)
-                universes[csv_rel] = (shim, {i + 1: c[0] for i, c in enumerate(catalog)})
+                universes[csv_rel] = (shim, {i + 1: (c[0], c[1]) for i, c in enumerate(catalog)})
             except Exception as exc:
                 universes[csv_rel] = None
         if universes[csv_rel] is None:
@@ -373,7 +379,7 @@ def main() -> None:
             continue
         n_translated += 1
         row["tree"] = tree
-        res = RuntimeAlgebraEvaluator(shim).run(tree)
+        res = WTQEvaluator(shim).run(tree)
         if res.get("status") != "ok":
             exec_census[str(res.get("reason", "?")).split(":")[0]] += 1
             row["exec"] = f"failed:{res.get('reason')}"

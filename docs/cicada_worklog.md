@@ -1326,3 +1326,38 @@ Squall fetched (11,276 gold SQL): next = SQL shape census -> first-cut translato
    nested_subquery 1,482; cond_shape 684; row_id_navigation 507; scalar_arith 226;
    unsupported_agg 68. Known caveats (user): ORDER-BY-LIMIT-1 vs argmax-all-ties semantics;
    numeric-only comparator; raw/typed dual-view pending — these gate the next loader pass.
+
+## 2026-07-20 (cont. 2): WTQ Rungs 1-3 complete — loader v2, algebra semantics lock, differential oracle audit
+
+**Rung 1 (loader reliability) DONE.** Loader v2 reads the official .tsv siblings
+(all 2,108 tables, uniform field width, escaped newlines): 2,108/2,108 parsed with
+row-conservation ASSERTED (0 silently dropped rows; the old on_bad_lines=skip path—
+which was corrupting 81 tables, not 2—is deleted). 57,960 data rows; 101 tables with
+header collisions resolved by the deterministic suffix rule. Dual view: records_df
+(typed, computation) + raw_df (display, projection) via WTQEvaluator adapter subclass
+(core evaluator untouched for projection logic). Synthetic contract_node_id removed
+from the model-visible schema enum. scripts/wtq/loader_audit.py is the standing
+regression test.
+
+**Rung 2 (algebra semantics) LOCKED, tag wtq-algebra-frozen-v1.** extreme_rows frozen
+semantics documented in-evaluator: returns the argmax SET (all ties; explicitly NOT
+SQL ORDER-BY-LIMIT-1 — plural distinct projections surface as multiple_answers);
+comparator by column content (numeric -> datetime-if-all-parse -> casefolded string);
+nulls excluded, all-null -> no_results. Scalar MAX/MIN inside arithmetic exits the
+expressible set (sum-over-ties fake semantics removed); scalar-subquery-as-sum kept
+as a documented approximation (class B in the audit).
+
+**Rung 3 (differential oracle audit) v1.** Reference = gold SQL on Squall's own
+sqlite; translated = gold-derived tree on OUR loader+evaluator. After removing
+comparison artifacts (accent folding, multiset-vs-set) and gating number-view-on-text
+into class C:
+  train: coverage 50.22%, fidelity A/(A+B) 92.95%, executor|A 94.14%, ref ceiling 88.99%
+  dev:   coverage 49.24%, fidelity        92.98%, executor|A 94.12%, ref ceiling 88.78%
+Joint one-number oracle (translator+loader+executor together): strict 83.21%,
+tolerant 84.21% on 6,164 translated. C census heads (train): column_transform 1,404;
+nested_subquery 1,178; cond_shape 542; number_view_on_text 429; row_id_navigation 400.
+Residual class B (~7%): scalar-subquery sum approximation on multi-row matches,
+extremum ties, residual normalization — no evaluator implementation bugs found.
+
+Zero-shot arms rewired post-hoc invalid (row-id hiding + dual view) — floor rerun
+pending; E probe template at docs/paper_compose/probe_E_template.md GATES Layer 2.

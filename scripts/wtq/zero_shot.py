@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT / "scripts/wtq"))
 from loader import WTQ_ROOT, catalog_text, load_universe  # noqa: E402
 
 from procurement_graph.compose.algebra import AlgebraError, validate_tree  # noqa: E402
-from procurement_graph.compose.eval_runtime import RuntimeAlgebraEvaluator  # noqa: E402
+from wtq_eval import WTQEvaluator  # noqa: E402
 from procurement_graph.compose.schema import algebra_json_schema  # noqa: E402
 
 PROMPT = """You answer a question about ONE table by writing a QUERY PLAN in a small typed algebra. A deterministic engine executes the plan on the full table; you never answer from memory.
@@ -91,7 +91,7 @@ def main() -> None:
         except Exception as exc:
             out.update(outcome="table_load_error", detail=str(exc)[:80], correct=False)
             return out
-        fields = [c[0] for c in catalog] + ["contract_node_id"]
+        fields = [c[0] for c in catalog]  # synthetic row id stays internal
         schema = {"type": "json_schema", "json_schema": {
             "name": "algebra", "schema": algebra_json_schema(fields=fields), "strict": True}}
         prompt = PROMPT.format(catalog=catalog_text(catalog), q=rec["utterance"])
@@ -113,7 +113,7 @@ def main() -> None:
         except AlgebraError as exc:
             out.update(outcome="invalid_tree", detail=exc.reason[:60], correct=False, tree=tree)
             return out
-        ev = RuntimeAlgebraEvaluator(shim)
+        ev = WTQEvaluator(shim)
         res = ev.run(tree)
         if res.get("status") != "ok":
             out.update(outcome="eval_failed", detail=str(res.get("reason"))[:60],

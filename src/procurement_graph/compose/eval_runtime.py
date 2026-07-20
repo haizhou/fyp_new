@@ -178,17 +178,36 @@ class RuntimeAlgebraEvaluator:
             return next(iter(distinct))
 
         if node == "extreme_rows":
+            # Frozen semantics (wtq-algebra-frozen-v1):
+            # - returns the argmax SET: all rows tied at the extremum (this is
+            #   NOT SQL's ORDER BY ... LIMIT 1, which picks one arbitrary row;
+            #   downstream select surfaces plural distinct projections as
+            #   multiple_answers rather than guessing).
+            # - comparator chosen by column content: numeric if the column is
+            #   typed numeric, else datetime if every non-null cell parses as a
+            #   date, else casefolded string order.
+            # - null / unparseable cells are excluded before comparison;
+            #   an empty comparable set raises no_results.
             rows = self._eval(tree["of"])
             field = tree["field"]
             if field not in rows.columns:
                 raise EvalError(f"unknown_field:{field}")
-            numeric = pd.to_numeric(rows[field], errors="coerce")
-            rows = rows[numeric.notna()]
-            numeric = numeric.dropna()
+            series = rows[field]
+            keyed = pd.to_numeric(series, errors="coerce")
+            if keyed.notna().sum() == 0:
+                as_dt = pd.to_datetime(series, errors="coerce", format="mixed")
+                nonnull = series.notna() & (series.astype(str).str.strip() != "")
+                if nonnull.any() and as_dt[nonnull].notna().all():
+                    keyed = as_dt
+                else:
+                    keyed = series.astype(str).str.strip().str.casefold()
+                    keyed = keyed.mask(~nonnull)
+            rows = rows[keyed.notna()]
+            keyed = keyed.dropna()
             if rows.empty:
                 raise EvalError("no_results")
-            target = numeric.max() if tree["op"] == "argmax" else numeric.min()
-            return rows[numeric == target]
+            target = keyed.max() if tree["op"] == "argmax" else keyed.min()
+            return rows[keyed == target]
 
         if node == "extreme":
             rows = self._eval(tree["of"])
