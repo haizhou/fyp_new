@@ -1404,3 +1404,22 @@ standard frozen SYSTEM_PROMPT + records-root rejection + truncation split.
 - empty-result probes #20/#21 both answered correctly ([] / 0) by v3.
 Layer-2 gate satisfied once manual scoring pass is recorded; user may still
 replace >=10 rows (edited rows rerun + documented).
+
+## 2026-07-20 (cont. 5): typed-feedback reflect on the compose line (PACS-dev, oracle-blind)
+
+User question surfaced that the compose/PACS line had NEVER run a reflector
+(all single-call — consistent with the main line's frozen repair-off verdict).
+Added --reflect to run_compose_probe_eval.py with the July-4 lesson built in:
+ORACLE-BLIND, hard-failures only (unparseable/no_tree/type-checker/malformed-
+plan runtime errors); abstain, answered, multiple_answers, no_results/no_groups
+are FINAL states, never reflected.
+
+PACS-dev channel a, v3, reflect<=2 vs frozen single-call (paired n=231):
+strict 71.86 -> 73.59 (+1.73), safe 82.25 -> 84.42 (+2.17); FIXED 4 / BROKE 0
+(McNemar p=0.125, sign-clean); reflection triggered on only 9/231 rows (~+4%
+calls, 7x1 + 2x2 rounds). Abstention safety CONFIRMED: unsupported 33->33
+unchanged; no_results safe 24->25 (one malformed plan repaired into a faithful
+empty result). Positioning: on the mature procurement planner the reflector is
+a small safe lift; whether to declare a reflect config for sealed PACS-test is
+the user's call. WTQ reflect arms (cold-start regime, 47% hard failures) still
+running — the contrast experiment.
