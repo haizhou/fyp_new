@@ -17,11 +17,12 @@ _FIELDS = [
 _CMP = ["gt", "lt", "ge", "le", "eq"]
 
 
-def algebra_json_schema(strict_fields: bool = True) -> dict:
-    """JSON schema for {"tree": EXPR} | {"abstain": true, "reason": str}."""
+def algebra_json_schema(strict_fields: bool = True, fields: list | None = None) -> dict:
+    """JSON schema for {"tree": EXPR} | {"abstain": true, "reason": str}.
+    `fields` overrides the enum — per-table dynamic catalogs (e.g. WTQ)."""
     field_schema = {"type": "string"}
     if strict_fields:
-        field_schema = {"type": "string", "enum": _FIELDS}
+        field_schema = {"type": "string", "enum": list(fields) if fields else _FIELDS}
 
     defs = {
         "pred": {
