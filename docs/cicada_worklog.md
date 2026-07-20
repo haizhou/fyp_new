@@ -1297,3 +1297,32 @@ Design frozen per user: L1 expressible-subset accuracy (via Squall gold SQL -> a
 Rung 1 loader audit: 2,098/2,100 tables load (2 ParserError -> python-engine fallback added); 29.5% columns numeric-typed.
 Rung "planner zero-shot floor" (300 dev, internal denotation match): v3 19.67% vs base 18.67% — indistinguishable => procurement-trained skill does NOT zero-shot transfer; the recipe, not the checkpoint, is the portable object (Layer-3 finding #1). Error mix: wrong-answer > eval_failed > invalid_tree > abstain.
 Squall fetched (11,276 gold SQL): next = SQL shape census -> first-cut translator -> executor oracle accuracy + expressibility census.
+
+## 2026-07-20 (cont.): WTQ boundary freeze (user directive) — Frozen-17 tag, Squall quarantine, zero-shot claim correction
+
+**User review mandates applied in full.**
+
+1. **Frozen-17 baseline preserved**: git tag `frozen-17-adapter-only` at 89d9de2 (last commit
+   before `extreme_rows`). Adapter-only portability claim measured THERE: 17/17 operators
+   untouched, new code = loader + driver + schema field parameterization. The `extreme_rows`
+   extension (row-preserving arg-extremum, a generic relational capability) lives in a separate
+   commit (4bdefc2). Migration-cost table now has two rows: Adapter-only (0 new ops) vs
+   Generic-extension (+1 op).
+2. **Squall leak audit: ZERO overlap with WTQ test.** All 11,276 Squall entries are WTQ
+   training-set questions; tables ∩ pristine-unseen = 0/1,617; question ids ∩ = 0. The
+   pre-quarantine full-file census therefore touched TRAINING SQL only; `wtq-test.json` never
+   opened. Disclosure + fold rules in `data/qa/wtq/squall_split/QUARANTINE.md`; manifests:
+   train 9,030 / dev 2,246 (Squall fold-0, table-disjoint).
+3. **Zero-shot claim CORRECTED (user): no-transfer conclusion withdrawn.** Paired McNemar on
+   300 dev: b=14 (v3-only-correct), c=11 (base-only), exact p=0.690 — NOT significant.
+   Correct statement: v3 shows no confirmed end-to-end accuracy difference vs base, but a
+   changed decision policy: abstain 25 vs 61, eval_failed 64 vs 42, answered-accuracy 42.8%
+   vs 38.4%. (v3 arm also had 20 api_errors scored incorrect — rerun planned.) Interpretation:
+   procurement training may transfer planning aggressiveness/answer policy, not table grounding.
+4. **Squall→algebra translator, first cut (full training-set oracle run)**: expressible
+   54.74% (6,173/11,276); of translated: exec-ok 95.72%, oracle strict 78.78%, tolerant
+   79.90%. Literal grounding (Squall lowercase-normalized literals → raw cell values) was the
+   big fix: strict 46.6→77.6 on the 800 sample. Skip census heads: column_transform 1,783;
+   nested_subquery 1,482; cond_shape 684; row_id_navigation 507; scalar_arith 226;
+   unsupported_agg 68. Known caveats (user): ORDER-BY-LIMIT-1 vs argmax-all-ties semantics;
+   numeric-only comparator; raw/typed dual-view pending — these gate the next loader pass.
