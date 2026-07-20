@@ -53,6 +53,30 @@ def main() -> None:
                 from identifiers import gold_tree_hash
                 train_hashes.add(gold_tree_hash(t))
 
+    # --- sanitation pass (mechanical, logged) -------------------------------
+    # (a) status variants inherit their base intent's exposure label but carry
+    #     their OWN trees: relabel exposure from the variant's actual shape.
+    relabelled = 0
+    for row in rows:
+        if row.get("cluster_of") and row.get("compose_tree"):
+            actual = "unseen" if row.get("shape_signature") not in train_sigs else "seen"
+            if actual != row.get("exposure"):
+                row["exposure"] = actual
+                relabelled += 1
+    # (b) exact-question collisions with training (channel c reproduces the
+    #     training idiom; anchor coincidences can collide verbatim): drop the
+    #     WHOLE cluster of any colliding row.
+    bad_clusters = set()
+    for row in rows:
+        for ch in ("question_a", "question_b", "question_c"):
+            q = row.get(ch)
+            if q and " ".join(q.casefold().split()) in train_qs:
+                bad_clusters.add(row.get("cluster_of") or row["intent_id"])
+    before = len(rows)
+    rows = [r for r in rows if (r.get("cluster_of") or r["intent_id"]) not in bad_clusters]
+    print(f"sanitation: relabelled {relabelled} variant exposures; "
+          f"dropped {len(bad_clusters)} colliding clusters ({before - len(rows)} rows)")
+
     fails = defaultdict(int)
     for row in rows:
         for ch in ("question_a", "question_b", "question_c"):
