@@ -81,12 +81,18 @@ class Anchors:
         return self.rng.choice(self.cats)
 
     def decoration(self, used_fields):
-        """Optional NOT/OR decoration to shift shape signature (unseen steering)."""
+        """Optional NOT/OR decoration to shift shape signature (unseen steering).
+        Never contradicts existing scope constraints: year-OR only when
+        release_year is unused; otherwise a harmless NOT on an unused value."""
         rng = self.rng
         if "tender_category" not in used_fields and rng.random() < 0.5:
             return {"op": "not", "pred": eqp("tender_category", self.cat())}
-        y1, y2 = self.two_years()
-        return {"op": "any", "preds": [eqp("release_year", y1), eqp("release_year", y2)]}
+        if "release_year" not in used_fields:
+            y1, y2 = self.two_years()
+            return {"op": "any", "preds": [eqp("release_year", y1), eqp("release_year", y2)]}
+        if "tender_category" not in used_fields:
+            return {"op": "not", "pred": eqp("tender_category", self.cat())}
+        return {"op": "not", "pred": eqp("supplier_name", self.supplier())}
 
 
 # --------------------------------------------------------------------------
