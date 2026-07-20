@@ -167,6 +167,12 @@ def main() -> None:
                          "via guided decoding (local vLLM arms only; breaks teacher symmetry)")
     ap.add_argument("--system-suffix", default="",
                     help="path to text appended to the system prompt (few-shot boundary arms)")
+    ap.add_argument("--reflect", type=int, default=0,
+                    help="max typed-feedback repair rounds. ORACLE-BLIND and "
+                         "abstention-safe: reflects only unparseable/no_tree, "
+                         "type-checker rejections, and malformed-plan runtime "
+                         "errors; abstain, answered, multiple_answers, "
+                         "no_results/no_groups are FINAL states, never reflected")
     ap.add_argument("--old-benchmark-abstention", action="store_true",
                     help="PRE-DECLARED mapping of old-benchmark abstention semantics: "
                          "unsupported -> abstain only; ambiguous -> abstain OR runtime "
@@ -187,6 +193,8 @@ def main() -> None:
     backend = ParquetKGQueryBackend.from_directory(ROOT / "data/kg", include_evidence=False)
     ev = RuntimeAlgebraEvaluator(backend)
 
+    _SEMANTIC_REASONS = ("no_results", "no_groups")
+
     def ask(row: dict) -> dict:
         out = {"id": row["id"], "family": row["template_family"], "band": row["distance_band"]}
         extra = {}
@@ -194,42 +202,76 @@ def main() -> None:
             from procurement_graph.compose.schema import algebra_json_schema
             extra["response_format"] = {"type": "json_schema", "json_schema": {
                 "name": "algebra", "schema": algebra_json_schema(), "strict": True}}
-        raw = None
-        for attempt in range(5):
-            try:
-                resp = client.chat.completions.create(
-                    model=args.model, temperature=0.0, max_tokens=args.max_tokens,
-                    messages=[{"role": "system", "content": SYSTEM_PROMPT},
-                              {"role": "user", "content": row["question"]}], **extra)
-                raw = resp.choices[0].message.content or ""
-                break
-            except Exception as exc:
-                last_exc = exc
-                import time
-                time.sleep(min(60, 5 * 2 ** attempt))
-        if raw is None:
-            out.update(outcome="api_error", detail=str(last_exc)[:200], correct=False)
-            return out
-        out["raw"] = raw[:4000]
-        payload = _extract_json(raw)
         expected_abstain = row["expected_status"] != "answerable"
         abstain_family = str(row["expected_status"])  # 'ambiguous' | 'no_results' | 'unsupported' | ...
-        if payload is None:
-            out.update(outcome="unparseable", correct=False)
-            return out
-        if payload.get("abstain"):
-            out.update(outcome="abstain", correct=expected_abstain)
-            return out
-        tree = payload.get("tree") if isinstance(payload.get("tree"), dict) else (
-            payload if payload.get("node") else None)
-        if tree is None:
-            out.update(outcome="no_tree", correct=False)
-            return out
-        try:
-            validate_tree(tree)
-        except AlgebraError as exc:
-            out.update(outcome="invalid_tree", detail=exc.reason, correct=False, tree=tree)
-            return out
+        messages = [{"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": row["question"]}]
+        rounds = 0
+        while True:
+            raw = None
+            for attempt in range(5):
+                try:
+                    resp = client.chat.completions.create(
+                        model=args.model, temperature=0.0, max_tokens=args.max_tokens,
+                        messages=messages, **extra)
+                    raw = resp.choices[0].message.content or ""
+                    break
+                except Exception as exc:
+                    last_exc = exc
+                    import time
+                    time.sleep(min(60, 5 * 2 ** attempt))
+            if raw is None:
+                out.update(outcome="api_error", detail=str(last_exc)[:200], correct=False)
+                return out
+            out["raw"] = raw[:4000]
+            out["rounds"] = rounds
+            payload = _extract_json(raw)
+            feedback = None
+            tree = None
+            if payload is None:
+                out.update(outcome="unparseable", correct=False)
+                feedback = ("Your reply was not one parseable JSON object (or was cut "
+                            "off). Reply with exactly one JSON object for the same "
+                            "question; prefer a shorter plan.")
+            elif payload.get("abstain"):
+                # abstention is a legitimate FINAL state: never reflected
+                out.update(outcome="abstain", correct=expected_abstain)
+                return out
+            else:
+                tree = payload.get("tree") if isinstance(payload.get("tree"), dict) else (
+                    payload if payload.get("node") else None)
+                if tree is None:
+                    out.update(outcome="no_tree", correct=False)
+                    feedback = ('Your JSON had neither "tree" nor "abstain". Reply with '
+                                '{"tree": {...}} or {"abstain": true, "reason": "..."}.')
+                else:
+                    try:
+                        validate_tree(tree)
+                    except AlgebraError as exc:
+                        out.update(outcome="invalid_tree", detail=exc.reason,
+                                   correct=False, tree=tree)
+                        feedback = (f"Your plan was REJECTED by the type checker: "
+                                    f"{exc.reason} at {exc.path}. Fix the plan.")
+                    else:
+                        probe_res = ev.run(tree)
+                        reason = str(probe_res.get("reason", ""))
+                        if (probe_res.get("status") != "ok"
+                                and not reason.startswith("multiple_answers")
+                                and reason not in _SEMANTIC_REASONS):
+                            # malformed plan (unknown_field / eval_error / ...):
+                            # reflectable. Semantic outcomes above stay FINAL —
+                            # they carry the abstention-safety metric.
+                            out.update(outcome=f"eval_{probe_res.get('status')}",
+                                       detail=reason, correct=False, tree=tree)
+                            feedback = (f"Your plan failed at execution: {reason}. "
+                                        f"Fix the plan.")
+                        else:
+                            break  # scoreable final state
+            if feedback is None or rounds >= args.reflect:
+                return out
+            rounds += 1
+            messages = messages + [{"role": "assistant", "content": raw},
+                                   {"role": "user", "content": feedback}]
         if expected_abstain:
             # STRICT metric (primary): only an explicit abstain counts (handled above).
             # SAFE metric (supplementary, faithfulness-gated): a runtime multi-answer

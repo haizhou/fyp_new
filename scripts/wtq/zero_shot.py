@@ -72,6 +72,10 @@ def main() -> None:
     ap.add_argument("--split", default="random-split-1-dev")
     ap.add_argument("--limit", type=int, default=300)
     ap.add_argument("--concurrency", type=int, default=8)
+    ap.add_argument("--reflect", type=int, default=0,
+                    help="max typed-feedback repair rounds on HARD failures only "
+                         "(invalid_tree/eval_failed/truncated); empty results and "
+                         "abstentions are never reflected")
     args = ap.parse_args()
     arm = args.arm or f"wtq_{args.model.split('/')[-1]}_{args.split}"
 
@@ -95,35 +99,61 @@ def main() -> None:
         schema = {"type": "json_schema", "json_schema": {
             "name": "algebra", "schema": algebra_json_schema(fields=fields), "strict": True}}
         prompt = PROMPT.format(catalog=catalog_text(catalog), q=rec["utterance"])
-        try:
-            resp = client.chat.completions.create(
-                model=args.model, temperature=0.0, max_tokens=900,
-                messages=[{"role": "user", "content": prompt}],
-                response_format=schema)
-            payload = json.loads(resp.choices[0].message.content or "{}")
-        except Exception as exc:
-            out.update(outcome="api_error", detail=str(exc)[:100], correct=False)
-            return out
-        tree = payload.get("tree")
-        if not isinstance(tree, dict):
-            out.update(outcome="abstain", correct=False)
-            return out
-        try:
-            validate_tree(tree)
-        except AlgebraError as exc:
-            out.update(outcome="invalid_tree", detail=exc.reason[:60], correct=False, tree=tree)
-            return out
         ev = WTQEvaluator(shim)
-        res = ev.run(tree)
-        if res.get("status") != "ok":
-            out.update(outcome="eval_failed", detail=str(res.get("reason"))[:60],
-                       correct=False, tree=tree)
-            return out
-        targets = rec["targetValue"].split("|")
-        ok = denotation_match(res["answer"], targets)
-        out.update(outcome="answered", correct=bool(ok), tree=tree,
-                   answer=str(res["answer"])[:200])
-        return out
+        messages = [{"role": "user", "content": prompt}]
+        rounds = 0
+        while True:
+            raw = None
+            try:
+                resp = client.chat.completions.create(
+                    model=args.model, temperature=0.0, max_tokens=900,
+                    messages=messages, response_format=schema)
+                raw = resp.choices[0].message.content or "{}"
+                payload = json.loads(raw)
+            except json.JSONDecodeError:
+                out.update(outcome="truncated", correct=False)
+                payload = None
+                feedback = ("Your previous plan was cut off before the JSON finished. "
+                            "Write a SHORTER, simpler plan for the same question.")
+            except Exception as exc:
+                out.update(outcome="api_error", detail=str(exc)[:100], correct=False)
+                return out
+            if payload is not None:
+                tree = payload.get("tree")
+                if not isinstance(tree, dict):
+                    # abstention is a legitimate final state: never reflected
+                    out.update(outcome="abstain", correct=False, rounds=rounds)
+                    return out
+                try:
+                    validate_tree(tree)
+                except AlgebraError as exc:
+                    out.update(outcome="invalid_tree", detail=exc.reason[:60],
+                               correct=False, tree=tree)
+                    feedback = (f"Your plan was REJECTED by the type checker: "
+                                f"{exc.reason} at {exc.path}. Fix the plan.")
+                else:
+                    res = ev.run(tree)
+                    if res.get("status") != "ok":
+                        out.update(outcome="eval_failed",
+                                   detail=str(res.get("reason"))[:60],
+                                   correct=False, tree=tree)
+                        feedback = (f"Your plan failed at execution: "
+                                    f"{res.get('reason')}. Fix the plan.")
+                    else:
+                        # success — including legitimately empty answers: final
+                        targets = rec["targetValue"].split("|")
+                        ok = denotation_match(res["answer"], targets)
+                        out.update(outcome="answered", correct=bool(ok), tree=tree,
+                                   answer=str(res["answer"])[:200], rounds=rounds)
+                        return out
+            if rounds >= args.reflect:
+                out["rounds"] = rounds
+                return out
+            rounds += 1
+            messages = messages + [
+                {"role": "assistant", "content": raw or "{}"},
+                {"role": "user", "content": feedback},
+            ]
 
     with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
         results = list(pool.map(one, rows))
