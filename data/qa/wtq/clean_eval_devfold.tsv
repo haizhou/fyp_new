@@ -1,0 +1,301 @@
+id	utterance	context	targetValue
+nt-2	which team won previous to crettyard?	csv/204-csv/772.csv	Wolfe Tones
+nt-15	what was the venue when he placed first?	csv/204-csv/706.csv	New Delhi, India
+nt-29	what is the total population in dzhebariki-khaya?	csv/204-csv/6.csv	1694
+nt-68	amazon is at the top of the chart, but what is the name below it?	csv/204-csv/568.csv	Antelope
+nt-69	when was the last time kansas state lost with 0 points in manhattan?	csv/203-csv/703.csv	1964
+nt-87	who was the only judge appointed by mckinley?	csv/203-csv/563.csv	David Davie Shelby
+nt-104	which composer produced his title after 2001?	csv/204-csv/969.csv	Pete Doherty
+nt-130	why type of genre was peter maxwell davies' work that was the same as emil petrovics'	csv/204-csv/969.csv	ballet
+nt-212	how many consecutive songs were by the album leaf?	csv/203-csv/357.csv	6
+nt-260	which illustrator was responsible for the last award winner?	csv/203-csv/788.csv	Helen Oxenbury
+nt-320	which tournament has the largest total win record?	csv/204-csv/153.csv	Wimbledon
+nt-355	"taylor kelly is shorter than 6' 3"", which other player is also shorter than 6' 3""?"	csv/204-csv/105.csv	Steven Shepp
+nt-367	how many total row entries are there?	csv/203-csv/364.csv	21
+nt-392	how many draft picks were between frank tripucka and dale armstrong?	csv/203-csv/735.csv	10
+nt-432	how many consecutive km were raced on july 8th?	csv/203-csv/475.csv	203.0 km (126.1 mi)
+nt-500	which country is represented for both men and women at the top of the list?	csv/203-csv/787.csv	Ireland
+nt-516	what city was ranked first in 2003?	csv/204-csv/317.csv	Tokyo
+nt-531	which opera has at least 5 acts?	csv/204-csv/104.csv	Il Giustino
+nt-535	what is the only train to reach a top speed of 500 or more?	csv/204-csv/751.csv	Transrapid SMT
+nt-615	which brazilian team took the top spot in the 1926 brazilian football cup?	csv/203-csv/654.csv	Palestra Itália-SP
+nt-620	in 2009, which competitor finished faster - the male or the female?	csv/203-csv/787.csv	male
+nt-624	how many players made an appearance that year?	csv/203-csv/456.csv	20
+nt-651	what township has the most land area?	csv/204-csv/616.csv	Tonganoxie
+nt-668	what is the total number dallara chassis listed in the table?	csv/203-csv/99.csv	5
+nt-673	who was the winner after 2007?	csv/204-csv/716.csv	Laois
+nt-683	what is the total of deaths in internment camps and during the wartime flight?	csv/203-csv/234.csv	173,805
+nt-697	how many total games did they win?	csv/204-csv/388.csv	22
+nt-713	number of teams above 9 medals	csv/203-csv/466.csv	3
+nt-761	which year has a crude birth rate of 29.1 with a population of 22,860?	csv/202-csv/269.csv	1928
+nt-805	what was the name of the competition that took place before the olympic games in 1996?	csv/203-csv/874.csv	World Championships
+nt-823	bob caudle was an announcer, who was the other one?	csv/204-csv/811.csv	Lance Russell
+nt-830	what is the number of russian participants in this set of semifinals?	csv/204-csv/59.csv	2
+nt-856	is solon borland a representative?	csv/203-csv/778.csv	yes
+nt-880	what is the name of the oldest map/catalog?	csv/204-csv/281.csv	M45
+nt-881	which driver has the least amount of points?	csv/203-csv/76.csv	Ralf Schumacher
+nt-899	how many locomotives were built after 1900?	csv/203-csv/213.csv	2
+nt-912	how many points does the artist rita have?	csv/203-csv/862.csv	43
+nt-919	which was the only album to be released by b'in music in an even-numbered year?	csv/203-csv/276.csv	Kissing The Future of Love
+nt-924	jimmy johnson won how many consecutive espy awards?	csv/203-csv/364.csv	4
+nt-941	marc dos santos started as coach the same year as what other coach?	csv/204-csv/832.csv	Martin Rennie
+nt-944	how many years are listed?	csv/204-csv/737.csv	5
+nt-956	which year end ranking was higher, 2004 or 2011?	csv/204-csv/153.csv	2011
+nt-1010	what is the number of townships with a population larger than 2,000?	csv/204-csv/616.csv	4
+nt-1040	who got the most bonus points?	csv/203-csv/529.csv	Jeff Gordon
+nt-1042	nations that had 10 or more medals each	csv/203-csv/466.csv	Cuba|Jamaica|Mexico
+nt-1066	tell me an inductee that was not living at the time.	csv/204-csv/811.csv	Gene Anderson
+nt-1078	which company had the least revenue?	csv/203-csv/320.csv	Orange Polska
+nt-1105	which area is listed above chicago?	csv/204-csv/317.csv	Chennai
+nt-1135	ballymore eustace is from the same county as what team that won in 2009?	csv/204-csv/772.csv	Maynooth
+nt-1152	what is the total number of districts of lima?	csv/204-csv/739.csv	43
+nt-1163	what was the total number of matches played from 2001 to 2014?	csv/204-csv/153.csv	37
+nt-1214	how many players had a field goal percentage greater than .500?	csv/203-csv/621.csv	4
+nt-1217	how many games total were played?	csv/204-csv/388.csv	50
+nt-1239	when was the first game that kansas state won by double digits?	csv/203-csv/703.csv	1926
+nt-1242	what school is listed next after michigan technological university?	csv/203-csv/721.csv	Missouri University of Science and Technology
+nt-1260	how many members were inducted for announcing?	csv/204-csv/811.csv	2
+nt-1269	what's the number of schools represented in the table?	csv/203-csv/721.csv	28
+nt-1279	what was the only team to place 5th called?	csv/203-csv/450.csv	Chelsea
+nt-1312	name the player whose fee was not free.	csv/204-csv/883.csv	Barrie Aitchison
+nt-1314	list each of the schools that came in 2nd for cws best finish.	csv/203-csv/412.csv	Arizona|Penn State|Western Michigan
+nt-1371	how many buildings has the same year of listing as 1974?	csv/204-csv/872.csv	15
+nt-1386	which driver in the top 8, drives a mclaran-mercedes but is not in first place?	csv/203-csv/76.csv	Kimi Räikkönen
+nt-1405	what was the last district created?	csv/204-csv/739.csv	Santa Anita
+nt-1427	is there a points difference between the 9th position and 19th position on the list?	csv/203-csv/76.csv	No
+nt-1456	which team won the champ car world series the year before rusport?	csv/203-csv/99.csv	Newman/Haas Racing
+nt-1472	what is the street of the only building listed in 1989?	csv/204-csv/872.csv	Swan Street
+nt-1488	what are the number of kurt maschler awards helen oxenbury has won?	csv/203-csv/788.csv	2
+nt-1515	how many works were made in the incidental music genre?	csv/204-csv/969.csv	6
+nt-1528	which artist had almost no points?	csv/203-csv/862.csv	Boaz Sharabi
+nt-1529	what was the top team according to position in table called?	csv/203-csv/450.csv	Manchester City
+nt-1607	what's the total of grass and hard surfaces listed?	csv/203-csv/848.csv	3
+nt-1618	how many games did larry johnson play?	csv/203-csv/621.csv	65
+nt-1624	what was the position that most of the players had?	csv/203-csv/735.csv	Back
+nt-1626	highest rd number?	csv/203-csv/735.csv	25
+nt-1642	name the only american who did not finish the race.	csv/204-csv/205.csv	Masten Gregory
+nt-1682	how many townships are in leavenworth county?	csv/204-csv/616.csv	10
+nt-1700	in which year did spain show the highest number of live births over deaths?	csv/202-csv/269.csv	1964
+nt-1702	total number of assists and turnovers combined	csv/204-csv/292.csv	193
+nt-1711	which company had the most revenue?	csv/203-csv/320.csv	PKN Orlen SA
+nt-1782	compare draws, which had the least amount of points?	csv/203-csv/862.csv	Boaz Sharabi
+nt-1831	which locomotive builder built a locomotive after 1888 and built the locomotive as a 2ft gauge locomotive?	csv/203-csv/213.csv	Hunslet
+nt-1835	which driver had four consecutive wins?	csv/203-csv/364.csv	Jimmie Johnson
+nt-1856	which had more ger numbers, 1898 or 1893?	csv/204-csv/737.csv	1898
+nt-1885	the only team to win the north in 2000-01 season?	csv/204-csv/1.csv	EHC Regensburg
+nt-1893	which township has the least land area?	csv/204-csv/616.csv	Delaware
+nt-1905	how many votes were counted as invalid or blank votes?	csv/202-csv/191.csv	0
+nt-1919	how many times did his jump surpass 7.70 m?	csv/204-csv/706.csv	5
+nt-1977	does clemson or western michigan have more cws appearances?	csv/203-csv/412.csv	Western Michigan
+nt-1984	which is the only team to score 13 points in 9 games?	csv/203-csv/654.csv	Corinthians
+nt-2054	which district in this city has the greatest population?	csv/204-csv/739.csv	San Juan de Lurigancho
+nt-2165	how many wins did confey have?	csv/204-csv/772.csv	1
+nt-2205	who is the last partner listed?	csv/203-csv/848.csv	Danie Visser
+nt-2218	how many causes were responsible for more than 50,000 confirmed deaths?	csv/203-csv/234.csv	5
+nt-2254	what is the difference in years between constiuency 1 and 2?	csv/203-csv/447.csv	4 years
+nt-2281	how many total titles were published by walker?	csv/203-csv/788.csv	5
+nt-2308	which is the only station with 8 affiliates?	csv/204-csv/796.csv	TV MÁS
+nt-2516	which minister resident had the shortest appointment?	csv/203-csv/778.csv	Henry C. Hall
+nt-2519	who scored the least?	csv/204-csv/716.csv	Wicklow
+nt-2529	fort gratiot lighthouse and fort st. joseph are located in what city?	csv/204-csv/558.csv	Port Huron
+nt-2544	is the number of freshmen (fr.) greater than, equal to, or less than the number of juniors (jr.)?	csv/204-csv/105.csv	greater
+nt-2552	"what tournament has 5-5 as it's ""w-l"" record?"	csv/204-csv/153.csv	French Open
+nt-2565	what is the number of years with a quantity of 10?	csv/204-csv/737.csv	5
+nt-2571	how many champions are listend in the north?	csv/204-csv/1.csv	9
+nt-2577	what was jimmie johnson's winnings?	csv/203-csv/529.csv	$251,736
+nt-2580	l'inganno innocente premiered in 1701. what was the previous title released?	csv/204-csv/104.csv	Diomede punito da Alcide
+nt-2591	what is was the difference in score in the december 19th win?	csv/204-csv/388.csv	3
+nt-2598	how many players hometowns are outside of california?	csv/204-csv/105.csv	5
+nt-2620	list the schools that came in last place in the cws best finish.	csv/203-csv/412.csv	Clemson|Colorado State|Connecticut
+nt-2623	jan schulz is ranked immediately below which player?	csv/203-csv/507.csv	Karel Hromádka
+nt-2635	which was the only team with less than 20 wins?	csv/203-csv/412.csv	Penn State
+nt-2661	how long was huang le's longest jump in 2002?	csv/204-csv/706.csv	7.91 m (w)
+nt-2680	which make had the most consecutive finishes at the aarons 499?	csv/203-csv/529.csv	Chevrolet
+nt-2690	what is the difference years won for crettyard and greystones	csv/204-csv/772.csv	6
+nt-2717	what driver earned the least amount of winnings?	csv/203-csv/529.csv	Paul Menard *
+nt-2825	how many teams had more points than silex?	csv/203-csv/654.csv	4
+nt-2832	what is the name of the venue listed before olympic stadium on 1950-08-27?	csv/204-csv/453.csv	Aarhus Stadion, Aarhus
+nt-2860	how many times was carlow the runner-up?	csv/204-csv/716.csv	3
+nt-2886	how many times was first place listed as the position?	csv/203-csv/874.csv	10
+nt-2912	after lance armstrong, who led next in the 1995 tour de france?	csv/203-csv/475.csv	Miguel Indurain
+nt-2919	which book won the award a total of 2 times?	csv/203-csv/788.csv	Alice's Adventures in Wonderland
+nt-2926	who is the last player on the list to not attempt a 3 point shot?	csv/204-csv/292.csv	Katie Hill
+nt-2955	what is the total amount of ties in this competition?	csv/203-csv/862.csv	2
+nt-2956	which year had the least ger numbers?	csv/204-csv/737.csv	1893
+nt-2967	what township has the largest population?	csv/204-csv/616.csv	Fairmount
+nt-2969	which engine was used the most by teams this season?	csv/204-csv/808.csv	Mugen-Honda
+nt-3004	which team was ray price on before he started for this team?	csv/204-csv/883.csv	Norwich City
+nt-3029	how many games did this team win during this season?	csv/204-csv/917.csv	9
+nt-3034	tell me the number of stations tv azteca owns.	csv/204-csv/796.csv	2
+nt-3110	what class is below s 1.6?	csv/204-csv/205.csv	GT 1.6
+nt-3115	in what year was the position of 3rd first achieved?	csv/204-csv/706.csv	2001
+nt-3122	"what is the name of the song listed before the song ""yesh""?"	csv/203-csv/862.csv	Gitara
+nt-3125	what is the total number of constituencies?	csv/203-csv/447.csv	19
+nt-3187	what is the difference between the number of wins and the number of losses?	csv/204-csv/917.csv	6
+nt-3196	how many networks have more affiliates than canal de las estrellas?	csv/204-csv/796.csv	1
+nt-3210	which player had the most total points?	csv/204-csv/292.csv	Amber Merritt
+nt-3213	how many events were at least 50 km?	csv/203-csv/874.csv	17
+nt-3237	how many times did sébastien bourdais win the champ car world series between 2005 and 2007?	csv/203-csv/99.csv	2
+nt-3246	who is the last to coach the san antonio scorpions?	csv/204-csv/832.csv	Alen Marcina
+nt-3264	which region is listed below atacama?	csv/203-csv/447.csv	Coquimbo
+nt-3271	who was the first judge from florida to serve the position?	csv/203-csv/563.csv	Nathan P. Bryan
+nt-3280	what is the total number of districts created in the 1900's?	csv/204-csv/739.csv	32
+nt-3294	what is the total number of times the competition was held at the semple stadium venue?	csv/204-csv/716.csv	7
+nt-3321	which judge was last appointed by president truman?	csv/203-csv/563.csv	Richard Rives
+nt-3415	which year was his best jump?	csv/204-csv/706.csv	1999
+nt-3439	what is the difference between the number of times the position of third was achieved and the number of times the position of first was achieved?	csv/204-csv/706.csv	1
+nt-3463	number of 3 points attempted	csv/204-csv/292.csv	10
+nt-3493	what is the number of affiliates of canal de las estrellas.	csv/204-csv/796.csv	5
+nt-3514	which player had the largest number of &#931; points?	csv/203-csv/507.csv	Karel Hromádka
+nt-3517	how many cities are in the united states?	csv/204-csv/317.csv	9
+nt-3533	what's the number of people who attended the oregon state game?	csv/204-csv/250.csv	76,290
+nt-3537	is arthur kaye older or younger than brian hill?	csv/204-csv/883.csv	Older
+nt-3566	what is the next site listed after lewis field?	csv/204-csv/250.csv	Memorial Stadium • Lincoln, Nebraska
+nt-3572	which are the only trains still in service?	csv/203-csv/332.csv	J515|J549
+nt-3605	what is the last name listed on this chart?	csv/204-csv/568.csv	Avenger
+nt-3630	the nation before mexico in the table	csv/203-csv/466.csv	Puerto Rico
+nt-3657	how many titles did walker publish?	csv/203-csv/788.csv	6
+nt-3658	what is the number of teams that had drivers all from the same country?	csv/204-csv/808.csv	4
+nt-3728	name three items created not long after the equatorial armillary sphere.	csv/204-csv/281.csv	Celestial Globe (渾象) (圓儀)|First remark of a constellation in observation in Korean history|First Ecliptic Armillary Sphere (黄道仪Huang Dao Yi)
+nt-3736	what are the number of times nc appears under the comp column?	csv/204-csv/453.csv	32
+nt-3789	which month is listed the least on this chart?	csv/204-csv/250.csv	January
+nt-3795	in what year did ádám szalai make his next international goal after 2010?	csv/203-csv/551.csv	2012
+nt-3796	what was the total amount of points scored on november 4th?	csv/204-csv/388.csv	8
+nt-3853	which rural settlement has the most males in their population?	csv/204-csv/6.csv	Bayagantaysky Nasleg (Áàÿãàíòàéñêèé íàñëåã)
+nt-3954	how many countries had more than one player in the consolation cup?	csv/203-csv/507.csv	4
+nt-3964	which driver earned the least amount of points.	csv/203-csv/519.csv	Nelson Philippe
+nt-4000	who was the last representative picked?	csv/203-csv/778.csv	Lisa Kubiske
+nt-4074	in 1926 brazilian football,aside from the first place team, what other teams had winning records?	csv/203-csv/654.csv	Auto|Corinthians|Santos
+nt-4112	who has the most number of affiliates?	csv/204-csv/796.csv	TV MÁS
+nt-4181	how many buildings had alfred waterhouse as their architect?	csv/204-csv/872.csv	3
+nt-4202	how many winners won in semple stadium?	csv/204-csv/716.csv	7
+nt-4209	next to merritt, who was the top scorer?	csv/204-csv/292.csv	Cobi Crispin
+nt-4220	which album was released later, beautiful, or j'adore?	csv/203-csv/276.csv	j'Adore
+nt-4221	was the average speed in the year 2011 of the indycar series above or below the average speed of the year before?	csv/203-csv/99.csv	below
+nt-4262	how many locomotives were scrapped?	csv/203-csv/213.csv	3
+nt-4278	what song earned the most points?	csv/203-csv/862.csv	Yavo Yom
+nt-4301	which composer is listed below pete doherty?	csv/204-csv/969.csv	Alexander Glazunov
+nt-4347	give the number of players covered by the table.	csv/203-csv/621.csv	16
+nt-4363	who was the winning captain the last time the competition was held at the gaelic grounds venue?	csv/204-csv/716.csv	Patrick Donnellan
+nt-4371	who had more points takaji mori or junji kawano?	csv/203-csv/456.csv	Takaji Mori
+nt-4382	what was the number of wins kansas state had in manhattan?	csv/203-csv/703.csv	8
+nt-4401	how many buildings do not have an image listed?	csv/204-csv/872.csv	11
+nt-4409	which date is below april 17, 1854	csv/203-csv/778.csv	March 17, 1860
+nt-4425	how many dates are on the chart	csv/204-csv/917.csv	12
+nt-4441	who is the only ambassadors to honduras appointed by barack obama?	csv/203-csv/778.csv	Lisa Kubiske
+nt-4447	how many trains other than the transrapid 07 can go faster than 450km/h?	csv/204-csv/751.csv	1
+nt-4461	how many more votes did the liberal democratic league win over the free-thinking democratic league?	csv/202-csv/191.csv	112,781
+nt-4474	avram grant was with chelsea for at least how many years?	csv/203-csv/450.csv	1
+nt-4488	how many episodes are below 2.00?	csv/203-csv/357.csv	27
+nt-4496	what are the number of schools with more than 2 cws appearances?	csv/203-csv/412.csv	3
+nt-4522	what is the difference in wins between wimbledon and the us open for this player?	csv/204-csv/153.csv	7
+nt-4530	the artist ash only had one song that appeared in the o.c. what is the name of that song?	csv/203-csv/357.csv	Burn Baby Burn
+nt-4566	what was the last year where tijuana was a venue?	csv/204-csv/983.csv	2012
+nt-4572	which other author, besides lewis carroll, has won the kurt maschler award twice?	csv/203-csv/788.csv	Anthony Browne
+nt-4583	which player who is only a forward (f) is the shortest?	csv/204-csv/105.csv	Justin Johnson
+nt-4627	does alexandria county have a higher or lower population than delaware county?	csv/204-csv/616.csv	lower
+nt-4651	who won the south after esc geretsried did during the 2006-07 season?	csv/204-csv/1.csv	SC Gaißach
+nt-4662	how many boats costed less than £20m to build?	csv/204-csv/568.csv	3
+nt-4670	which owner has the most networks?	csv/204-csv/796.csv	Televisa
+nt-4677	what is the difference between the highest scoring player's points and the lowest scoring player's points?	csv/204-csv/292.csv	83
+nt-4713	which country had the most finishers in the top 8?	csv/204-csv/59.csv	Russia
+nt-4736	what is the average number of teams that had a mugen-honda engine?	csv/204-csv/808.csv	24
+nt-4761	in list of venues, how many years was beijing above moscow (1st venue is above 2nd venue, etc)?	csv/204-csv/983.csv	3
+nt-4820	who was inducted after royal?	csv/204-csv/811.csv	Lance Russell
+nt-4824	how many operas on this list has at least 3 acts?	csv/204-csv/104.csv	51
+nt-4849	how many drivers received points from the race?	csv/203-csv/76.csv	8
+nt-4864	who did they play in the game listed directly above july 25, 1952?	csv/204-csv/453.csv	Poland
+nt-4892	who is next on the list after alexander krein?	csv/204-csv/969.csv	Constant Lambert
+nt-4951	how many total representatives have there been?	csv/203-csv/778.csv	50
+nt-4953	what was the make of both jeff gordon's and jimmie johnson's race car?	csv/203-csv/529.csv	Chevrolet
+nt-4975	what song is listed in the table right before layla layla?	csv/203-csv/862.csv	Kafe o te
+nt-4980	which name appears more often, kottern or bayreuth?	csv/204-csv/1.csv	Bayreuth
+nt-4991	which player is the oldest?	csv/204-csv/883.csv	Arthur Kaye
+nt-4993	what are the number of times an artist earned first place?	csv/203-csv/862.csv	1
+nt-5017	largest medal differential between countries	csv/203-csv/466.csv	31
+nt-5021	name the top three parties?	csv/202-csv/191.csv	Liberal Democratic League|Anti Revolutionary Party|General League of Roman Catholic Caucuses
+nt-5054	which company had the most employees?	csv/203-csv/320.csv	PGE SA
+nt-5080	how many total coaches on the list are from canada?	csv/204-csv/832.csv	5
+nt-5095	which competition did this person compete in immediately before the east asian games in 2001?	csv/204-csv/706.csv	World Championships
+nt-5103	which team was the previous winner before ballyroan abbey in 2008?	csv/204-csv/772.csv	Fingal Ravens
+nt-5147	how many tournaments had 5 total losses?	csv/204-csv/153.csv	2
+nt-5178	which city is home to the greatest number of historic sites, existing or demolished?	csv/204-csv/558.csv	Port Huron
+nt-5187	did mitsuo kamata have more than 40 total points?	csv/203-csv/456.csv	No
+nt-5194	how many names do not have images next to them?	csv/204-csv/558.csv	41
+nt-5259	what is the number of wins for each team	csv/204-csv/772.csv	1
+nt-5268	how many points did the brazilian football team auto get in 1926?	csv/203-csv/654.csv	14
+nt-5298	which driver won espy awards 11 years apart from each other?	csv/203-csv/364.csv	Jeff Gordon
+nt-5313	name a city from the same country as bangalore.	csv/204-csv/317.csv	Ahmedabad
+nt-5318	which opponent did kindley have the most victories against?	csv/202-csv/233.csv	Fokker D.VII
+nt-5328	how many cities are below 1000 in population?	csv/204-csv/6.csv	5
+nt-5332	were there more cause undetermined or miscellaneous deaths in the baltic states?	csv/203-csv/234.csv	Cause undetermined
+nt-5362	who became the ambassador after the completion of hewson ryan's mission?	csv/203-csv/778.csv	Phillip V. Sanchez
+nt-5390	what is the last team on the chart	csv/204-csv/772.csv	Dundalk Gaels
+nt-5416	which date was attended by the most people?	csv/204-csv/917.csv	November 19
+nt-5469	which year between 1893 and 1898 was there not an order?	csv/204-csv/737.csv	1895
+nt-5477	which place has the lowest, lower zip code?	csv/203-csv/115.csv	Cooper
+nt-5510	in what year was korzeniowski's last competition?	csv/203-csv/874.csv	2004
+nt-5512	how many drivers from germany?	csv/203-csv/76.csv	3
+nt-5573	what company is the only one with a revenue greater than 75,000,000 thou. pln?	csv/203-csv/320.csv	PKN Orlen SA
+nt-5648	how many representatives were appointed by theodore roosevelt?	csv/203-csv/778.csv	4
+nt-5668	how many times has anthony browne won an kurt maschler award for illustration?	csv/203-csv/788.csv	3
+nt-5696	what number of members were inducted before 2009?	csv/204-csv/811.csv	14
+nt-5738	who built the larger version of the first bagnall locomotive?	csv/203-csv/213.csv	W.G. Bagnall
+nt-5764	how many total competitions were in south korea?	csv/204-csv/706.csv	2
+nt-5804	was the quantity higher in 1894 or 1893?	csv/204-csv/737.csv	1894
+nt-5807	which new manager was purchased for the most money in the 2007-08 premier league season?	csv/203-csv/450.csv	Mark Hughes
+nt-5817	what is the total number of international goals ádám szalai has made?	csv/203-csv/551.csv	7
+nt-5863	what is the total of wins on the chart	csv/204-csv/772.csv	9
+nt-5881	what is the difference in enrollment between the top 2 schools listed in the table?	csv/203-csv/721.csv	1512
+nt-5887	which team was the first to win with a team captain?	csv/204-csv/716.csv	Kerry
+nt-5912	which title was after the year 1991 but before the year 1993?	csv/203-csv/788.csv	The Man
+nt-5929	name a year whose second venue was the same as 2011.	csv/204-csv/983.csv	2012
+nt-5985	who weighs the most on the team?	csv/204-csv/105.csv	Brandon Webster
+nt-5990	who was the top scorer from switzerland?	csv/203-csv/507.csv	Erwin Voellmy
+nt-5992	how many districts have more than 100,000 people in this city?	csv/204-csv/739.csv	21
+nt-6001	how many times did korzeniowski finish above fourth place?	csv/203-csv/874.csv	13
+nt-6057	how many different teams are represented in the table?	csv/203-csv/99.csv	4
+nt-6093	which chassis is in the middle of simca 1300 and alfa romeo gta?	csv/204-csv/205.csv	Porsche 911S
+nt-6114	how many routes have below 100 km total?	csv/203-csv/475.csv	4
+nt-6125	how many more total appearances did shigeo yaegashi have than mitsuo kamata?	csv/203-csv/456.csv	5
+nt-6129	what is the total number of games played?	csv/203-csv/703.csv	66
+nt-6164	who was picked after frank burns?	csv/203-csv/735.csv	Frank Ziegler
+nt-6176	what is the number of toyota's on the list?	csv/203-csv/76.csv	4
+nt-6183	which areas had a population of more than 10,000,000 but less than 20,000,000?	csv/204-csv/317.csv	Buenos Aires|Dhaka|İstanbul|Kolkata|London|Los Angeles|Manila|Moscow|New York|Osaka-Kobe-Kyoto (Keihanshin)|Paris|Rio de Janeiro|São Paulo
+nt-6185	on december 14 was the home team the chicago black hawks or the boston bruins?	csv/204-csv/388.csv	Boston Bruins
+nt-6196	when was g42, 1898 or 1894?	csv/204-csv/737.csv	1898
+nt-6206	the last runner crossed the finish line in 2:03.01. what was the previous time for the 7th runner?	csv/204-csv/59.csv	2:02.64
+nt-6264	in what year was the best year end ranking achieved?	csv/204-csv/153.csv	2011
+nt-6302	which country was awarded more than 5 silver medals?	csv/203-csv/466.csv	Cuba
+nt-6331	how many teams had a manner of departure due to there contract being terminated?	csv/203-csv/450.csv	5
+nt-6403	what is the difference in the scores in 2000?	csv/204-csv/716.csv	13
+nt-6414	oklahoma state and penn state both have how many cws appearances?	csv/203-csv/412.csv	2
+nt-6417	what driver earned the most points?	csv/203-csv/519.csv	Sebastien Bourdais
+nt-6426	how long did colin clarke coach the puerto rico islanders for?	csv/204-csv/832.csv	4 years
+nt-6446	which party did jaime quintana belong to?	csv/203-csv/447.csv	PPD
+nt-6447	is denmark better against sweden or england?	csv/204-csv/453.csv	Sweden
+nt-6450	karl behting and giovanni cenni each had final scores of what?	csv/203-csv/507.csv	6
+nt-6610	what amount of time to the years span?	csv/204-csv/737.csv	5 years
+nt-6620	which two buildings were listed before 1974?	csv/204-csv/872.csv	The Old Wellington Inn|Smithfield Market Hall
+nt-6628	what is the number of wins for confey	csv/204-csv/772.csv	1
+nt-6630	which years was a ranking below 200 achieved?	csv/204-csv/153.csv	2005|2006|2009|2010|2011|2012|2013
+nt-6635	what was the first club for the north in the 2000's?	csv/204-csv/1.csv	EHC Regensburg
+nt-6672	how many times was korzeniowski disqualified from a competition?	csv/203-csv/874.csv	5
+nt-6679	in what year was szalai's first international goal?	csv/203-csv/551.csv	2010
+nt-6691	which county had the most number of wins?	csv/204-csv/772.csv	Kildare
+nt-6698	what is the total point difference between the driver who received the most points and the driver who received the least?	csv/203-csv/519.csv	30
+nt-6755	which canadian driver finished first: alex tagliani or paul tracy?	csv/203-csv/519.csv	Paul Tracy
+nt-6764	what company has the top number of employees?	csv/203-csv/320.csv	PGE SA
+nt-6778	who was manager of manchester city after stuart pearce left in 2007?	csv/203-csv/450.csv	Sven-Göran Eriksson
+nt-6779	"what is the number of works titled ""salome?"""	csv/204-csv/969.csv	11
+nt-6783	how many teams had their cws best finish in 1955?	csv/203-csv/412.csv	3
+nt-6795	how many women's winners are from kenya?	csv/203-csv/787.csv	3
+nt-6833	did kurt thomas play more or less than 2126 minutes?	csv/203-csv/621.csv	less
+nt-6845	"did the song ""gitara"" or ""yesh"" earn more points?"	csv/203-csv/862.csv	Yesh
+nt-6893	what is the earliest year that a film was released?	csv/204-csv/18.csv	1870
+nt-6898	does the united states have more nation of citzenship then united kingdom?	csv/203-csv/364.csv	yes
+nt-7026	what same country did marc dos santos coach as colin miller?	csv/204-csv/832.csv	Canada
+nt-7052	what is the difference in years of granville bantock's work compared to pete dohert?	csv/204-csv/969.csv	91
+nt-7061	what is the name of the top finalist of this semifinals heat?	csv/204-csv/59.csv	Liliana Barbulescu
+nt-7116	how many goals were scored at the euro 2012 qualifying competition?	csv/203-csv/551.csv	12
+nt-7153	was charles heathcote the architect of ancoats hospital and apollo theatre?	csv/204-csv/872.csv	No

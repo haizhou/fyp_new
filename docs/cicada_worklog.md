@@ -1439,3 +1439,22 @@ residual WTQ gap (~80%) is grounding/knowledge, not format.
 Paired McNemar: v3 fixed 6 / broke 0, p=0.0312; base fixed 10 / broke 0,
 p=0.0020 — BOTH SIGNIFICANT, zero regressions in either domain. v3 trigger
 rate 141/300 rows (34x1 + 107x2 rounds).
+
+## 2026-07-20 (cont. 7): C-arm trained; home-quota incident; clean table-disjoint eval set
+
+**C-arm (gold-program SFT) trained** on GPU2: 3,956 examples, compose-v3 QLoRA
+recipe (r64, 2 epochs, lr 1e-4), 496 steps, loss 1.106->0.008, eval_loss
+converged 0.0274 (no 400->496 degradation). Save crashed at optimizer.pt with
+"basic_ios::clear: iostream error" — ROOT CAUSE: 50GB home quota hit 100%
+(volume df misleading; per-user quota is the binding limit). checkpoint-496
+adapter intact (504 tensors verified readable). Freed: mid checkpoint-248
+(2.0G), truncated optimizer.pt, broken ~/.cache/huggingface (2.3G, the
+documented IncompleteSnapshotError cache). ~4.4G headroom; NFS quota reclaim
+lags several minutes after deletion. A-arm training must set save_only_model.
+
+**Eval-leak guard**: C training pool (Squall TRAIN fold, table-level) overlaps
+random-split-1-dev questions — the 300-question floor set is NOT valid for SFT
+arms. Built clean_eval_devfold.tsv: 300 (of 569) random-split-1-dev questions
+whose tables are in the 327-table dev fold — table-disjoint from ALL training
+pools (A and C). SFT-arm comparisons run there; second vLLM (port 8001, GPU2)
+serves base+composev3+wtq_C so GPU3 harvest is undisturbed.
