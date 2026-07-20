@@ -1264,3 +1264,12 @@ Pool: 897 answerable + 294 status = 1,191 intent clusters; 19/21 cells at full q
 ## 2026-07-19 - PACS-dev FIRST NUMBERS (diagnosis) + confirmatory test run launched
 
 PACS-dev, compose-v3: channel a strict 71.86 / safe 82.25 (answerable-only 76.9% = 133/173); channel b (naturalized) 71.43/81.82 — naturalization costs ~0.4pt, robust; channel c 55.41/64.94 (CAVEAT: generic channel-c renderer produces underspecified stems for complex templates — c-based paired deltas compromised, c remains diagnostic-only; recorded); base on channel a 41.13/48.92 (v3 +30.7pt strict). Structure the program-space holdouts never showed: family F1/F2/F4 near-ceiling (86/87), F5 24/32, F3 9/23, F6 13/23, F7 1/8; depth L1 94% / L2 62.5% / L3 77.6%; **exposure seen 85.7% vs unseen 69.8% — a real task-space unseen gap** (vs 99.17% program-space B_clean). Dev autopsies (allowed): F3 = bind-scope misread (top-k computed outside the bound buyer set); F7 = universal quantifier fails under NEW surface ("kept a perfect record"); F6 = type-composition near-misses (size/count over wrong types, invalid_tree). Model-freeze rule holds: findings feed Discussion, no retraining. PACS-test single confirmatory run (frozen compose-v3, channels a+b, aggregate-only reading) LAUNCHED per spec's one-run rule.
+
+## 2026-07-19 - PACS-TEST CONFIRMATORY RESULT (single run, frozen compose-v3, aggregate-only reading per spec)
+
+**PRIMARY BENCHMARK NUMBERS (PACS-test, 922 rows / 694 answerable clusters + 228 status rows):**
+- channel a (independent grammar): **strict 74.51% / safe 82.43%**; channel b (naturalized): 73.21/81.13 — surface-transfer cost only ~1.3pt.
+- Answerable: **79.11%** (549/694). Status rows: Status Exact Match 60.5%, Safe Semantic Outcome 92.5%.
+- Family: F1 spending 99%, F2 temporal 96%, F4 cross-buyer 93%, F5 overlap 97% | F3 concentration 41%, F6 relational 70%, F7 disclosure 39%.
+- Depth: L1 98% / L2 63% / L3 78%. Exposure: seen 84.9% vs unseen 74.6% (10.3pt task-space unseen gap).
+Reading: the intent-first benchmark reveals exactly the structure program-space holdouts (B_clean 99.17%) concealed — four families at or near ceiling, three families (bind-scope top-k, relational chains, disclosure quantifiers) carrying the real capability boundary, per dev autopsies: bind-scope misreads, quantifier surface transfer, type-composition near-misses. Naturalized channel robust. All findings feed Discussion; model stays frozen; PACS-test remains row-uninspected.
