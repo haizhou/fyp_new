@@ -150,6 +150,10 @@ The paired comparison on the full frozen legacy test set (2,285 items, per-item,
 
 **Scope.** One domain, one schema, one KG; the recipe's portability is untested. The lock-in result is protocol-scoped: it demonstrates a format channel, not permanent capability loss. Legacy-comparison claims await the paired run.
 
+**What the primary benchmark adds over the suites.** The companion suites certify mechanism (99.17% on unseen program shapes; construction transfer) while PACS certifies task competence — and the two disagree in exactly the informative way: four task families sit at ceiling while three carry a real boundary invisible to program-space evaluation, and the task-space unseen gap (10.8 points) survives where the program-space gap (≈0) closed. Benchmarks organised by generator convenience would have missed all of this; the intent-first design was proposed in review and proved decisive.
+
+**Audit as part of the method.** The 93-row human audit found one real labelling defect (boolean False treated as an empty result), two moderate surface defects (unfilled scope placeholders in missing-operator variants; occasional loss of the word "additive" in naturalization — the literal gate protects parameters, not lexicon), and cosmetic decoration artifacts. The defect correction *raised* the headline (the model had been answering the mislabelled rows correctly), which we note as the general case for audits: unaudited gates do not merely admit errors, they can silently misprice competence in either direction. Backlog for PACS v1.2: scope filling, a protected-word list for the naturalization gate, and quota completion for the two anchor-constrained F7 cells.
+
 **Capability extension.** The natural third stage — beyond fixed programs (stage one) and learned composition over a fixed grammar (stage two) — is capability extension: detecting that a question exceeds the operator inventory and proposing a new primitive with its executor and verification obligations. Our out-of-grammar controls already measure the detection half; the proposal half is future work.
 
 ## 7 Conclusion
