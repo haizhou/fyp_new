@@ -1361,3 +1361,20 @@ extremum ties, residual normalization — no evaluator implementation bugs found
 
 Zero-shot arms rewired post-hoc invalid (row-id hiding + dual view) — floor rerun
 pending; E probe template at docs/paper_compose/probe_E_template.md GATES Layer 2.
+
+## 2026-07-20 (cont. 3): zero-shot floor v2 (frozen stack) + probe E authored & frozen
+
+**Zero-shot floor rerun** (dual-view loader, row_id hidden, extreme_rows in prompt,
+truncations retried at 1600 tok): v3 56/300 = 18.67% vs base 52/300 = 17.33%,
+McNemar b=15 c=11 p=0.557 (n.s.) — consistent with the corrected framing: no
+confirmed end-to-end difference; policy differs (abstain 21 vs 57; NEW signal:
+runaway-generation truncations 28 vs 10 even at 1600 tokens — v3 builds deeper,
+unfinished trees on tables). Arms stored eval_wtq_zs2_{v3,base}.jsonl.
+
+**Probe E authored and FROZEN** (docs/paper_compose/probe_E.md): 40 questions,
+30 answerable (incl. deep #28/#30, extension-node #40, cross-lingual/typo
+surfaces), 10 abstention (2 empty_result, 2 requires_missing_operator, 2
+unsupported_field, 2 ambiguous, causal/future, field-vs-field grammar hole #39).
+AUTHORSHIP DISCLOSED: written by the co-developing agent at user request, without
+consulting training templates — hand-authored held-out probe, NOT external human
+evidence; user may replace/edit >=10 rows to upgrade independence. Gates Layer 2.
