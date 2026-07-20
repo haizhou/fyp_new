@@ -41,8 +41,13 @@ def _to_num(cell: str):
 def load_universe(csv_rel: str):
     """Returns (backend_shim, field_catalog) for one WTQ table.
     field_catalog: list of (field_name, dtype_label, sample_values)."""
-    df = pd.read_csv(WTQ_ROOT / csv_rel, dtype=str, keep_default_na=False,
-                     on_bad_lines="skip")
+    try:
+        df = pd.read_csv(WTQ_ROOT / csv_rel, dtype=str, keep_default_na=False,
+                         on_bad_lines="skip")
+    except Exception:
+        # fallback for malformed quoting: python engine, permissive
+        df = pd.read_csv(WTQ_ROOT / csv_rel, dtype=str, keep_default_na=False,
+                         engine="python", on_bad_lines="skip", quoting=3)
     seen: set = set()
     df.columns = [_norm_header(h, seen) for h in df.columns]
 
