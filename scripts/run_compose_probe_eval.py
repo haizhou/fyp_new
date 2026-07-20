@@ -311,16 +311,33 @@ def main() -> None:
     out_path = out_dir / f"eval_{args.arm}.jsonl"
 
     kept: dict[str, dict] = {}
-    if args.resume and out_path.exists():
-        for line in out_path.open():
-            r = json.loads(line)
-            if r.get("outcome") != "api_error":
-                kept[r["id"]] = r
+    if args.resume:
+        for src in (out_path, out_dir / f"eval_{args.arm}.stream.jsonl"):
+            if src.exists():
+                for line in src.open():
+                    r = json.loads(line)
+                    if r.get("outcome") != "api_error":
+                        kept[r["id"]] = r
         print(f"resume: keeping {len(kept)} prior results, redoing {len(rows) - len(kept)}")
     todo = [r for r in rows if r["id"] not in kept]
 
+    # incremental stream: every finished row is appended immediately so a
+    # killed run loses nothing (final write below rewrites in probe order)
+    import threading
+    stream_path = out_dir / f"eval_{args.arm}.stream.jsonl"
+    _lock = threading.Lock()
+    _stream = stream_path.open("a")
+
+    def ask_streamed(row):
+        r = ask(row)
+        with _lock:
+            _stream.write(json.dumps(r, default=str) + "\n")
+            _stream.flush()
+        return r
+
     with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
-        fresh = list(pool.map(ask, todo))
+        fresh = list(pool.map(ask_streamed, todo))
+    _stream.close()
     by_id = {**kept, **{r["id"]: r for r in fresh}}
     results = [by_id[r["id"]] for r in rows]
     with out_path.open("w") as fh:

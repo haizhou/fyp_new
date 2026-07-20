@@ -1547,3 +1547,16 @@ p=0.0075. Wrong-rate among answered 67.6%->63.7%; eval_failed 40->35;
 empty-answer wrongs 6->4; truncated 10->3. DECISION: the value linker
 (column-aware cell candidates, locked rules) enters the frozen recipe;
 next = hint-augmented C retrain at the best curve point, A same, then freeze.
+
+## 2026-07-20 (cont. 12): teacher-D LANDS — PACS-test teacher 50.33/56.62; student +28.0pt
+
+Azure trial exhaustion (401, account disabled) was the 7h-stall root cause;
+user upgraded to pay-as-you-go; rerun with the new STREAMING driver
+(incremental jsonl + resume) finished 922 rows in ~13 min at concurrency 4
+(~$0.5 at listed grok-4-1-fast rates). After api_error resume-retry:
+**teacher strict 50.33 / safe 56.62 (n=922)** vs compose-v3 78.31/82.43,
+base 36.01, RAG 21.90. The distilled local 8B student beats its cloud teacher
+by +27.98pt strict on the primary benchmark — the main line's
+student-surpasses-teacher pattern replicates on PACS. Teacher failure mass is
+format-channel: invalid_tree 156 + unparseable 57 = 23.1% (no guided decoding
+via cloud API — asymmetry pre-declared; it is also the deployment argument).
