@@ -1504,3 +1504,36 @@ composev3-init, save_only_model + non-mark checkpoint reaper (quota guard),
 per-init serve+eval on clean 300 then prune to checkpoint-2000. Answers:
 does procurement compose-training buy ADAPTATION SPEED / sample efficiency
 in the new domain, even where endpoints converge?
+
+## 2026-07-20 (cont. 10): attribution corrections (user) + intent audit + value linker pre-declared
+
+Corrections applied: (1) the 82-question bucket is renamed "Gold-audit
+uncovered — cannot be auto-attributed; EXCLUDED from the fixable-error
+denominator" (not "coverage, training-unfixable": it mixes translator gaps,
+alternative-derivation-solvable, truly-missing-operator, and unattributable).
+(2) The 11%-7.5% intent subtraction is heuristic only; claim downgraded to:
+"no evidence that intent recognition is the dominant residual bottleneck."
+
+Manual audit of all 17 intent-flagged wrongs: 5 detector false positives
+("A or B" comparatives whose gold answer IS an entity), 4 ANSWER-FORM gaps
+(model computed the right quantity — diff=0 / -502 / 15 — but target wants
+'greater'/'lower'/'yes': a rendering layer, new micro-bucket), 4 true
+intent/structure (retrieved instead of compared; echoed instead of exists),
+4 grounding/coverage. True intent errors ~= 4/160 = 2.5%.
+
+Paper sentence adopted (user): "Error attribution shows that intent
+recognition is not the dominant residual bottleneck. Among automatically
+attributable executed errors, grounding failures — especially unmatched
+filter values and incorrect field/value bindings — account for the majority.
+We therefore transfer the value-linking component of the original recipe by
+augmenting each table schema with retrieved, column-aware cell candidates."
+
+VALUE LINKER built (scripts/wtq/linker.py) under locked rules: current-table
+retrieval only; no gold answer/SQL/test annotations; identical logic across
+splits; fixed top-k (4 cols x 5 cells); no synthetic row id; column-aware
+rendering. Four-way ablation RUNNING on base/clean-300: none | columns |
+cells | random-control. Pre-declared success criteria: filter-empty (35) and
+same-shape grounding (20) drop; structure errors unchanged; random control
+flat. Ordering (user): linker validation -> hint-augmented C retrain (best
+curve point) -> A same -> only then full-data scaling (never conflate data
+scale with grounding fix).

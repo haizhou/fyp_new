@@ -72,6 +72,9 @@ def main() -> None:
     ap.add_argument("--split", default="random-split-1-dev")
     ap.add_argument("--limit", type=int, default=300)
     ap.add_argument("--concurrency", type=int, default=8)
+    ap.add_argument("--hints", choices=["none", "columns", "cells", "random"], default="none",
+                    help="value-linker ablation: none | columns (ranked cols only) | "
+                         "cells (column-aware candidates) | random (control: random cells)")
     ap.add_argument("--reflect", type=int, default=0,
                     help="max typed-feedback repair rounds on HARD failures only "
                          "(invalid_tree/eval_failed/truncated); empty results and "
@@ -98,7 +101,25 @@ def main() -> None:
         fields = [c[0] for c in catalog]  # synthetic row id stays internal
         schema = {"type": "json_schema", "json_schema": {
             "name": "algebra", "schema": algebra_json_schema(fields=fields), "strict": True}}
-        prompt = PROMPT.format(catalog=catalog_text(catalog), q=rec["utterance"])
+        cat_txt = catalog_text(catalog)
+        if args.hints != "none":
+            import random as _rnd
+            from linker import link, render, TOP_COLS, TOP_CELLS
+            links = link(rec["utterance"], shim.raw_df, catalog)
+            if args.hints == "columns":
+                links = [(c, []) for c, _ in links]
+            elif args.hints == "random":
+                rng = _rnd.Random(hash(rec["id"]) & 0xffff)
+                cols = [c[0] for c in catalog]
+                rng.shuffle(cols)
+                links = []
+                for c in cols[:TOP_COLS]:
+                    vals = [v for v in shim.raw_df[c].dropna().astype(str) if v.strip()]
+                    links.append((c, rng.sample(vals, min(TOP_CELLS, len(vals)))))
+            hint = render(links)
+            if hint:
+                cat_txt = cat_txt + "\n\n" + hint
+        prompt = PROMPT.format(catalog=cat_txt, q=rec["utterance"])
         ev = WTQEvaluator(shim)
         messages = [{"role": "user", "content": prompt}]
         rounds = 0
