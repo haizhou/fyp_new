@@ -1481,3 +1481,26 @@ Three findings:
    repair-off verdict; reflect pays only in cold-start (base +3.3 significant).
 Caveat for Discussion: C abstains 0/300 (all-answerable SFT atrophies the
 abstention head) — fine for WTQ scoring, relevant for safety-style deployments.
+
+## 2026-07-20 (cont. 9): C-arm 40% DECOMPOSED — verdict: coverage-limited (user's scenario 1)
+
+Eight-way decomposition on the clean 300 (user directive):
+full-set 40.0% | expressible(A∪B) 86/117 = 73.5% | ORACLE-SOLVABLE 81/95 =
+85.3% | inexpressible 25/115 = 21.7% | unannotated 9/68 = 13.2% | valid-tree
+98.7% | exec-success|valid 94.6% | inexpressible rate 115/232 = 49.6% |
+normalization-recoverable 3/160 (negligible). On the 14 oracle-solvable
+wrongs: 4 wrong-structure, 9 grounding (same shape, wrong field/literal),
+1 exec-failure.
+
+VERDICT: the planner reaches 85.3% on questions the system can express —
+9pt from the 94.1% executor ceiling; the 40% full-set number is dominated by
+the ~50% algebra-coverage boundary. Paper phrasing: "full-set performance is
+primarily coverage-limited rather than execution-limited." A/B/pristine may
+proceed; no C-arm crisis.
+
+LAUNCHED (user mandate): learning curve x init control — same C data, marks
+{100,200,500,1000,2000} (250->200: save_steps grid), base-init vs
+composev3-init, save_only_model + non-mark checkpoint reaper (quota guard),
+per-init serve+eval on clean 300 then prune to checkpoint-2000. Answers:
+does procurement compose-training buy ADAPTATION SPEED / sample efficiency
+in the new domain, even where endpoints converge?
