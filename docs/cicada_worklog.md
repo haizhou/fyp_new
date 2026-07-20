@@ -1560,3 +1560,22 @@ by +27.98pt strict on the primary benchmark — the main line's
 student-surpasses-teacher pattern replicates on PACS. Teacher failure mass is
 format-channel: invalid_tree 156 + unparseable 57 = 23.1% (no guided decoding
 via cloud API — asymmetry pre-declared; it is also the deployment argument).
+
+## 2026-07-20 (cont. 13): constraint-necessity audit (Minervini-style) — first cut on PACS-dev
+
+User direction review mapped four frontier gaps; coverage: (1) no_results
+disambiguation — PACS status axis already separates empty_result/ambiguous/
+unsupported/missing-operator as gold labels and the faithfulness gate detects
+planning-failure empties; MISSING: a "missing evidence" (open-world) class.
+(2) temporal/conflict reasoning — substrate exists (value_is_additive, org
+canonicalization, 2022-2026 span) but releases are flattened; future work.
+(3) constraint necessity — NOT previously done; FIRST CUT TODAY (below).
+(4) unseen compositions covered; operator-INVENTION and DAG programs not.
+
+PACS-dev answerable (173 rows, 536 deletable predicates, oracle-tree side):
+predicate necessity 62.1% (333/536); fully-necessary rows 87/173 = 50.3%;
+rows with >=1 redundant predicate 49.7%. Defines the IRREDUCIBLE SPLIT
+(87 dev rows; same audit to run on test gold side post-freeze — permitted as
+post-hoc dataset audit). PENDING (join bug to fix): v3 accuracy on
+irreducible vs reducible rows — the shortcut-inflation check; then paper
+gains "necessity-audited benchmark" claim + irreducible-split reporting.
