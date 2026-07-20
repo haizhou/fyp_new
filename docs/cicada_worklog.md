@@ -1537,3 +1537,13 @@ same-shape grounding (20) drop; structure errors unchanged; random control
 flat. Ordering (user): linker validation -> hint-augmented C retrain (best
 curve point) -> A same -> only then full-data scaling (never conflate data
 scale with grounding fix).
+
+## 2026-07-20 (cont. 11): value-linker ablation VALIDATED (pre-declared criteria met)
+
+Four-way on base/clean-300: none 15.00 | +columns 16.33 | +CELLS 19.00 |
++random 13.33. Dose-response ordered; RANDOM CONTROL NEGATIVE (-1.67) — the
+gain is not "more context". McNemar cells vs none: fixed 15 / broke 3,
+p=0.0075. Wrong-rate among answered 67.6%->63.7%; eval_failed 40->35;
+empty-answer wrongs 6->4; truncated 10->3. DECISION: the value linker
+(column-aware cell candidates, locked rules) enters the frozen recipe;
+next = hint-augmented C retrain at the best curve point, A same, then freeze.
