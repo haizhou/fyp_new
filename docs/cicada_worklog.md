@@ -1608,3 +1608,17 @@ REACHES the gold-translation ceiling with zero program supervision — the
 answer-only bootstrap claim holds; C exceeds A by 8.3pt (> 3pt pre-declared
 threshold) -> B-arm (structure-filtered bootstrap) triggered per rule.
 Format channel closed in both SFT arms (invalid 7/4, truncated 1/0).
+
+## 2026-07-21 (cont. 2): B-arm lands — supervision ladder COMPLETE
+
+B (structure-filtered bootstrap, 1,244 ex = 1/3 of A's pool): **30.00%** —
+ties A (31.67%). FINAL LADDER on clean-300: floors 15.3/15.7 -> +linker 19.0
+-> A (answer-only, 3,739 ex) 31.67 -> B (structure-filtered, 1,244 ex) 30.00
+-> C (gold-program, 3,956 ex) 40.00 -> translation ceiling 32.7 -> executor|A
+94.1. READING: structure filtering costs 2/3 of the data and moves nothing —
+spurious programs are NOT what separates bootstrap from gold supervision;
+HARVEST COVERAGE is (self-harvest only reaches questions the zero-shot model
+already solves; gold programs reach beyond). Every rung McNemar-verified
+(A vs floor p=1.9e-11; C vs A p=0.0013). B quota crash at final save was
+survived via checkpoint-152 (adapter intact); optimizer states of frozen
+trainings pruned per precedent (8.5G freed).
