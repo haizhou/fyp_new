@@ -1639,3 +1639,35 @@ view); adapter/eval subclass ~90 LOC; linker ~60 LOC; drivers/tooling ~700
 LOC (translator, audits, harvest); core algebra: +1 generic operator
 (extreme_rows), 17/17 originals unchanged; core evaluator: extreme_rows
 comparator block only; light SFT 1000 steps on one A100.
+
+## 2026-07-21 (cont. 4): PRISTINE-UNSEEN FINAL RUN — WTQ track complete
+
+One-shot, frozen config (guided + linker hints + single call), official WTQ
+evaluator, full test n=4,344, manifest (commit + 7 file sha256) recorded.
+
+  base zero-shot   22.51%   | v3 zero-shot  27.33%
+  A-final (answer-only bootstrap, 4,709 ex)  **44.43%**
+  C-final (gold-program, 5,423 ex)           **51.80%**
+
+McNemar (paired): v3>base +380/-177 p=4.9e-18; A>v3 +810/-89 p=2.7e-146;
+C>A +604/-299 p=1.7e-24. Behavior at scale: C-final answered 94.9%,
+invalid 16/4344, truncated 3 — the format channel stays closed on 4.3k
+unseen tables.
+
+Context: 51.8% sits above the classic supervised semantic-parsing band
+(Pasupat 37, Zhang ~43-48) and near TAPAS-scale systems, from an 8B local
+model with a closed verifiable algebra, 5.4k examples, 1000 steps, one A100.
+A-final 44.4% with ZERO program supervision matches classic fully-supervised
+parsers.
+
+HONEST REVISION to recipe-not-weights: at test power (n=4,344) procurement
+weights DO carry a small zero-shot transfer (+4.8pt, decisively significant)
+that dev n=300 could not detect; the adaptation-speed curves still overlap.
+Final phrasing: weights contribute a small zero-shot prior; the RECIPE
+(algebra + loader + linker + verified SFT) delivers the bulk (+17pt beyond
+v3 for A; +24.5pt for C). The dev-side story (floors indistinguishable at
+n=300) stands as recorded, now superseded by the higher-power test estimate.
+
+WTQ track CLOSED. Remaining tails: necessity-audit join bug + test-side
+audit; paper portability-section backfill; PACS-test reflect config decision
+(user's call).

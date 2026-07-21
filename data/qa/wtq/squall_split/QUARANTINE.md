@@ -42,3 +42,8 @@ config (1000 steps, v2 algebra, linker hints). The internal clean-300 set is
 thereby consumed; final numbers come solely from the one pristine-unseen run
 (config hash + commit hash recorded). Pristine tables/questions/SQL remain
 untouched until that run.
+
+## STATUS: CONSUMED (2026-07-21)
+The pristine-unseen run has been executed once under the frozen config
+(manifest in worklog). No further pristine runs are permitted except under
+the documented-infrastructure-failure clause.
