@@ -104,3 +104,15 @@ Key commands: scripts/wtq/{loader_audit,differential_audit,audit_4way.sh,run_pri
 - v3 type system (Predicate⟨Expr,Expr⟩, OrderedRelation): designed, NOT built — next paper.
 - Teacher-harvest grok pilot: $1 gate, awaiting A/C-v3 gap after local re-harvest.
 - PACS-test reflect config; E-probe replacement rows; H (RLVR): user decisions.
+
+## E13b. C-v3 ceiling check — STATUS: POST-PRISTINE DIAGNOSTIC (clean-300)
+Config: phase-1 grammar (translator+loader closure), train-fold-only pool
+4,810 (clean-300 stays table-disjoint), 1000 steps, linker hints.
+Numbers: 51.00 (153/300) vs C-v2 47.67; behavior answered 280 / eval_failed
+16 / invalid 4 / truncated 0. Sits ~5pt under the widened ceiling
+(60.06% dev coverage x ~93% executor). Chain: C-v1 40.0 -> C-v2 47.67 ->
+C-v3 51.00 as coverage 52.7 -> 60.1: capability tracks the grammar boundary
+(third consecutive confirmation).
+Incident: gated runner retrained needlessly after an eval-phase server
+failure (train+eval now split into separately retryable stages); attempt-10
+adapter preserved at outputs/wtq_C_v3_final.
