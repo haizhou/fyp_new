@@ -87,7 +87,8 @@ def build_c():
 def build_a():
     out, universes = [], {}
     import os as _os
-    pats = ["data/qa/wtq/harvest_A_*.jsonl"]
+    import os as _os2
+    pats = [_os2.environ.get("WTQ_HARVEST_GLOB", "data/qa/wtq/harvest_A_*.jsonl")]
     if _os.environ.get("WTQ_FINAL") == "1":
         pats.append("data/qa/wtq/harvest_dev_*.jsonl")
     files = []
