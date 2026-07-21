@@ -31,3 +31,14 @@ construction). All subsequent development follows the fold rules below.
   arg-extremum), a generic relational capability motivated by TRAIN-split
   census. Migration cost: 1 new generic operator; 17/17 original operators
   reused unchanged.
+
+## Protocol amendment (2026-07-21, PRE-DECLARED before any pristine contact)
+All development functions of the dev fold are complete (translator error
+analysis, differential audit, curve/step selection, arm comparisons, v2
+census). Per the standard select-on-dev / retrain-on-train+dev protocol and
+for comparability with published full-training-data WTQ systems, the FINAL
+models (A-final, C-final) are trained on train+dev pools with the dev-frozen
+config (1000 steps, v2 algebra, linker hints). The internal clean-300 set is
+thereby consumed; final numbers come solely from the one pristine-unseen run
+(config hash + commit hash recorded). Pristine tables/questions/SQL remain
+untouched until that run.
