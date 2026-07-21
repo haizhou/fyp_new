@@ -58,8 +58,9 @@ def resolve_col(tok: str, colmap: dict) -> str:
         raise Skip("column_index_out_of_range")
     name, dtype = entry
     if suffix == "number" and dtype != "number":
-        # Squall's per-cell numeric view over a column our loader types as
-        # text ("10,000 m", "75 000 000"): not materialized -> out of scope
+        aux = f"{name}__num"
+        if aux in colmap.get(0, set()):
+            return aux  # v2: loader materializes the per-cell numeric view
         raise Skip("number_view_on_text_column")
     return name
 
@@ -257,7 +258,12 @@ def trans_select(toks, colmap, df, want_number=False) -> dict:
         rows = {"node": "extreme_rows", "of": base, "field": field,
                 "op": "argmax" if agg[0] == "max" else "argmin"}
         return {"node": "select", "of": rows, "field": field}
-    if agg[0] in ("avg", "abs", "julianday"):
+    if agg[:2] == ["avg", "("]:
+        field = resolve_col(agg[2], colmap)
+        return {"node": "combine", "op": "ratio",
+                "left": {"node": "sum", "of": base, "field": field},
+                "right": {"node": "count", "of": base}}
+    if agg[0] in ("abs", "julianday"):
         raise Skip(f"unsupported_agg:{agg[0]}")
     if len(agg) == 1:
         field = resolve_col(agg[0], colmap)
@@ -355,7 +361,10 @@ def main() -> None:
         if csv_rel not in universes:
             try:
                 shim, catalog = load_universe(csv_rel)
-                universes[csv_rel] = (shim, {i + 1: (c[0], c[1]) for i, c in enumerate(catalog)})
+                orig = [c for c in catalog if not c[0].endswith("__num")]
+                cm = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
+                cm[0] = {c[0] for c in catalog if c[0].endswith("__num")}
+                universes[csv_rel] = (shim, cm)
             except Exception as exc:
                 universes[csv_rel] = None
         if universes[csv_rel] is None:

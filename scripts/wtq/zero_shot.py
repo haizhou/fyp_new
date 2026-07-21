@@ -56,6 +56,8 @@ def norm(x):
 
 
 def denotation_match(pred, targets: list) -> bool:
+    if isinstance(pred, bool):  # deterministic rendering: BOOL -> yes/no
+        pred = "yes" if pred else "no"
     if isinstance(pred, list) and pred and isinstance(pred[0], list):
         pred = [p[0] for p in pred]  # ranking -> keys
     preds = pred if isinstance(pred, list) else [pred]

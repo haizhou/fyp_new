@@ -100,6 +100,35 @@ def load_universe(csv_rel: str):
         catalog.append((col, dtype, list(non_empty.head(3))))
     records_df = pd.DataFrame(typed)
 
+    # v2: per-cell numeric view — for text columns where >=50% of non-empty
+    # cells contain an extractable number, add <col>__num (first number in the
+    # cell, commas stripped). Fixed rule, identical across splits; raw_df gets
+    # the display string of the extracted number for projection.
+    _first_num = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
+    def _cell_num(s):
+        m = _first_num.search(str(s))
+        if not m:
+            return None
+        try:
+            return float(m.group(0).replace(",", ""))
+        except ValueError:
+            return None
+    for col, dtype, _ in list(catalog):
+        if dtype == "number":
+            continue
+        series = raw_df[col].astype(str).str.strip()
+        non_empty = series[series != ""]
+        if len(non_empty) == 0:
+            continue
+        nums = non_empty.map(_cell_num)
+        if nums.notna().mean() >= 0.5:
+            aux = f"{col}__num"
+            records_df[aux] = series.map(_cell_num)
+            raw_df[aux] = records_df[aux].map(
+                lambda v: "" if v is None else (f"{int(v)}" if float(v).is_integer() else f"{v:g}"))
+            catalog.append((aux, "number",
+                            [v for v in nums.dropna().head(3)]))
+
     # synthetic row id: internal to the evaluator (dedup key); NOT in catalog.
     records_df["contract_node_id"] = [f"row{i}" for i in range(len(records_df))]
     shim = SimpleNamespace(records_df=records_df, raw_df=raw_df, integrity=integrity)

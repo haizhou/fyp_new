@@ -125,7 +125,9 @@ def main() -> None:
             out_rows.append(row)
             continue
         shim, catalog = universes[csv_rel]
-        colmap = {i + 1: (c[0], c[1]) for i, c in enumerate(catalog)}
+        orig = [c for c in catalog if not c[0].endswith("__num")]
+        colmap = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
+        colmap[0] = {c[0] for c in catalog if c[0].endswith("__num")}
 
         ref, ref_err = ref_execute(e["tbl"], sql_text(e["sql"]))
         targets = e["tgt"].split("|")
