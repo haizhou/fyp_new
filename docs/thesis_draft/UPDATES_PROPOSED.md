@@ -1,8 +1,8 @@
-# Proposed frozen-text revisions (for user approval — nothing applied)
-
-The main-line chapters (00–08) are frozen. Chapters 9–11 now exist beyond
-them. The abstract and conclusion therefore under-claim the dissertation.
-Below are drop-in additions with exact anchors; approve, edit, or reject.
+# Writing material — drafted language for frozen-chapter updates
+# STATUS: raw material only (role decision 2026-07-21: recorder, not author).
+# Facts here are ledger-checked; the prose is NOT to be applied as-is.
+# Which result goes to Abstract/Intro/Discussion/Appendix/nowhere is decided
+# later from RESULTS_LEDGER.md, which is the authoritative record.
 
 ---
 
