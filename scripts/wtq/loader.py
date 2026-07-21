@@ -129,11 +129,17 @@ def load_universe(csv_rel: str):
             catalog.append((aux, "number",
                             [v for v in nums.dropna().head(3)]))
 
-    # v3 views: __year / __maxyear (4-digit years in cell) and __first /
-    # __second (composite-cell split on newline/dash/comma). Same fixed-rule
-    # discipline as __num: added only when >=50% of non-empty cells qualify.
+    # v3 typed views (attribution flag WTQ_VIEWS: "v3" default, "v2" disables).
+    # Fixed cross-split rules, never question- or gold-SQL-conditioned:
+    # __number_k = k-th valid numeric token IN ORIGINAL TEXT ORDER (unified
+    #   token extractor; span/provenance = the raw cell, preserved alongside).
+    # __min_year/__max_year = min/max of 4-DIGIT year tokens (1000-2099).
+    #   Two-digit shorthand ("1998-99") is NOT expanded: yields [1998] only —
+    #   fixed pre-declared convention. Parse failure -> null, never guessed.
+    import os as _os
+    _views_on = _os.environ.get("WTQ_VIEWS", "v3") == "v3"
     _year_re = re.compile(r"\b(1[0-9]{3}|20[0-9]{2})\b")
-    for col, dtype, _ in list(catalog):
+    for col, dtype, _ in (list(catalog) if _views_on else []):
         if dtype == "number" or col.endswith("__num"):
             continue
         series = raw_df[col].astype(str).str.strip()

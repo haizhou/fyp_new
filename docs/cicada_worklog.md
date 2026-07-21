@@ -1685,3 +1685,26 @@ data/qa/pacs_v1/necessity_rows.jsonl. NEXT (user direction, coverage attack):
 translator engineering pack (in-list/between/subquery-compare->combine) +
 loader derived views (__year/__first/__second); teacher-harvest arm awaits
 user's spend approval (~$20 Azure).
+
+## 2026-07-21 (cont. 6): TWO MANDATED CORRECTIONS + 4-way attribution audit launched
+
+User corrections adopted verbatim:
+1. Phase 1 is "SQL expression NORMALIZATION and LOWERING into the frozen v2
+   algebra" — NOT "SQL Expr AST -> Algebra Expr AST". A general
+   Predicate<Expr,Expr> IS the phase-2 v3 type-system change; smuggling it in
+   would dirty the attribution. Phase 1 lowers to existing v2 nodes only.
+2. "Second pristine" TERMINOLOGY ABOLISHED. The pristine set is consumed;
+   any future run on it is a post-hoc evaluation on a consumed test set.
+   A formal one-shot number requires a NEW untouched holdout or a different
+   pre-frozen benchmark.
+
+View conventions pre-declared (cross-split, never question/SQL-conditioned):
+__number_k = k-th valid numeric token in ORIGINAL TEXT ORDER; __min_year/
+__max_year over 4-digit tokens only ("1998-99" -> [1998], shorthand NOT
+expanded); parse failure -> null; raw always preserved.
+
+Attribution flags wired: WTQ_VIEWS (loader views) x WTQ_LOWERING (translator
+pack) -> 4-way audit RUNNING (baseline / translator-only / loader-only /
+both) with migration matrix + regression count + overlap. Execution order
+locked to the user's 12 steps: C-ceiling BEFORE any teacher pilot; pilot
+metrics = unique-new-verified-questions vs local + cost per new trace.

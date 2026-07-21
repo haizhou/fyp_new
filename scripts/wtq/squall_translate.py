@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Squall gold SQL -> compose algebra translator (Layer 1, first cut).
+"""Squall gold SQL -> compose algebra: SQL expression NORMALIZATION and
+LOWERING into the frozen v2 algebra (phase 1 — no algebra/schema/evaluator
+changes; every construct lowers to existing v2 nodes or is censused).
+Attribution flag WTQ_LOWERING: "v3" (default) enables the normalization pack
+(in-list, between, scalar comparisons, unified scalar-expression lowering);
+"v2" reproduces the pre-pack translator for the 4-way audit.
 
 Two numbers this produces:
   1. Expressibility census: % of Squall gold programs the algebra can express
@@ -33,6 +38,10 @@ from procurement_graph.compose.algebra import AlgebraError, validate_tree  # noq
 from wtq_eval import WTQEvaluator  # noqa: E402
 
 SQUALL = Path("/var/tmp/cicada/squall/squall-main/data/squall.json")
+
+
+import os as _os
+LOWERING_ON = _os.environ.get("WTQ_LOWERING", "v3") == "v3"
 
 
 class Skip(Exception):
@@ -152,13 +161,13 @@ def trans_conds(toks, colmap, df) -> list:
             else:
                 preds.append({"op": "not", "pred": pred})
             continue
-        if len(vals) >= 5 and vals[1] == "in" and vals[2] == "(":
+        if LOWERING_ON and len(vals) >= 5 and vals[1] == "in" and vals[2] == "(":
             field = resolve_col(vals[0], colmap)
             lits = [ground(literal(part[i][0], vals[i]), field, df)
                     for i in range(3, len(vals) - 1) if vals[i] != ","]
             preds.append({"field": field, "op": "in", "value": lits})
             continue
-        if len(vals) == 5 and vals[1] == "between" and vals[3] == "and":
+        if LOWERING_ON and len(vals) == 5 and vals[1] == "between" and vals[3] == "and":
             field = resolve_col(vals[0], colmap)
             preds.append({"field": field, "op": "gte", "value": ground(literal(part[2][0], vals[2]), field, df)})
             preds.append({"field": field, "op": "lte", "value": ground(literal(part[4][0], vals[4]), field, df)})
@@ -307,8 +316,10 @@ def translate(sql_tokens, colmap, df) -> dict:
     # scalar arithmetic: select ( Q1 ) OP ( Q2 )
     if vals[:2] == ["select", "("]:
         body = toks[1:]
-        for op_tok, op in (("-", "diff"), ("+", "add"), ("/", "ratio"),
-                           (">", "gt"), (">=", "ge"), ("<", "lt"), ("<=", "le"), ("=", "eq")):
+        _ops = [("-", "diff"), ("+", "add"), ("/", "ratio")]
+        if LOWERING_ON:
+            _ops += [(">", "gt"), (">=", "ge"), ("<", "lt"), ("<=", "le"), ("=", "eq")]
+        for op_tok, op in _ops:
             parts = split_top(body, {op_tok})
             if len(parts) == 2:
                 sides = []
