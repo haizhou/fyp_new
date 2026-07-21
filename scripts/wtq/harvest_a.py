@@ -36,6 +36,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base-url", default="http://127.0.0.1:8000/v1")
     ap.add_argument("--dev-fold", action="store_true")
+    ap.add_argument("--outtag", default=None, help="output file tag (protects old pools from overwrite)")
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--limit", type=int, default=500)
     ap.add_argument("--n", type=int, default=8)
@@ -102,7 +103,7 @@ def main() -> None:
     with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
         results = list(pool.map(one, rows))
 
-    tag = "dev" if args.dev_fold else "A"
+    tag = args.outtag or ("dev" if args.dev_fold else "A")
     out_path = ROOT / f"data/qa/wtq/harvest_{tag}_{args.start}_{args.start+args.limit}.jsonl"
     with out_path.open("w") as fh:
         for r in results:

@@ -108,7 +108,7 @@ Key commands: scripts/wtq/{loader_audit,differential_audit,audit_4way.sh,run_pri
 ## E13b. C-v3 ceiling check — STATUS: POST-PRISTINE DIAGNOSTIC (clean-300)
 Config: phase-1 grammar (translator+loader closure), train-fold-only pool
 4,810 (clean-300 stays table-disjoint), 1000 steps, linker hints.
-Numbers: 51.00 (153/300) vs C-v2 47.67; behavior answered 280 / eval_failed
+Numbers: 51.00 (153/300) vs C-v2 47.67 (+22/-12, p=0.121, direction positive, underpowered at n=300); behavior answered 280 / eval_failed
 16 / invalid 4 / truncated 0. Sits ~5pt under the widened ceiling
 (60.06% dev coverage x ~93% executor). Chain: C-v1 40.0 -> C-v2 47.67 ->
 C-v3 51.00 as coverage 52.7 -> 60.1: capability tracks the grammar boundary
