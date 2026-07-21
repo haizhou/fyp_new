@@ -1594,3 +1594,17 @@ the plateau band. (3) base-init and v3init curves OVERLAP (deltas within
 speed; combined with zero-shot p=0.557, the strongest evidence yet that THE
 RECIPE, NOT THE CHECKPOINT, IS THE PORTABLE OBJECT. Frozen step choice for
 final runs: 1000 (base-init peak; 500 within noise).
+
+## 2026-07-21 (cont.): A-arm lands — supervision ladder complete; B-arm triggered
+
+(First A launch was voided by a shell-precedence bug — '&' backgrounded the
+whole train chain and eval ran against a dead server; sequential script with
+set -e + adapter assertion is the fix and the pattern going forward.)
+
+A-arm (denotation-only bootstrap, 3,739 examples, ~460 steps, same recipe as
+C): **31.67%** on clean-300. Ladder: floors 15.3/15.7 -> +linker 19.0 ->
+A 31.67 -> C 40.0 -> translation ceiling 32.7 -> executor|A 94.1. A nearly
+REACHES the gold-translation ceiling with zero program supervision — the
+answer-only bootstrap claim holds; C exceeds A by 8.3pt (> 3pt pre-declared
+threshold) -> B-arm (structure-filtered bootstrap) triggered per rule.
+Format channel closed in both SFT arms (invalid 7/4, truncated 1/0).
