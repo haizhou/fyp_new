@@ -1708,3 +1708,23 @@ pack) -> 4-way audit RUNNING (baseline / translator-only / loader-only /
 both) with migration matrix + regression count + overlap. Execution order
 locked to the user's 12 steps: C-ceiling BEFORE any teacher pilot; pilot
 metrics = unique-new-verified-questions vs local + cost per new trace.
+
+## 2026-07-21 (cont. 7): Phase-1 normalization+lowering COMPLETE — 4-way attribution clean
+
+Three audit-caught bugs en route (colmap pollution; NaN display-map crash on
+549 tables; v1 early suffix gate blocking the view map) — each invisible to a
+merged coverage number; the regression gate + per-arm attribution caught all
+three. FINAL (train/dev): baseline 54.66/52.72 -> translator-only
+59.68/58.01 (+5.0) -> loader-only 55.89/54.63 (+1.2) -> BOTH 61.03/60.06
+(+6.4/+7.3). Fidelity held 92.4-92.7; REGRESSIONS 0/6080; overlap 0
+(modules perfectly complementary; interaction both-only 14).
+
+MIGRATION MATRIX (originally inexpressible 5,196): translator 562, loader
+154, both-only 14, STILL 4,466. User thesis quantified: ~14% of the original
+coverage gap was compiler/representation closure, recovered with the algebra
+frozen; the remaining 86% is the true language gap = the v3 agenda
+(Predicate<Expr,Expr> for scalar-subquery/field-vs-field; OrderedRelation
+for source-order navigation; _first/_second/_list stay rejected pending
+typed parsers). Next per 12-step order: remaining-bucket recount -> C-v3
+ceiling (train-fold-only, so clean-300 stays valid) -> local re-harvest ->
+$1 grok pilot gate.

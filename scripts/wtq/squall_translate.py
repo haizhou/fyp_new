@@ -60,7 +60,7 @@ def resolve_col(tok: str, colmap: dict) -> str:
     if not m:
         raise Skip(f"unknown_column_token")
     idx, suffix = int(m.group(1)), m.group(2)
-    if suffix not in (None, "number"):
+    if suffix not in (None, "number", "year", "minimum_year", "maximum_year"):
         raise Skip(f"column_transform:{suffix}")
     entry = colmap.get(idx)
     if entry is None:
