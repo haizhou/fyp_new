@@ -399,7 +399,7 @@ def main() -> None:
         if csv_rel not in universes:
             try:
                 shim, catalog = load_universe(csv_rel)
-                orig = [c for c in catalog if not c[0].endswith("__num")]
+                orig = [c for c in catalog if "__" not in c[0]]
                 cm = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
                 cm[0] = {c[0] for c in catalog if "__" in c[0]}
                 universes[csv_rel] = (shim, cm)

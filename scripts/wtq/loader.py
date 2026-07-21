@@ -125,7 +125,7 @@ def load_universe(csv_rel: str):
             aux = f"{col}__num"
             records_df[aux] = series.map(_cell_num)
             raw_df[aux] = records_df[aux].map(
-                lambda v: "" if v is None else (f"{int(v)}" if float(v).is_integer() else f"{v:g}"))
+                lambda v: "" if pd.isna(v) else (f"{int(v)}" if float(v).is_integer() else f"{v:g}"))
             catalog.append((aux, "number",
                             [v for v in nums.dropna().head(3)]))
 
@@ -150,12 +150,12 @@ def load_universe(csv_rel: str):
         if years.map(bool).mean() >= 0.5:
             aux = f"{col}__min_year"
             records_df[aux] = series.map(lambda s: float(_year_re.findall(s)[0]) if _year_re.findall(s) else None)
-            raw_df[aux] = records_df[aux].map(lambda v: "" if v is None else str(int(v)))
+            raw_df[aux] = records_df[aux].map(lambda v: "" if pd.isna(v) else str(int(v)))
             catalog.append((aux, "number", [y[0] for y in years if y][:3]))
             if years.map(lambda y: len(y) >= 2).mean() >= 0.2:
                 aux2 = f"{col}__max_year"
                 records_df[aux2] = series.map(lambda s: float(_year_re.findall(s)[-1]) if _year_re.findall(s) else None)
-                raw_df[aux2] = records_df[aux2].map(lambda v: "" if v is None else str(int(v)))
+                raw_df[aux2] = records_df[aux2].map(lambda v: "" if pd.isna(v) else str(int(v)))
                 catalog.append((aux2, "number", [y[-1] for y in years if y][:3]))
         # typed positional numbers: "5-14 (29)" -> number_1=5, number_2=14
         # parse failure -> null, never guessed; raw always preserved
@@ -168,7 +168,7 @@ def load_universe(csv_rel: str):
                     lambda s, i=idx: (lambda ns: ns[i] if len(ns) > i else None)(
                         [float(m.replace(",", "")) for m in re.findall(r"-?\d[\d,]*(?:\.\d+)?", s)]))
                 raw_df[aux] = records_df[aux].map(
-                    lambda v: "" if v is None else (f"{int(v)}" if float(v).is_integer() else f"{v:g}"))
+                    lambda v: "" if pd.isna(v) else (f"{int(v)}" if float(v).is_integer() else f"{v:g}"))
                 catalog.append((aux, "number", [n[idx] for n in allnums if len(n) > idx][:3]))
 
     # synthetic row id: internal to the evaluator (dedup key); NOT in catalog.

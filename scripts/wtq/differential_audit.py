@@ -125,7 +125,7 @@ def main() -> None:
             out_rows.append(row)
             continue
         shim, catalog = universes[csv_rel]
-        orig = [c for c in catalog if not c[0].endswith("__num")]
+        orig = [c for c in catalog if "__" not in c[0]]
         colmap = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
         colmap[0] = {c[0] for c in catalog if "__" in c[0]}
 
