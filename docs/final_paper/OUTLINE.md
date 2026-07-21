@@ -1,7 +1,10 @@
 # ELEC0054 paper. Outline before prose.
 
-Deliverable per module lead. A paper of roughly five pages of content. Claim
-plus evidence plus communication. This file fixes the claim, maps every
+Deliverable confirmed. TMLR format, 8 pages main text + 4 pages appendix,
+single column. TMLR's acceptance criteria are exactly two questions. Are the
+claims supported by clear and convincing evidence. Would some of TMLR's
+audience be interested. No novelty bar. Claim-evidence alignment is the
+whole game, which is the ledger discipline by another name. This file fixes the claim, maps every
 claim to its evidence, pre-runs the referee, and locks the style contract.
 Prose starts only after this file is agreed.
 
@@ -29,9 +32,9 @@ official sealed test, while the checkpoint alone moves the floor 4.8 points.
 Scope statement for the paper. Claims are about this recipe on these two
 benchmarks. No state-of-the-art claim anywhere.
 
-## 2. Section plan (≈5 content pages)
+## 2. Section plan (8 main pages, TMLR single column)
 
-### §1 Introduction (0.9 p)
+### §1 Introduction (1.2 p)
 Problem. Public spending questions need answers a reader can audit, and a
 refusal when the data cannot support one. Gap, three sentences. Retrieval
 cannot aggregate exhaustively (our RAG controls 31.5/28.8 vs 61.5 zero-shot
@@ -44,7 +47,7 @@ C2 typed compositional algebra with dual evaluators, evidence §4, §5.2.
 C3 sealed necessity-audited benchmark PACS, evidence §5.2.
 C4 cross-domain transfer with migration accounting, evidence §5.3.
 
-### §2 Related work (0.6 p)
+### §2 Related work (1.0 p)
 Three clusters, each with how it works, why relevant, why not enough
 (lecture rule, one sentence each).
 Cluster A filtered self-training (STaR, RFT, ReST, ExeSQL, SCD). Not enough
@@ -60,7 +63,7 @@ object. Positions our WTQ numbers honestly (44.4 matches the classical
 weakly-supervised band, 51.8 above TAPAS-large, below modern specialised
 systems).
 
-### §3 System (0.8 p) + Figure 1
+### §3 System (1.5 p) + Figure 1
 Three layers in one diagram. Typed algebra (17+1 node types, closed grammar,
 open composition). Deterministic chain. Guided decoding as format authority.
 Abstention with provenance-gated empty results. Verified-bootstrap loop
@@ -68,13 +71,13 @@ Abstention with provenance-gated empty results. Verified-bootstrap loop
 Notation kept to one paragraph (lecture: terminology section is for symbols
 used later, nothing else).
 
-### §4 Benchmarks and evaluation protocol (0.5 p)
+### §4 Benchmarks and evaluation protocol (0.8 p)
 Procurement benchmark (12,828 questions, dual-oracle agreement 99.88, plan
 level split isolation). PACS (sealed 922, abstention axis, one confirmatory
 run). WTQ official test consumed once under a recorded manifest. Metrics,
 repair budget, significance tests all named here once.
 
-### §5 Experiments (1.6 p)
+### §5 Experiments (2.5 p)
 5.1 Main result. Five-system scoreboard table. Controls: RAG baseline,
 zero-shot scaffolding floor. Rival: cloud teacher, plus noise floor 72.6±1.1
 discipline. Ledger E-main.
@@ -86,14 +89,14 @@ test 22.51/27.33/44.43/51.80 with per-rung McNemar. Migration cost table.
 Four-way attribution audit as the closing decomposition (14 percent of the
 gap was compiler debt). Ledger E6-E13.
 
-### §6 Discussion and limitations (0.5 p)
+### §6 Discussion and limitations (0.7 p)
 What the evidence does and does not support. Abstention does not transfer
 free (legacy comparison, no-retirement verdict). Preference optimisation
 hazard in near-miss regimes, two sentences. Coverage-limited verdict and
 the two designed-not-built extensions. Benchmark surfaces are LLM-generated.
 WTQ test consumed. Single KG for the main claim.
 
-### §7 Conclusion (0.2 p)
+### §7 Conclusion (0.3 p)
 Restate claim, one paragraph, no new material.
 
 ## 3. Referee pre-attack (write answers into the draft before submission)
@@ -120,10 +123,17 @@ artifact appendix table.
 R10 "Novelty of the loop." The loop is standard and we say so. The filter
 strength and blind-region accounting are the contribution (ch.2 divide).
 
+## 2b. Appendix plan (4 pages)
+A. Reproducibility. Commit+sha manifests, frozen configs, seeds, serving
+   command, cost table.
+B. Benchmark integrity detail. Dual-oracle residual characterisation, PACS
+   seal and audit record, necessity-audit tables (dev+test).
+C. Full result tables. PACS family breakdown, WTQ supervision ladder with
+   discordant pairs, learning curves both inits, four-way attribution and
+   migration matrix.
+D. Algebra reference. Node inventory, typed grammar, one worked tree.
+
 ## 4. Open items for the user
-- Template and page limit confirmation (transcript says 5 pages content,
-  also mentions 12. Which template does ELEC0054 mandate, IEEE or NeurIPS
-  style?).
 - Whether the paper's headline is the main-line scoreboard (recommended,
   rubric wants focused) with PACS+WTQ as generality evidence, or the
   compose/PACS line as headline.
