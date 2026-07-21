@@ -1622,3 +1622,20 @@ already solves; gold programs reach beyond). Every rung McNemar-verified
 (A vs floor p=1.9e-11; C vs A p=0.0013). B quota crash at final save was
 survived via checkpoint-152 (adapter intact); optimizer states of frozen
 trainings pruned per precedent (8.5G freed).
+
+## 2026-07-21 (cont. 3): C-v2 47.67% — the v2 wave delivers; algebra-v2 tagged
+
+C-v2 (v2 translator pool 4,378 ex, linker hints in train+inference prompts,
+1000 steps): **47.67%** on clean-300 vs C-v1 40.0% (+7.67pt). Outcomes:
+answered 278, eval_failed 22, invalid_tree 0, truncated 0 — the format
+channel is fully closed and grounding failures halved. The system again
+converges onto its (widened) coverage boundary: dev coverage 52.72% x
+executor 94.1% ~= 49.6% ceiling, C-v2 sits 2pt under it. Pattern held three
+times now (v1 probe -> PACS -> WTQ): capability tracks the grammar boundary,
+the recipe converts coverage into accuracy.
+
+Migration-cost table (final): loader v2 ~150 LOC (tsv, dual view, numeric
+view); adapter/eval subclass ~90 LOC; linker ~60 LOC; drivers/tooling ~700
+LOC (translator, audits, harvest); core algebra: +1 generic operator
+(extreme_rows), 17/17 originals unchanged; core evaluator: extreme_rows
+comparator block only; light SFT 1000 steps on one A100.

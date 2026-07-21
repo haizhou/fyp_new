@@ -59,7 +59,9 @@ def build_c():
         if universes[csv_rel] is None:
             continue
         shim, catalog = universes[csv_rel]
-        colmap = {i + 1: (c[0], c[1]) for i, c in enumerate(catalog)}
+        orig = [c for c in catalog if not c[0].endswith("__num")]
+        colmap = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
+        colmap[0] = {c[0] for c in catalog if c[0].endswith("__num")}
         try:
             tree = translate(e["sql"], colmap, shim.records_df)
             if validate_tree(tree) == "RECORDS":
@@ -73,8 +75,11 @@ def build_c():
         if not tolerant:
             continue
         q = " ".join(e["nl"]) if isinstance(e["nl"], list) else e["nl"]
+        from linker import link, render
+        hint = render(link(q, shim.raw_df, catalog))
+        cat_txt = catalog_text(catalog) + (("\n\n" + hint) if hint else "")
         out.append({"context": csv_rel, "question": q, "tree": tree,
-                    "catalog": catalog_text(catalog)})
+                    "catalog": cat_txt})
     return out
 
 
