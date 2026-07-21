@@ -129,6 +129,42 @@ def load_universe(csv_rel: str):
             catalog.append((aux, "number",
                             [v for v in nums.dropna().head(3)]))
 
+    # v3 views: __year / __maxyear (4-digit years in cell) and __first /
+    # __second (composite-cell split on newline/dash/comma). Same fixed-rule
+    # discipline as __num: added only when >=50% of non-empty cells qualify.
+    _year_re = re.compile(r"\b(1[0-9]{3}|20[0-9]{2})\b")
+    for col, dtype, _ in list(catalog):
+        if dtype == "number" or col.endswith("__num"):
+            continue
+        series = raw_df[col].astype(str).str.strip()
+        non_empty = series[series != ""]
+        if len(non_empty) == 0:
+            continue
+        years = non_empty.map(lambda s: [int(y) for y in _year_re.findall(s)])
+        if years.map(bool).mean() >= 0.5:
+            aux = f"{col}__min_year"
+            records_df[aux] = series.map(lambda s: float(_year_re.findall(s)[0]) if _year_re.findall(s) else None)
+            raw_df[aux] = records_df[aux].map(lambda v: "" if v is None else str(int(v)))
+            catalog.append((aux, "number", [y[0] for y in years if y][:3]))
+            if years.map(lambda y: len(y) >= 2).mean() >= 0.2:
+                aux2 = f"{col}__max_year"
+                records_df[aux2] = series.map(lambda s: float(_year_re.findall(s)[-1]) if _year_re.findall(s) else None)
+                raw_df[aux2] = records_df[aux2].map(lambda v: "" if v is None else str(int(v)))
+                catalog.append((aux2, "number", [y[-1] for y in years if y][:3]))
+        # typed positional numbers: "5-14 (29)" -> number_1=5, number_2=14
+        # parse failure -> null, never guessed; raw always preserved
+        allnums = non_empty.map(lambda s: [float(m.replace(",", "")) for m in
+                                           re.findall(r"-?\d[\d,]*(?:\.\d+)?", s)])
+        if allnums.map(lambda x: len(x) >= 2).mean() >= 0.5:
+            for idx in (0, 1):
+                aux = f"{col}__number_{idx+1}"
+                records_df[aux] = series.map(
+                    lambda s, i=idx: (lambda ns: ns[i] if len(ns) > i else None)(
+                        [float(m.replace(",", "")) for m in re.findall(r"-?\d[\d,]*(?:\.\d+)?", s)]))
+                raw_df[aux] = records_df[aux].map(
+                    lambda v: "" if v is None else (f"{int(v)}" if float(v).is_integer() else f"{v:g}"))
+                catalog.append((aux, "number", [n[idx] for n in allnums if len(n) > idx][:3]))
+
     # synthetic row id: internal to the evaluator (dedup key); NOT in catalog.
     records_df["contract_node_id"] = [f"row{i}" for i in range(len(records_df))]
     shim = SimpleNamespace(records_df=records_df, raw_df=raw_df, integrity=integrity)

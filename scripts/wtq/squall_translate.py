@@ -57,11 +57,15 @@ def resolve_col(tok: str, colmap: dict) -> str:
     if entry is None:
         raise Skip("column_index_out_of_range")
     name, dtype = entry
-    if suffix == "number" and dtype != "number":
-        aux = f"{name}__num"
+    _SUFFIX_VIEWS = {"number": "__num", "year": "__min_year", "minimum_year": "__min_year",
+                     "maximum_year": "__max_year"}  # first/second stay censused: ambiguous parse rejected
+    if suffix in _SUFFIX_VIEWS and not (suffix == "number" and dtype == "number"):
+        aux = f"{name}{_SUFFIX_VIEWS[suffix]}"
         if aux in colmap.get(0, set()):
-            return aux  # v2: loader materializes the per-cell numeric view
-        raise Skip("number_view_on_text_column")
+            return aux  # loader-materialized derived view
+        if suffix == "number" and dtype == "number":
+            return name
+        raise Skip(f"column_transform:{suffix}")
     return name
 
 
@@ -128,8 +132,16 @@ def trans_conds(toks, colmap, df) -> list:
         raise Skip("or_condition")
     if any(t[1] == "select" for t in toks):
         raise Skip("where_subquery")
+    parts_raw = split_top(toks, {"and"})
+    merged = []
+    for part in parts_raw:
+        if merged and "between" in [t[1] for t in merged[-1]] and \
+                len([t for t in merged[-1] if t[1] == "between"]) > len([t for t in merged[-1] if t[1] == "and"]):
+            merged[-1] = merged[-1] + [("Keyword", "and")] + part
+        else:
+            merged.append(part)
     preds = []
-    for part in split_top(toks, {"and"}):
+    for part in merged:
         vals = [t[1] for t in part]
         # col is [not] null
         if len(vals) >= 3 and vals[1] == "is":
@@ -139,6 +151,17 @@ def trans_conds(toks, colmap, df) -> list:
                 preds.append(pred)
             else:
                 preds.append({"op": "not", "pred": pred})
+            continue
+        if len(vals) >= 5 and vals[1] == "in" and vals[2] == "(":
+            field = resolve_col(vals[0], colmap)
+            lits = [ground(literal(part[i][0], vals[i]), field, df)
+                    for i in range(3, len(vals) - 1) if vals[i] != ","]
+            preds.append({"field": field, "op": "in", "value": lits})
+            continue
+        if len(vals) == 5 and vals[1] == "between" and vals[3] == "and":
+            field = resolve_col(vals[0], colmap)
+            preds.append({"field": field, "op": "gte", "value": ground(literal(part[2][0], vals[2]), field, df)})
+            preds.append({"field": field, "op": "lte", "value": ground(literal(part[4][0], vals[4]), field, df)})
             continue
         if len(vals) != 3:
             raise Skip("cond_shape")
@@ -284,7 +307,8 @@ def translate(sql_tokens, colmap, df) -> dict:
     # scalar arithmetic: select ( Q1 ) OP ( Q2 )
     if vals[:2] == ["select", "("]:
         body = toks[1:]
-        for op_tok, op in (("-", "diff"), ("+", "add"), ("/", "ratio")):
+        for op_tok, op in (("-", "diff"), ("+", "add"), ("/", "ratio"),
+                           (">", "gt"), (">=", "ge"), ("<", "lt"), ("<=", "le"), ("=", "eq")):
             parts = split_top(body, {op_tok})
             if len(parts) == 2:
                 sides = []
@@ -294,7 +318,10 @@ def translate(sql_tokens, colmap, df) -> dict:
                         inner = inner[1:]
                     while inner and inner[-1][1] == ")":
                         inner = inner[:-1]
-                    sides.append(trans_select(inner, colmap, df, want_number=True))
+                    if len(inner) == 1 and inner[0][1].replace(".", "").replace("-", "").isdigit():
+                        sides.append({"node": "num", "value": float(inner[0][1])})
+                    else:
+                        sides.append(trans_select(inner, colmap, df, want_number=True))
                 return {"node": "combine", "op": op, "left": sides[0], "right": sides[1]}
         raise Skip("scalar_arith_shape")
     if vals.count("select") > 1:
@@ -363,7 +390,7 @@ def main() -> None:
                 shim, catalog = load_universe(csv_rel)
                 orig = [c for c in catalog if not c[0].endswith("__num")]
                 cm = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
-                cm[0] = {c[0] for c in catalog if c[0].endswith("__num")}
+                cm[0] = {c[0] for c in catalog if "__" in c[0]}
                 universes[csv_rel] = (shim, cm)
             except Exception as exc:
                 universes[csv_rel] = None
