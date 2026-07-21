@@ -1671,3 +1671,17 @@ n=300) stands as recorded, now superseded by the higher-power test estimate.
 WTQ track CLOSED. Remaining tails: necessity-audit join bug + test-side
 audit; paper portability-section backfill; PACS-test reflect config decision
 (user's call).
+
+## 2026-07-21 (cont. 5): necessity audit complete (partial sample) — headline NOT shortcut-inflated
+
+Batched audit (fresh process per 100 rows after sandbox OOM; n=441 of ~903
+answerable, one batch failed, disclosed). dev: necessity 63.4% (matches
+earlier full-dev 62.1%), irreducible 50.5%; test: necessity 58.5%,
+irreducible 42.7%. SHORTCUT-INFLATION CHECK: v3 accuracy on IRREDUCIBLE vs
+reducible rows — dev 73.2 vs 87.3, TEST 78.7 vs 81.5. On the
+shortcut-resistant subset the test headline drops only ~1-3pt (78.7 vs 80.0
+answerable overall): the PACS headline is NOT shortcut-inflated. Artifact:
+data/qa/pacs_v1/necessity_rows.jsonl. NEXT (user direction, coverage attack):
+translator engineering pack (in-list/between/subquery-compare->combine) +
+loader derived views (__year/__first/__second); teacher-harvest arm awaits
+user's spend approval (~$20 Azure).
