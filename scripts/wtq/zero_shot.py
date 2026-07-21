@@ -166,8 +166,18 @@ def main() -> None:
                         # success — including legitimately empty answers: final
                         targets = rec["targetValue"].split("|")
                         ok = denotation_match(res["answer"], targets)
+                        ans = res["answer"]
+                        if isinstance(ans, bool):
+                            items = ["yes" if ans else "no"]
+                        elif isinstance(ans, list) and ans and isinstance(ans[0], list):
+                            items = [str(p[0]) for p in ans]
+                        elif isinstance(ans, list):
+                            items = [str(x) for x in ans]
+                        else:
+                            items = [str(ans)]
                         out.update(outcome="answered", correct=bool(ok), tree=tree,
-                                   answer=str(res["answer"])[:200], rounds=rounds)
+                                   answer=str(res["answer"])[:200],
+                                   answer_items=items, rounds=rounds)
                         return out
             if rounds >= args.reflect:
                 out["rounds"] = rounds
