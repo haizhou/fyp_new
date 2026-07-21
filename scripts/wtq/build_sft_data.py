@@ -47,8 +47,9 @@ def build_c():
     squall = json.load(open("/var/tmp/cicada/squall/squall-main/data/squall.json"))
     out, universes = [], {}
     for e in squall:
-        if e["tbl"] in DEV_TBLS:
-            continue  # train fold only
+        import os as _os
+        if _os.environ.get("WTQ_FINAL") != "1" and e["tbl"] in DEV_TBLS:
+            continue  # train fold only (final pools include dev per amendment)
         num, grp = e["tbl"].split("_", 1)
         csv_rel = f"csv/{num}-csv/{grp}.csv"
         if csv_rel not in universes:
@@ -85,7 +86,14 @@ def build_c():
 
 def build_a():
     out, universes = [], {}
-    for f in sorted(ROOT.glob("data/qa/wtq/harvest_A_*.jsonl")):
+    import os as _os
+    pats = ["data/qa/wtq/harvest_A_*.jsonl"]
+    if _os.environ.get("WTQ_FINAL") == "1":
+        pats.append("data/qa/wtq/harvest_dev_*.jsonl")
+    files = []
+    for pat in pats:
+        files += list(ROOT.glob(pat))
+    for f in sorted(files):
         for line in f.open():
             r = json.loads(line)
             if r.get("status") != "ok" or not r.get("trees"):
@@ -97,11 +105,14 @@ def build_a():
                     universes[r["context"]] = None
             if universes[r["context"]] is None:
                 continue
-            _, catalog = universes[r["context"]]
+            shim, catalog = universes[r["context"]]
+            from linker import link, render
+            hint = render(link(r["question"], shim.raw_df, catalog))
+            cat_txt = catalog_text(catalog) + (("\n\n" + hint) if hint else "")
             trees = sorted(r["trees"], key=nodes)[:2]  # shortest first, cap 2
             for t in trees:
                 out.append({"context": r["context"], "question": r["question"],
-                            "tree": t, "catalog": catalog_text(catalog)})
+                            "tree": t, "catalog": cat_txt})
     return out
 
 

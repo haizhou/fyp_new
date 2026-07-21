@@ -34,6 +34,8 @@ DEV_TBLS = set(json.load(open("/var/tmp/cicada/squall/squall-main/data/dev-0.ids
 
 def main() -> None:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--base-url", default="http://127.0.0.1:8000/v1")
+    ap.add_argument("--dev-fold", action="store_true")
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--limit", type=int, default=500)
     ap.add_argument("--n", type=int, default=8)
@@ -44,13 +46,13 @@ def main() -> None:
     with open(WTQ_ROOT / "data/training.tsv") as fh:
         for rec in csv.DictReader(fh, delimiter="\t"):
             tbl = rec["context"].removeprefix("csv/").replace("-csv/", "_").removesuffix(".csv")
-            if tbl not in DEV_TBLS:
+            if (tbl in DEV_TBLS) == args.dev_fold:
                 rows.append(rec)
     total_pool = len(rows)
     rows = rows[args.start: args.start + args.limit]
 
     from openai import OpenAI
-    client = OpenAI(base_url="http://127.0.0.1:8000/v1", api_key="local", timeout=300)
+    client = OpenAI(base_url=args.base_url, api_key="local", timeout=300)
 
     def one(rec):
         out = {"id": rec["id"], "context": rec["context"], "target": rec["targetValue"]}
@@ -100,7 +102,8 @@ def main() -> None:
     with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
         results = list(pool.map(one, rows))
 
-    out_path = ROOT / f"data/qa/wtq/harvest_A_{args.start}_{args.start+args.limit}.jsonl"
+    tag = "dev" if args.dev_fold else "A"
+    out_path = ROOT / f"data/qa/wtq/harvest_{tag}_{args.start}_{args.start+args.limit}.jsonl"
     with out_path.open("w") as fh:
         for r in results:
             fh.write(json.dumps(r, default=str) + "\n")
