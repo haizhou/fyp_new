@@ -41,7 +41,13 @@ Below are drop-in additions with exact anchors; approve, edit, or reject.
 > value linking, verified bootstrap — delivers +17 to +24.5 points over that
 > prior on the official sealed test, at a migration cost of ~300 runtime
 > lines and one generic operator.) The dissertation's sentence holds in each
-> new setting, and its sharpest post-freeze refinement is the attribution
+> new setting. Three statements of this chapter are explicitly superseded:
+> the "compositional generalisation is unproven" verdict of §8.2 is answered
+> by Chapter 9's held-out composition results and PACS's unseen-exposure
+> axis; the single-domain limitation of §8.2 is answered by Chapter 11; and
+> the cross-schema probe proposed in §8.3 is delivered, on
+> WikiTableQuestions rather than BIRD, in Chapter 11. Its sharpest
+> post-freeze refinement is the attribution
 > result of §11.4: much of what presents as missing reasoning capability in
 > executable-QA systems is representation and compilation debt, separable
 > from true language gaps only by audits designed to tell them apart.
@@ -55,6 +61,17 @@ Below are drop-in additions with exact anchors; approve, edit, or reject.
 > and language components — with a four-way attribution audit whose
 > zero-regression gate caught three implementation bugs invisible to any
 > merged accuracy number.
+
+## 4. Chapter 1, §1.7 dissertation structure — append after the final sentence
+
+> Three chapters extend the dissertation beyond the frozen main line.
+> Chapter 9 opens the closed plan language into a typed compositional
+> algebra and teaches the local planner to use it. Chapter 10 evaluates the
+> frozen compositional planner on PACS, a sealed and necessity-audited
+> procurement analytics challenge set. Chapter 11 transplants the full
+> recipe to WikiTableQuestions, measures what ports and at what cost, and
+> closes with an attribution audit separating representation, compilation,
+> and language gaps.
 
 ## Notes
 - All numbers above are frozen-worklog numbers (PACS 78.31/80.0/78.7;
