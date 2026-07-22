@@ -62,14 +62,26 @@ def resolve_col(tok: str, colmap: dict) -> str:
     if not m:
         raise Skip(f"unknown_column_token")
     idx, suffix = int(m.group(1)), m.group(2)
-    if suffix not in (None, "number", "year", "minimum_year", "maximum_year", "first", "second"):
+    if suffix not in (None, "number", "year", "minimum_year", "maximum_year",
+                      "first", "second", "number1", "number2", "month", "parsed", "list"):
         raise Skip(f"column_transform:{suffix}")
     entry = colmap.get(idx)
     if entry is None:
         raise Skip("column_index_out_of_range")
     name, dtype = entry
     _SUFFIX_VIEWS = {"number": "__num", "year": "__min_year", "minimum_year": "__min_year",
-                     "maximum_year": "__max_year", "first": "__part_1", "second": "__part_2"}  # first/second stay censused: ambiguous parse rejected
+                     "maximum_year": "__max_year", "number1": "__number_1",
+                     "number2": "__number_2", "month": "__month", "parsed": "__date"}
+    _PAIR_FALLBACK = {"first": ("__part_1", "__number_1"), "second": ("__part_2", "__number_2")}
+    if suffix in _PAIR_FALLBACK:
+        entry0 = colmap.get(idx)
+        if entry0 is None:
+            raise Skip("column_index_out_of_range")
+        base = entry0[0]
+        for cand in _PAIR_FALLBACK[suffix]:
+            if f"{base}{cand}" in colmap.get(0, set()):
+                return f"{base}{cand}"
+        raise Skip(f"column_transform:{suffix}")  # first/second stay censused: ambiguous parse rejected
     if suffix in _SUFFIX_VIEWS and not (suffix == "number" and dtype == "number"):
         aux = f"{name}{_SUFFIX_VIEWS[suffix]}"
         if aux in colmap.get(0, set()):
@@ -155,6 +167,18 @@ def trans_conds(toks, colmap, df) -> list:
     for part in merged:
         vals = [t[1] for t in part]
         # col is [not] null
+        if LOWERING_ON and len(vals) == 3 and vals[1] == "not" and vals[2] == "null":
+            preds.append({"field": resolve_col(vals[0], colmap), "op": "exists"})
+            continue
+        if LOWERING_ON and len(vals) == 2 and vals[1] == "null":
+            preds.append({"op": "not", "pred": {"field": resolve_col(vals[0], colmap), "op": "exists"}})
+            continue
+        if LOWERING_ON and len(vals) == 3 and vals[0].endswith("_list") and vals[1] == "=":
+            base_tok = vals[0][:-5]
+            field = resolve_col(base_tok, colmap)
+            preds.append({"field": field, "op": "contains",
+                          "value": ground(literal(part[2][0], vals[2]), field, df)})
+            continue
         if len(vals) >= 3 and vals[1] == "is":
             field = resolve_col(vals[0], colmap)
             pred = {"field": field, "op": "exists"}
@@ -292,6 +316,12 @@ def trans_select(toks, colmap, df, want_number=False) -> dict:
         rows = {"node": "extreme_rows", "of": base, "field": field,
                 "op": "argmax" if agg[0] == "max" else "argmin"}
         return {"node": "select", "of": rows, "field": field}
+    if LOWERING_ON and len(agg) == 3 and agg[1] in ("-", "+") and not want_number:
+        fa, fb = resolve_col(agg[0], colmap), resolve_col(agg[2], colmap)
+        op = "diff" if agg[1] == "-" else "add"
+        return {"node": "combine", "op": op,
+                "left": {"node": "sum", "of": base, "field": fa},
+                "right": {"node": "sum", "of": base, "field": fb}}
     if agg[:2] == ["avg", "("]:
         field = resolve_col(agg[2], colmap)
         return {"node": "combine", "op": "ratio",

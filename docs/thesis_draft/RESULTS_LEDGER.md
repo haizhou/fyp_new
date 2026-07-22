@@ -153,3 +153,17 @@ algebra frozen: 54.66 -> 61.03 -> 65.49. Next free steps: C-v4/A-v4
 retrain+eval; two-stage understanding pilot with LOCAL model. SPEND GATE:
 any nano/grok call requires prior user approval; grok full-run decision
 deferred until v4 re-harvest resizes the zero-hit pool.
+
+## E13f. Mechanical sweep (v4b) — STATUS: POST-PRISTINE DIAGNOSTIC
+One-wave lowering of the remaining mechanical residue: not-null -> exists
+preds; number1/number2 -> existing __number_k; first/second numeric-pair
+fallback; new __month/__date typed views; _list equality -> base-column
+contains; single-row field difference -> combine.diff(sum,sum); constant
+folding. Audit: coverage 65.49->70.23 train / 64.96->69.99 dev (+4.7/+5.0),
+newly expressible 521, REGRESSIONS 0, fidelity held 92.3.
+CUMULATIVE (algebra frozen throughout): 54.66 -> 70.23 train, 52.72 -> 69.99
+dev, four waves, zero regressions at every gate. Remaining census:
+nested_subquery 1,482 (structural, Predicate<Expr,Expr> or understanding
+arm), domain-specific transforms 1,238 (address/result/length: no fixed
+mechanical semantics), tails ~230. C-v4 (pre-sweep pool) mid-training kept
+as an attribution point; C-v5 on the post-sweep pool queued after it.

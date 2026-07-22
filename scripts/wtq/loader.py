@@ -201,6 +201,43 @@ def load_universe(csv_rel: str):
                     raw_df[aux] = vals
                     catalog.append((aux, "text", [p2[k] for p2 in parts if len(p2) > k][:3]))
 
+    # v4b typed views: __month (1-12 from month name or date pattern) and
+    # __date (ISO date string via fixed parse; null on failure).
+    if _os.environ.get("WTQ_VIEWS", "v4") == "v4":
+        _MONTHS = {m: i+1 for i, m in enumerate(
+            ["january","february","march","april","may","june","july",
+             "august","september","october","november","december"])}
+        for ab, full in [("jan","january"),("feb","february"),("mar","march"),
+                         ("apr","april"),("jun","june"),("jul","july"),
+                         ("aug","august"),("sep","september"),("oct","october"),
+                         ("nov","november"),("dec","december")]:
+            _MONTHS[ab] = _MONTHS[full]
+        def _cell_month(sv):
+            for w in re.findall(r"[a-z]+", str(sv).casefold()):
+                if w in _MONTHS:
+                    return float(_MONTHS[w])
+            return None
+        for col, dtype, _ in list(catalog):
+            if dtype == "number" or "__" in col or col == "row_index":
+                continue
+            series = raw_df[col].astype(str).str.strip()
+            non_empty = series[series != ""]
+            if len(non_empty) == 0:
+                continue
+            months = non_empty.map(_cell_month)
+            if months.notna().mean() >= 0.5:
+                aux = f"{col}__month"
+                records_df[aux] = series.map(_cell_month)
+                raw_df[aux] = records_df[aux].map(lambda v: "" if pd.isna(v) else str(int(v)))
+                catalog.append((aux, "number", [int(v) for v in months.dropna().head(3)]))
+            dts = pd.to_datetime(non_empty, errors="coerce", format="mixed")
+            if dts.notna().mean() >= 0.5:
+                aux = f"{col}__date"
+                full_dt = pd.to_datetime(series.where(series != ""), errors="coerce", format="mixed")
+                records_df[aux] = full_dt.dt.strftime("%Y-%m-%d")
+                raw_df[aux] = records_df[aux].fillna("")
+                catalog.append((aux, "text", list(records_df[aux].dropna().head(3))))
+
     # synthetic row id: internal to the evaluator (dedup key); NOT in catalog.
     records_df["contract_node_id"] = [f"row{i}" for i in range(len(records_df))]
     shim = SimpleNamespace(records_df=records_df, raw_df=raw_df, integrity=integrity)
