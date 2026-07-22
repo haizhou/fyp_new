@@ -116,3 +116,14 @@ C-v3 51.00 as coverage 52.7 -> 60.1: capability tracks the grammar boundary
 Incident: gated runner retrained needlessly after an eval-phase server
 failure (train+eval now split into separately retryable stages); attempt-10
 adapter preserved at outputs/wtq_C_v3_final.
+
+## E13c. A-v3 (answer-only, v3 grammar + hints + 1000 steps) — STATUS: POST-PRISTINE DIAGNOSTIC (clean-300)
+Pool: re-harvest under v3 grammar, yield 26.5%->28.7% train / 27.8% dev-fold;
+train-fold pool 4,215 ex (3,283 q). Numbers: **40.00** (120/300) vs A-v1
+31.67; answered 243 / eval_failed 47 / invalid 10. Chain A-v1 31.67 -> A-v3
+40.00 mirrors C-v1 40.0 -> C-v3 51.0 (both +8~11 from the same phase-1
+closure). A-v3 to C-v3 gap = 11.0pt > 3pt pre-declared threshold ->
+teacher-harvest $1 pilot WARRANTED per rule; AWAITING USER SPEND APPROVAL.
+Pilot design (frozen): 1,000 questions with zero local hits, grok k=2,
+metrics = unique-new-verified-questions vs local, cost per new trace,
+estimated $0.8-1.0.
