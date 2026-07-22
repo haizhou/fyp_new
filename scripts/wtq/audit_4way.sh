@@ -2,6 +2,7 @@
 set -e
 cd /home/uceeh01/fyp_new/fyp_new
 PY=.venv/bin/python
+export OPENBLAS_NUM_THREADS=4 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4
 run_arm () {
   export WTQ_LOWERING=$1 WTQ_VIEWS=$2
   echo "=== arm $3 (lowering=$1 views=$2) ==="

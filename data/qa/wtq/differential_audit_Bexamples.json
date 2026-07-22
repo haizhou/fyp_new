@@ -11,6 +11,17 @@
   "tree": "{\"node\": \"combine\", \"op\": \"diff\", \"left\": {\"node\": \"sum\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"constituency\", \"op\": \"eq\", \"value\": 1}]}, \"field\": \"last_elected\"}, \"right\": {\"node\": \"sum\", \"of"
  },
  {
+  "nt": "nt-5539",
+  "tbl": "203_16",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": true,
+  "answer": "James S. Davenport",
+  "ref": "['district created']",
+  "sql": "select c1 from w order by c2_parsed asc limit 1",
+  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"took_office__date\", \"op\": \"argmin\"}, \"field\": \"name\"}"
+ },
+ {
   "nt": "nt-4253",
   "tbl": "204_488",
   "fold": "dev",
@@ -20,6 +31,28 @@
   "ref": "['2 years, 115 days']",
   "sql": "select c3 from w order by c4_number asc limit 1",
   "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"rank_by_length_of_term_s\", \"op\": \"argmin\"}, \"field\": \"length_of_the_presidential_action\"}"
+ },
+ {
+  "nt": "nt-5573",
+  "tbl": "203_320",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": false,
+  "answer": "[]",
+  "ref": "['pkn orlen sa']",
+  "sql": "select c2 from w where c4_number > 75000000",
+  "tree": "{\"node\": \"values\", \"of\": {\"node\": \"filter\", \"where\": [{\"op\": \"not\", \"pred\": {\"field\": \"revenue_thou_pln__num\", \"op\": \"lte\", \"value\": 75000000}}]}, \"field\": \"name_of_concern\"}"
+ },
+ {
+  "nt": "nt-11949",
+  "tbl": "203_320",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": false,
+  "answer": "2",
+  "ref": "[6]",
+  "sql": "select count ( c2 ) from w where c5_number > 1000000",
+  "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"op\": \"not\", \"pred\": {\"field\": \"profit_thou_pln__num\", \"op\": \"lte\", \"value\": 1000000}}, {\"field\": \"name_of_concern\", \"op\": \"exists\"}]}}"
  },
  {
   "nt": "nt-6472",
@@ -42,6 +75,17 @@
   "ref": "[2012]",
   "sql": "select max ( c1_number ) from w where c2 = 'did not qualify'",
   "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"position\", \"op\": \"eq\", \"value\": \"Did not qualify\"}]}, \"field\": \"year\", \"op\": \"argmax\"}, \"field\": \"year\"}"
+ },
+ {
+  "nt": "nt-12119",
+  "tbl": "203_224",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": false,
+  "answer": "Only Men Aloud \u2013 Merry Christmas",
+  "ref": "['only men aloud - merry christmas']",
+  "sql": "select c1 from w where c2_number = 2010 order by id desc limit 1",
+  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"year\", \"op\": \"eq\", \"value\": 2010}]}, \"field\": \"row_index\", \"op\": \"argmax\"}, \"field\": \"title\"}"
  },
  {
   "nt": "nt-2406",
@@ -165,6 +209,17 @@
   "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"points\", \"op\": \"argmin\"}, \"field\": \"driver\"}"
  },
  {
+  "nt": "nt-4849",
+  "tbl": "203_76",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": false,
+  "answer": "20",
+  "ref": "[8]",
+  "sql": "select count ( c3 ) from w where c8 not null",
+  "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"points\", \"op\": \"exists\"}, {\"field\": \"driver\", \"op\": \"exists\"}]}}"
+ },
+ {
   "nt": "nt-214",
   "tbl": "202_231",
   "fold": "dev",
@@ -198,6 +253,17 @@
   "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"points\", \"op\": \"argmax\"}, \"field\": \"points\"}"
  },
  {
+  "nt": "nt-5964",
+  "tbl": "204_524",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": true,
+  "answer": "2006/07",
+  "ref": "['2005/06']",
+  "sql": "select c1 from w where c1 in ( '2005/06' , '2006/07' ) order by c4_number asc limit 1",
+  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"season\", \"op\": \"in\", \"value\": [\"2005/06\", \"2006/07\"]}]}, \"field\": \"place__num\", \"op\": \"argmin\"}, \"field\""
+ },
+ {
   "nt": "nt-12787",
   "tbl": "204_524",
   "fold": "dev",
@@ -207,6 +273,39 @@
   "ref": "[7]",
   "sql": "select count ( c1 ) from w where c3 = '1a aut. pref'",
   "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"division\", \"op\": \"eq\", \"value\": \"1a aut. pref\"}, {\"field\": \"season\", \"op\": \"exists\"}]}}"
+ },
+ {
+  "nt": "nt-6006",
+  "tbl": "204_240",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": true,
+  "answer": "Lindsay-Crossman Chapel",
+  "ref": "[\"historian's house\"]",
+  "sql": "select c1 from w order by c3_minimum_year asc limit 1",
+  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"completed__min_year\", \"op\": \"argmin\"}, \"field\": \"name\"}"
+ },
+ {
+  "nt": "nt-12961",
+  "tbl": "203_5",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": false,
+  "answer": "13",
+  "ref": "[1]",
+  "sql": "select count ( * ) > 0 from w where c4 not null",
+  "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"opponent\", \"op\": \"exists\"}]}}"
+ },
+ {
+  "nt": "nt-3916",
+  "tbl": "204_994",
+  "fold": "dev",
+  "class": "B",
+  "target_hit": false,
+  "answer": "['Missouri State*']",
+  "ref": "['missouri state']",
+  "sql": "select c3 from w where id = 1",
+  "tree": "{\"node\": \"values\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"row_index\", \"op\": \"eq\", \"value\": 1}]}, \"field\": \"opponent\"}"
  },
  {
   "nt": "nt-11918",
@@ -220,113 +319,14 @@
   "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"division\", \"op\": \"eq\", \"value\": \"division de honor\"}]}}"
  },
  {
-  "nt": "nt-899",
-  "tbl": "203_213",
+  "nt": "nt-13519",
+  "tbl": "204_636",
   "fold": "dev",
   "class": "B",
   "target_hit": false,
-  "answer": "3",
-  "ref": "[2]",
-  "sql": "select count ( c2 ) from w where c4_number > 1900",
-  "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"op\": \"not\", \"pred\": {\"field\": \"date\", \"op\": \"lte\", \"value\": 1900}}, {\"field\": \"builder\", \"op\": \"exists\"}]}}"
- },
- {
-  "nt": "nt-12025",
-  "tbl": "204_292",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": true,
-  "answer": "Tina McKenzie",
-  "ref": "['team']",
-  "sql": "select c2 from w order by c4_number asc limit 1",
-  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"games\", \"op\": \"argmin\"}, \"field\": \"name\"}"
- },
- {
-  "nt": "nt-9731",
-  "tbl": "204_846",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": false,
-  "answer": "[]",
-  "ref": "['8']",
-  "sql": "select c1 from w where c5 is null",
-  "tree": "{\"node\": \"values\", \"of\": {\"node\": \"filter\", \"where\": [{\"op\": \"not\", \"pred\": {\"field\": \"attendance\", \"op\": \"exists\"}}]}, \"field\": \"tie_no\"}"
- },
- {
-  "nt": "nt-10289",
-  "tbl": "204_846",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": true,
-  "answer": "6",
-  "ref": "['8']",
-  "sql": "select c1 from w order by c5_number asc limit 1",
-  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"attendance\", \"op\": \"argmin\"}, \"field\": \"tie_no\"}"
- },
- {
-  "nt": "nt-7228",
-  "tbl": "203_873",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": false,
-  "answer": "4",
-  "ref": "[3]",
-  "sql": "select count ( c1 ) from w where c6_number != 600",
-  "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"op\": \"not\", \"pred\": {\"field\": \"capacity\", \"op\": \"eq\", \"value\": 600}}, {\"field\": \"model_name\", \"op\": \"exists\"}]}}"
- },
- {
-  "nt": "nt-1365",
-  "tbl": "203_83",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": true,
-  "answer": "Wal-Mart Stores, Inc.",
-  "ref": "['wal-mart stores, inc']",
-  "sql": "select c2 from w order by c4_number desc limit 1",
-  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"revenue_usd_billions\", \"op\": \"argmax\"}, \"field\": \"company\"}"
- },
- {
-  "nt": "nt-10039",
-  "tbl": "203_83",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": true,
-  "answer": "Wal-Mart Stores, Inc.",
-  "ref": "['wal-mart stores, inc']",
-  "sql": "select c2 from w order by c4_number desc limit 1",
-  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": []}, \"field\": \"revenue_usd_billions\", \"op\": \"argmax\"}, \"field\": \"company\"}"
- },
- {
-  "nt": "nt-9391",
-  "tbl": "204_654",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": false,
-  "answer": "4",
-  "ref": "[3]",
-  "sql": "select count ( c6 ) from w where c7 = 'intentions'",
-  "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"album\", \"op\": \"eq\", \"value\": \"Intentions\"}, {\"field\": \"uk\", \"op\": \"exists\"}]}}"
- },
- {
-  "nt": "nt-13739",
-  "tbl": "204_654",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": false,
-  "answer": "2009",
-  "ref": "[13]",
-  "sql": "select min ( c1_number ) - 1996 from w where c1_number > 1996",
-  "tree": "{\"node\": \"select\", \"of\": {\"node\": \"extreme_rows\", \"of\": {\"node\": \"filter\", \"where\": [{\"op\": \"not\", \"pred\": {\"field\": \"year\", \"op\": \"lte\", \"value\": 1996}}]}, \"field\": \"year\", \"op\": \"argmin\"}, \"field\": "
- },
- {
-  "nt": "nt-3237",
-  "tbl": "203_99",
-  "fold": "dev",
-  "class": "B",
-  "target_hit": false,
-  "answer": "0",
-  "ref": "[2]",
-  "sql": "select count ( * ) from w where c1_number >= 2005 and c1_number <= 2007 and c3 = 'sebastien bourdais'",
-  "tree": "{\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"season\", \"op\": \"gte\", \"value\": 2005}, {\"field\": \"season\", \"op\": \"lte\", \"value\": 2007}, {\"field\": \"driver\", \"op\": \"eq\", \"value\": \"sebasti"
+  "answer": "Primera Nacional",
+  "ref": "['division de honor']",
+  "sql": "select c3 from w where c3 in ( 'division de honor' , 'primera nacional' ) group by c3 order by count ( * ) desc limit 1",
+  "tree": "{\"node\": \"argext\", \"of\": {\"node\": \"groupby\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"division\", \"op\": \"in\", \"value\": [\"division de honor\", \"Primera Nacional\"]}]}, \"key\": \"division\", \"metric\": \"c"
  }
 ]
