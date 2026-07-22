@@ -6,6 +6,17 @@ neighbour below lies on two axes. The first is what a candidate must prove
 before it becomes supervision. The second is what happens to candidates
 that pass wrongly. We state both for every cluster.
 
+**Procurement knowledge graphs.** TheyBuyForYou integrated cross-national
+EU procurement into a knowledge graph and built services for data
+integration, anomaly detection and search. Later work organises
+procurement documents into navigable knowledge bases. These efforts are
+relevant because they establish that procurement data rewards graph
+treatment, and they are not enough for our purpose because none defines
+question answering as an executable task. They ship no gold programs, no
+compositional query language, no refusal semantics, and no
+independently-audited oracles, which are exactly the components a
+measurable QA task needs.
+
 **Filtered self-training.** STaR keeps sampled rationales whose final
 answer matches a gold label and retrains on them. Rejection-sampling
 fine-tuning and ReST generalise the pattern to reward thresholds and

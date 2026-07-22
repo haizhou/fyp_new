@@ -19,6 +19,15 @@ Prose starts only after this file is agreed.
 - Register per the lecture. "In this paper we show that" appears once, in
   the introduction, and the shown thing is exactly the claim below.
 
+## 0b. FRAMING DECISION (user analysis, 2026-07-22, adopted)
+Headline = the DOMAIN: first systematic auditable compositional KGQA
+benchmark and system for UK public procurement (with "to the best of our
+knowledge" + TheyBuyForYou positioning). Verified bootstrap, algebra, PACS,
+dual oracles, WTQ are each answers to sub-questions of that task. Teacher
+surpassing remains the flagship RESULT, no longer the headline CLAIM.
+Contribution list restructured to five layers: task / representation /
+evaluation foundation / method / empirical case.
+
 ## 1. The claim (specific, falsifiable, scoped)
 An 8-billion-parameter local model, trained only on supervision that passed
 a deterministic compile, ground, execute and verify chain, answers UK
