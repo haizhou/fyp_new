@@ -127,3 +127,14 @@ teacher-harvest $1 pilot WARRANTED per rule; AWAITING USER SPEND APPROVAL.
 Pilot design (frozen): 1,000 questions with zero local hits, grok k=2,
 metrics = unique-new-verified-questions vs local, cost per new trace,
 estimated $0.8-1.0.
+
+## E13d. Grok teacher-harvest pilot — STATUS: DEV diagnostic (user-approved spend $0.43)
+Design per E13c: 1,000 of 8,049 zero-local-hit questions, k=2 free-decode,
+four-gate verification (validate / non-RECORDS / execute / answer match).
+Numbers: incremental questions 155/1,000 = 15.50%; kept trees 167; 1,980
+calls; 1.83M in / 0.12M out tokens; $0.43; $0.0027 per new verified
+question. Every kept question is incremental over the local sampler by
+construction. Full-run projection: ~1,250 new questions over the remaining
+pool at ~$3.5 total (+38% A-pool growth on the uncovered distribution).
+DECISION PENDING: full-run spend approval (user gate).
+Artifact: data/qa/wtq/harvest_grok_pilot.jsonl.
