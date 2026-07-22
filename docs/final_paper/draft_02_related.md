@@ -12,7 +12,7 @@ fine-tuning and ReST generalise the pattern to reward thresholds and
 iterated grow-filter-train cycles. ExeSQL bootstraps text-to-SQL with
 execution success as the filter, and SCD distils structured QA through
 self-consistency votes. All of these are relevant because they train small
-models from filtered model outputs, exactly our setting. None of them is
+models from filtered model outputs, exactly our setting. The systems reviewed here are not
 enough for our task, for one measured reason. Their pass criteria are
 proxies. Execution success accepts queries that run and compute the wrong
 thing. Agreement accepts consistent errors. Gold-answer matching accepts
@@ -20,8 +20,9 @@ right answers reached by invalid programs. During our own harvest, 86.7
 percent of generated bridge plans passed every deterministic check while
 only 52.3 percent matched the oracle. A filter blind to that stratum feeds
 a third of its pool with structurally valid wrong programs and never knows.
-We route that stratum into labelled hard negatives instead, and we report
-where it leaks.
+We retain that stratum with its verifier diagnoses for failure analysis
+and for controlled negative-training experiments, and we report where it
+leaks.
 
 **Agents over structured knowledge.** Pangu constrains an LLM to
 discriminate among logical-form extensions enumerated from the graph.
@@ -29,8 +30,8 @@ ChatKBQA generates a form and grounds it by retrieval. RoG plans relation
 paths and reasons over them. StructGPT gives a frozen model iterative read
 access through fixed interfaces. These systems share our premise that the
 structure, not the model, is the ground. They are not enough for two
-reasons. None treats verifier rejections as a supervision source, so the
-training value of failure is discarded. And none scores refusal. Questions
+reasons. Their training pipelines, as reported, draw no supervision from
+verifier rejections, so the training value of failure is discarded. And their reported evaluations do not score refusal. Questions
 that are ambiguous, unsupported by the schema, or matched by no records are
 first-class citizens of our benchmarks, with three trap families and a
 faithfulness-gated metric.
@@ -43,9 +44,9 @@ Python against the table. These works calibrate our transfer numbers, and
 our answer-only result of 44.4 percent sits inside the classical band while
 our gold-program result of 51.8 exceeds TAPAS-large. They are not enough
 for our purpose because the program language is chosen for coverage, not
-for verifiability. Free Python has no type checker that a second
-implementation can replay, no closed grammar that decoding can enforce, and
-no abstention semantics. Our algebra buys those properties and pays for
+for verifiability. Open-ended Python generation does not by itself provide a type checker
+that a second implementation can replay, a closed grammar that decoding
+can enforce, or abstention semantics. Our algebra buys those properties and pays for
 them in coverage, and Section 5.3 measures the price and then decomposes
 it.
 

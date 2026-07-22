@@ -17,8 +17,8 @@ Retrieval augmentation does not close this gap, because the questions are
 dominated by exhaustive computation. A count over every contract of every
 London borough does not fit in a context window. On our development set a
 retrieval baseline answers 31.5 percent of questions while an untrained 8B
-model that is forced to emit an executable plan answers 61.5 percent. The
-scaffolding is worth more than the retrieval.
+model that is forced to emit an executable plan answers 61.5 percent. Forcing an executable plan is worth more than
+retrieval before any training takes place.
 
 The standard route to a competent small model is distillation from a large
 one. That route assumes the teacher can be trusted, and on this task it
@@ -42,14 +42,15 @@ percent on a held-out procurement benchmark of 2,285 questions, against
 gap is significant at p below 1e-15 under a paired McNemar test, and it
 survives a measured teacher noise floor of one point.
 
-The recipe travels. We rebuild only the data layer and move the system to
+The recipe transfers. We rebuild only the data layer and move the system to
 WikiTableQuestions, a benchmark of crowd-written questions over web tables
 that we did not construct. The procurement checkpoint alone moves the
 zero-shot floor from 22.5 to 27.3 percent. The recipe moves it to 44.4
 percent when supervision comes from final answers only, and to 51.8 percent
 when gold programs exist, both on the official sealed test under a single
-frozen-configuration run. The checkpoint contributes a few points. The
-recipe contributes the rest.
+frozen-configuration run. The checkpoint accounts for 4.8 points of the
+transfer gain, while verified training accounts for the larger subsequent
+improvement.
 
 We make four contributions.
 
@@ -79,7 +80,8 @@ reasoning capability.
 We claim no state of the art. Recent specialised table systems score higher
 on WikiTableQuestions than we do. The claim is that a deterministic filter
 over an executable language turns weak local models into systems that beat
-their own teachers, at auditable cost, twice.
+their own teachers, across both the home benchmark and an independently
+constructed challenge set.
 
 ---
 ## Self-review notes (referee pass on this draft)
@@ -91,9 +93,8 @@ their own teachers, at auditable cost, twice.
   throughout, one idea per paragraph, no judgement words. "The scaffolding
   is worth more than the retrieval" is a factual comparison of two stated
   numbers.
-- Open wording question for user: "The checkpoint contributes a few points.
-  The recipe contributes the rest." Punchy but informal. Alternative:
-  "The checkpoint accounts for 4.8 points of the lift. The recipe accounts
-  for the remainder."
+- RESOLVED per user review 2026-07-22: formal wording adopted (4.8 points
+  of transfer gain attributed to checkpoint, remainder to verified
+  training).
 - Missing citations to be added in LaTeX pass: RAG, STaR/ReST, ExeSQL/SCD,
   WTQ, TAPAS.

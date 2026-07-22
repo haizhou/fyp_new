@@ -19,9 +19,10 @@ seven task families, three depth levels, a seen and unseen exposure axis,
 and an answerability axis. Surfaces come from an independently written
 grammar. Isolation is enforced by five zero-overlap gates between training
 and test at the level of question text, logical signature, surface
-template, entity anchors, and program hash. The test split is evaluated
-once per frozen configuration. A 93-row human audit preceded unsealing and
-its one finding, 46 mislabelled empty-result rows, was corrected by offline
+template, entity anchors, and program hash. The sealed test was evaluated once under the frozen primary
+configuration. A 93-row human audit preceded unsealing. Its one finding
+was a single systematic defect, a boolean-handling error in the
+empty-result class that had mislabelled 46 rows, corrected by offline
 re-execution before any number was read.
 
 **WikiTableQuestions.** The transfer target is the standard benchmark of
@@ -42,6 +43,9 @@ counts only if every literal of the emitted program traces to the question.
 Paired systems are compared by exact McNemar tests on discordant pairs.
 Teacher comparisons respect a measured provider noise floor of 1.1 points,
 and no single-run teacher delta below three points is claimed anywhere.
+Each student configuration is a single frozen training run. Paired
+significance therefore quantifies test-set disagreement between systems,
+not optimisation variance across seeds.
 
 ---
 ## Reviewer pass

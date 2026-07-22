@@ -34,8 +34,8 @@ surfaces are model-generated under style controls, which is not user
 language. The WikiTableQuestions test set is consumed, so future work on
 that benchmark reports development folds or a new holdout. Probe evidence
 of composition beyond demonstrated constructs is bounded, 11.5 points of
-unseen-exposure cost. And every system here serves one narrow task
-family, executable analytics over one graph and one table corpus.
+unseen-exposure cost. The evidence remains confined to executable structured-data analytics
+over one procurement graph and one table benchmark.
 
 # §7 Conclusion (draft 1)
 
@@ -43,11 +43,11 @@ A deterministic filter over an executable language replaces teacher trust.
 Trained only on outputs that compile, ground, execute, and match an
 independent oracle, an 8B local model overtakes the cloud model that
 generated its training data, by 15.89 points at home and by 27.98 on a
-sealed benchmark neither system authored. The recipe moves. Rebuilt on
-web tables at the cost of a loader, a linker, and one operator, it turns
-a 22.5 percent floor into 44.4 without a single gold program and 51.8
-with them. What limits it now is not learning but language coverage, and
-the audits in this paper are what make that distinction measurable.
+sealed benchmark neither system authored. Rebuilt on web tables at the cost of a loader, a linker, and one
+operator, the recipe turns a 22.5 percent floor into 44.4 without a
+single gold program and 51.8 with them. Language coverage is now the
+dominant measured bottleneck, while program discovery remains incomplete,
+and the audits in this paper are what make that distinction measurable.
 
 ---
 ## Reviewer pass

@@ -13,11 +13,11 @@ records, grouping with count or sum metrics, group reduction by extremum or
 top-k, scalar arithmetic and comparison, set union, intersection and
 difference, and groupwise combination. A later transfer adds one generic
 node, the row-preserving arg-extremum, and nothing else. The grammar is
-closed. Every node and enum is fixed, so a recursive type checker decides
-membership mechanically and its failures are typed diagnostics. The space
-of trees is combinatorially open. This pair of properties is the design
-point. Verification stays as mechanical as whitelist membership while
-composition becomes free.
+closed but recursively compositional. Every node and enum is fixed, so a
+recursive type checker decides membership mechanically and its failures
+are typed diagnostics, while the nodes combine into well-typed trees never
+seen during design. Verification stays as mechanical as whitelist
+membership.
 
 **Deterministic execution.** Two evaluators execute every tree. The runtime
 evaluator shares data loading with the production system. The independent
@@ -55,9 +55,13 @@ evaluators, and only then renders a question surface. A harvest samples
 candidate programs from a teacher or from the student itself, executes
 them, and keeps a candidate only when every check passes and the answer
 matches the oracle. The oracle filters and never authors. No gold program
-or answer is copied into training text. What survives trains the next
-model, and what fails with a diagnosis becomes labelled negative material.
-The recipe has no human annotation and no trusted teacher anywhere in it.
+or answer is copied into training text. What survives trains the next model. What fails is retained with its
+diagnosis for failure analysis and for controlled negative-training
+experiments, and the primary models are trained on verified survivors
+only. In the answer-only arms no human-authored gold program is used
+anywhere. The teacher proposes candidates but is never treated as an
+oracle, because deterministic execution and answer verification decide
+which trajectories survive.
 
 ---
 ## Reviewer pass

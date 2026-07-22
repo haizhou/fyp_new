@@ -26,9 +26,8 @@ three identical development runs and obtained 72.6 plus or minus 1.1
 points. The student beats each replicate separately, and no teacher
 comparison in this paper rests on a delta inside that floor.
 
-Two controls locate where the gain comes from. A retrieval baseline
-answers 31.5 percent of the development set, and a strengthened variant
-28.8, while an untrained 8B model forced through the executable
+Two controls locate where the gain comes from. Two retrieval baselines answer 31.5 and 28.8 percent of the development
+set, while an untrained 8B model forced through the executable
 scaffolding answers 61.5 percent, rising to 70.4 under the revised
 pipeline. Scaffolding, not retrieval, sets the floor, and training adds
 its gains on top of that floor. A format diagnostic separates the two
@@ -45,9 +44,11 @@ The compositional planner was frozen and evaluated once on the 922 sealed
 PACS test rows. It scores 78.31 percent strict overall and 80.00 on the
 answerable subset, with a cluster bootstrap interval of 77.06 to 82.92. On
 the same rows the untrained base scores 36.01, a retrieval baseline 21.90,
-and the cloud teacher 50.33. The distilled student exceeds its teacher by
-27.98 points here, and 23.1 percent of teacher rows fail on format alone,
-which the teacher's API offers no constrained decoding to prevent.
+and the cloud teacher 50.33. The verified-bootstrap student exceeds its teacher by 27.98 points here.
+The comparison is a system-level one between deployable configurations,
+not a model comparison under equal decoding, because the teacher's API
+offers no constrained decoding and 23.1 percent of its rows fail on
+format alone.
 
 Two audits attack this headline from opposite directions. Deleting each
 oracle-program predicate in turn and re-executing shows that 42.7 percent
@@ -90,17 +91,19 @@ rather than excuses.
 A differential audit against 11,276 gold SQL programs separates three
 error sources. The algebra expresses 53 to 55 percent of gold programs.
 Translated programs match the reference denotation 92 to 93 percent of
-the time. Executed class-A programs hit the target 94.1 percent of the
-time, against an 88.9 percent ceiling set by annotation noise itself.
+the time. Executed class-A programs recover the target answer in 94.1 percent of
+cases. By comparison, the gold SQL annotations themselves reproduce the
+benchmark answer in 88.9 percent, so the annotation layer is noisy and is
+not treated as an absolute oracle.
 Performance is coverage limited, not execution limited. A closure pass
 that lowers SQL constructs onto existing nodes and adds typed loader
 views raises coverage to 61.0 percent with zero regressions, and its
 attribution matrix shows 562 questions recovered by the translator alone,
 154 by the loader alone, 14 jointly, and 4,466 still outside the
 language. One seventh of the apparent expressiveness gap was compiler and
-representation debt. Retraining under the widened grammar lifts the
+representation debt. Retraining after representation and compilation closure lifts the
 gold-program model from 40.0 to 51.0 on the development fold and the
-answer-only model from 31.7 to 40.0, so capability tracks the grammar
+answer-only model from 31.7 to 40.0, so capability tracks the coverage
 boundary in both supervision regimes.
 
 ---
