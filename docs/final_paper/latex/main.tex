@@ -10,6 +10,8 @@
 \usepackage{microtype}
 \usepackage{hyperref}
 \usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
 
 \title{Auditable Compositional Question Answering over UK Public Procurement}
 
@@ -188,10 +190,10 @@ which are exactly the components a measurable QA task needs.
 sampled rationales whose final answer matches a gold label and retrains on
 them. Rejection-sampling fine-tuning \citep{yuan2023scaling} and ReST
 \citep{gulcehre2023rest} generalise the pattern to reward thresholds and
-iterated grow-filter-train cycles. ExeSQL \citep{exesql2025} bootstraps
-text-to-SQL with execution success as the filter, and self-consistency
-distillation distils structured QA through agreement votes.
-% TODO exact SCD citation before submission
+iterated grow-filter-train cycles. ExeSQL \citep{zhang2025exesql}
+bootstraps text-to-SQL with execution success as the filter, and
+self-correction distillation \citep{zhu2026scd} transfers query
+generation and error-correction trajectories from a trusted teacher.
 All of these are relevant because they train small models from filtered
 model outputs, exactly our setting. The systems reviewed here are not
 enough for our task, for one measured reason. Their pass criteria are
@@ -257,14 +259,36 @@ code produces answers.
 
 \begin{figure}[t]
 \centering
-% TODO Figure 1: three-layer architecture, algebra box with node
-% inventory, dual evaluators, bootstrap loop arrows.
-\fbox{\parbox{0.9\linewidth}{\centering\vspace{6em}Figure 1
-placeholder\vspace{6em}}}
-\caption{The system. A language model translates the question into a
-typed program under constrained decoding. Deterministic code compiles,
-grounds and executes the program, and dual independent evaluators decide
-what may enter training.}
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=2.1em},
+  det/.style={box, fill=blue!6},
+  lm/.style={box, fill=orange!12},
+  data/.style={box, fill=gray!10},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lab/.style={font=\footnotesize\itshape, text=black!60}
+]
+\node[data] (q) {Question};
+\node[lm, right=8mm of q] (plan) {LM planner\\\footnotesize constrained decoding};
+\node[det, right=8mm of plan] (check) {Type check\\\footnotesize typed diagnostics};
+\node[det, right=8mm of check] (exec) {Ground + execute\\\footnotesize dual evaluators};
+\node[data, right=8mm of exec] (ans) {Answer\\or abstention};
+\draw[arr] (q) -- (plan);
+\draw[arr] (plan) -- (check) node[midway, above, lab, yshift=1pt] {program};
+\draw[arr] (check) -- (exec);
+\draw[arr] (exec) -- (ans);
+\node[det, below=9mm of check.south east, anchor=north, align=center] (oracle)
+  {Oracle agreement\\\footnotesize filters, never authors};
+\node[data, left=10mm of oracle] (pool) {Verified\\training pool};
+\draw[arr, dashed] (exec.south) |- (oracle.east) node[pos=0.3, right, lab] {candidates};
+\draw[arr] (oracle) -- (pool) node[midway, above, lab] {survivors};
+\draw[arr, dashed] (pool.west) -| (plan.south) node[pos=0.85, left, lab] {retrain};
+\end{tikzpicture}
+\caption{The system. A language model appears in one role, translating
+the question into a typed program under constrained decoding. Everything
+downstream is deterministic code. In the bootstrap loop, candidates that
+compile, ground, execute and match the independently computed oracle
+become training data; the oracle filters and never authors.}
 \label{fig:architecture}
 \end{figure}
 
@@ -430,7 +454,63 @@ invented schema on 98 of 100 questions and matches the executable contract
 on 3. The tuned models match it on 98 and 99. Fine-tuning contributes
 contract conformance and planning quality within it, and constrained
 decoding grants the contract to every system equally, so the table
-measures planning.
+measures planning. Figure~\ref{fig:scoreboard} places both scoreboards
+side by side.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/scoreboard.pdf}
+\caption{The two scoreboards. (a) On the held-out procurement test both
+hybrid and fully local students pass the cloud teacher that generated
+their training data, and the fully local systems pass the hybrids. (b) On
+the sealed PACS test, evaluated once, the ordering survives with a larger
+margin. Dashed lines mark the teacher.}
+\label{fig:scoreboard}
+\end{figure}
+
+Two further slices report what the headline hides
+(Table~\ref{tab:decay}). First, moving from development to the 2{,}285-row
+test costs the hybrid systems 5.5 and 7.1 points but the fully local
+systems only 0.5 and 0.9, on both base models. Training on verified
+survivors appears to remove exactly the brittleness that shows up as
+dev-to-test decay. Second, on a composite hard slice of the development
+set the fully local student is flat, moving $+0.8$ points where the
+teacher loses 6 to 12 and a preference-tuned hybrid loses 7.7, so the
+student advantage is largest, 18 to 20 points, precisely where questions
+are hardest. Third, the bootstrap converges. A second self-harvest round
+lifts harvest yield from 76.6 to 86.3 percent, yet the evaluation gain is
+$+0.4$ points and not significant, so the verifier-gated loop has a
+natural ceiling on this task and we report it rather than iterate past
+it.
+
+\begin{table}[t]
+\centering
+\caption{What the headline hides. Left, development-to-test decay by
+system class, both bases. Right, accuracy on the iid and composite hard
+slices of the development set.}
+\label{tab:decay}
+\small
+\begin{tabular}{lccc}
+\toprule
+System & Dev & Test & Decay \\
+\midrule
+Llama hybrid & 83.1 & 75.97 & $-7.1$ \\
+Qwen hybrid & 83.5 & 78.03 & $-5.5$ \\
+Llama fully local & 84.2 & 83.33 & $-0.9$ \\
+Qwen fully local & 86.2 & 85.65 & $-0.5$ \\
+\bottomrule
+\end{tabular}
+\hspace{1.5em}
+\begin{tabular}{lccc}
+\toprule
+System & iid & hard & slope \\
+\midrule
+Teacher (3 runs) & 73.8--78.6 & 65.4--67.6 & $-6$ to $-12$ \\
+Qwen hybrid (DPO) & 86.4 & 78.7 & $-7.7$ \\
+Qwen fully local & 84.5 & 85.3 & $+0.8$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{A Sealed Benchmark the System Did Not Author}\label{sec:pacs}
 
@@ -442,7 +522,31 @@ and the cloud teacher 50.33. The verified-bootstrap student exceeds its
 teacher by 27.98 points here. The comparison is a system-level one between
 deployable configurations, not a model comparison under equal decoding,
 because the teacher's API offers no constrained decoding and 23.1 percent
-of its rows fail on format alone.
+of its rows fail on format alone. Table~\ref{tab:pacs} collects the
+headline and the audits that defend it.
+
+\begin{table}[t]
+\centering
+\caption{PACS results and integrity audits. The sealed test was evaluated
+once; all audit rows are computed offline from the frozen run.}
+\label{tab:pacs}
+\small
+\begin{tabular}{lc}
+\toprule
+Measurement & Value \\
+\midrule
+Strict accuracy, all 922 sealed rows & 78.31 \\
+Answerable subset & 80.00 \; [77.06, 82.92] \\
+\;\; same rows: untrained base / retrieval / cloud teacher & 36.01 / 21.90 / 50.33 \\
+\midrule
+Irreducible rows (every predicate load-bearing) & 42.7\% of answerable \\
+Planner accuracy on the irreducible subset & 78.7 \\
+Unseen-exposure cost (intent shapes absent from training) & $-11.5$ \; [5.6, 17.2] \\
+Typed-feedback repair variant (development, not primary) & $+1.7$ \\
+Teacher rows failing on format alone & 23.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Two audits attack this headline from opposite directions. Deleting each
 oracle-program predicate in turn and re-executing shows that 42.7 percent
@@ -471,34 +575,95 @@ baseline while random cells lose 1.7, so the gain is grounding rather than
 added context.
 
 On the official test set, evaluated once under a recorded manifest, the
-untrained base scores 22.51 percent, the procurement checkpoint 27.33, the
-answer-only bootstrapped model 44.43, and the gold-program model 51.80,
-each rung significant at $p < 5 \times 10^{-18}$. The checkpoint therefore
-carries a 4.8-point zero-shot prior, and the recipe carries 17 to 24.5
-points beyond it. The answer-only figure matches classical
-weakly-supervised parsers on this benchmark, the gold-program figure
-exceeds early table-pretrained baselines such as TaPas
-\citep{herzig2020tapas}, and neither approaches recent specialised systems
+four rungs of Table~\ref{tab:wtq} are each significant at
+$p < 5 \times 10^{-18}$. The checkpoint carries a 4.8-point zero-shot
+prior, and the recipe carries 17 to 24.5 points beyond it. The
+answer-only figure matches classical weakly-supervised parsers on this
+benchmark, the gold-program figure exceeds early table-pretrained
+baselines such as TaPas \citep{herzig2020tapas}, and neither approaches
+recent specialised systems
 \citep{cheng2023binder,ye2023dater,wang2024chainoftable}, a gap the next
 paragraph explains rather than excuses.
 
+\begin{table}[t]
+\centering
+\caption{WikiTableQuestions transfer. Left, the official sealed test,
+touched once. Right, the development fold before and after
+representation-and-compilation closure, showing capability tracking the
+coverage boundary in both supervision regimes.}
+\label{tab:wtq}
+\small
+\begin{tabular}{lc}
+\toprule
+System (official test, $n$=4{,}344) & Acc \\
+\midrule
+Untrained base & 22.51 \\
+Procurement checkpoint & 27.33 \\
+Answer-only bootstrap & 44.43 \\
+Gold-program training & \textbf{51.80} \\
+\bottomrule
+\end{tabular}
+\hspace{1.5em}
+\begin{tabular}{lcc}
+\toprule
+Dev fold & Before & After closure \\
+\midrule
+Answer-only & 31.7 & 40.0 \\
+Gold-program & 40.0 & 51.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 A differential audit against 11{,}276 gold SQL programs
-\citep{shi2020squall} separates three error sources. The algebra expresses
-53 to 55 percent of gold programs. Translated programs match the reference
-denotation 92 to 93 percent of the time. Executed class-A programs recover
-the target answer in 94.1 percent of cases. By comparison, the gold SQL
-annotations themselves reproduce the benchmark answer in 88.9 percent, so
-the annotation layer is noisy and is not treated as an absolute oracle.
-Performance is coverage limited, not execution limited. A closure pass
+\citep{shi2020squall} separates where the remaining gap actually lives.
+Table~\ref{tab:audit} decomposes the pipeline stage by stage, and
+Figure~\ref{fig:attribution} shows the resulting attribution over the
+gold-program universe. The algebra expresses 53 to 55 percent of gold
+programs. Translated programs match the reference denotation 92 to 93
+percent of the time, and executed class-A programs recover the target
+answer in 94.1 percent of cases, so performance is coverage limited, not
+execution limited. By comparison, the gold SQL annotations themselves
+reproduce the benchmark answer in only 88.9 percent, so the annotation
+layer is noisy and is not treated as an absolute oracle. A closure pass
 that lowers SQL constructs onto existing nodes and adds typed loader views
-raises coverage to 61.0 percent with zero regressions, and its attribution
-matrix shows 562 questions recovered by the translator alone, 154 by the
-loader alone, 14 jointly, and 4{,}466 still outside the language. One
-seventh of the apparent expressiveness gap was compiler and representation
-debt. Retraining after representation and compilation closure lifts the
-gold-program model from 40.0 to 51.0 on the development fold and the
-answer-only model from 31.7 to 40.0, so capability tracks the coverage
-boundary in both supervision regimes.
+raises coverage to 61.0 percent with zero regressions. One seventh of the
+apparent expressiveness gap was compiler and representation debt.
+Retraining after closure lifts the development fold in both supervision
+regimes (Table~\ref{tab:wtq}, right), so capability tracks the coverage
+boundary.
+
+\begin{table}[t]
+\centering
+\caption{Where the WikiTableQuestions gap lives. Stage-by-stage
+decomposition against 11{,}276 gold SQL programs. Each rate conditions on
+the stage above it.}
+\label{tab:audit}
+\small
+\begin{tabular}{lc}
+\toprule
+Stage & Rate \\
+\midrule
+Gold programs expressible in the algebra (before closure) & 53--55\% \\
+\;\; after translator and loader closure, zero regressions & 61.0\% \\
+Translated programs matching the reference denotation & 92--93\% \\
+Executed class-A programs recovering the target answer & 94.1\% \\
+\midrule
+Gold SQL annotations reproducing the benchmark answer & 88.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figs/attribution.pdf}
+\caption{Attribution over the 11{,}276 gold SQL programs. The closure
+pass recovers 562 questions through the translator alone, 154 through
+typed loader views alone and 14 jointly, moving coverage from 53.9 to
+61.0 percent; 4{,}466 remain outside the language, and the two largest
+remaining families are specified as typed extensions and deliberately not
+built mid-evaluation.}
+\label{fig:attribution}
+\end{figure}
 
 % ---------------------------------------------------------------
 \section{Discussion and Limitations}\label{sec:discussion}
@@ -566,11 +731,124 @@ that distinction measurable.
 
 \appendix
 \section{Operator Algebra Reference}\label{app:algebra}
-% TODO node inventory table with type signatures
-\section{Audit Protocols}\label{app:audits}
-% TODO dual-oracle audit, PACS gates, constraint-necessity procedure
-\section{Prompt and Serving Configuration}\label{app:config}
-% TODO prompts, decoding parameters, training configs, LLaMA-Factory
-% \citep{zheng2024llamafactory} and vLLM \citep{kwon2023vllm} versions
+
+Programs are trees over seven value types. \textsc{records} is a subset
+of the flat record universe, \textsc{values} a distinct set of scalars,
+\textsc{groups} a mapping from group key to number, \textsc{ranking} an
+ordered list of key--number pairs, and \textsc{number}, \textsc{value}
+and \textsc{bool} are scalars. Table~\ref{tab:algebra} lists the closed
+node inventory with type signatures. Depth is capped at 16 and node count
+at 64. Every check failure raises a typed diagnostic with a path into the
+tree, which is what the gated repair loop consumes.
+
+\begin{table}[h]
+\centering
+\caption{Node inventory. The seventeen procurement nodes plus the one
+node added for the WikiTableQuestions transfer (marked $\dagger$).
+Predicates inside \texttt{filter} support base constraints
+(\texttt{eq}, \texttt{in}, \texttt{contains}, \texttt{exists},
+\texttt{gte}, \texttt{lte}), negation, disjunction, and computed-set
+membership (\texttt{in\_expr}, a semijoin or antijoin on a subtree).}
+\label{tab:algebra}
+\small
+\begin{tabular}{lll}
+\toprule
+Node & Signature & Meaning \\
+\midrule
+\texttt{filter} & preds $\to$ \textsc{records} & subset by predicate conjunction \\
+\texttt{values} & \textsc{records} $\to$ \textsc{values} & distinct field values \\
+\texttt{count} & \textsc{records} $\to$ \textsc{number} & record count \\
+\texttt{size} & \textsc{values} $\to$ \textsc{number} & set cardinality \\
+\texttt{sum} & \textsc{records} $\to$ \textsc{number} & guarded money summation \\
+\texttt{exists} & \textsc{records} $\to$ \textsc{bool} & non-emptiness \\
+\texttt{select} & \textsc{records} $\to$ \textsc{value} & unique field lookup \\
+\texttt{extreme} & \textsc{records} $\to$ \textsc{value} & argmax/argmin record \\
+\texttt{groupby} & \textsc{records} $\to$ \textsc{groups} & grouped count or sum \\
+\texttt{argext} & \textsc{groups} $\to$ \textsc{value} & extremum group key \\
+\texttt{top} & \textsc{groups} $\to$ \textsc{ranking} & top-$k$ groups \\
+\texttt{num} & literal $\to$ \textsc{number} & numeric literal \\
+\texttt{combine} & \textsc{number}$^2$ $\to$ \textsc{number}/\textsc{bool} & arithmetic or comparison \\
+\texttt{vcompare} & \textsc{value} $\to$ \textsc{bool} & scalar comparison, date-aware \\
+\texttt{setop} & \textsc{values}$^2$ $\to$ \textsc{values} & union, intersection, difference \\
+\texttt{gcombine} & \textsc{groups}$^2$ $\to$ \textsc{groups} & groupwise combination \\
+\texttt{keys\_where} & \textsc{groups} $\to$ \textsc{values} & keys passing a threshold \\
+\texttt{extreme\_rows}$^\dagger$ & \textsc{records} $\to$ \textsc{records} & row-preserving arg-extremum \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Audit Protocols and Supplementary Results}\label{app:audits}
+
+\paragraph{Dual-oracle audit.} The independent evaluator was implemented
+from the raw releases with no shared code and replays every benchmark
+answer. Agreement is 99.88 percent over 14{,}770 audited answers. All 18
+residual disagreements were opened by hand and characterised; none
+affects a reported comparison.
+
+\paragraph{PACS isolation gates.} Five zero-overlap gates hold between
+training and sealed test at the level of question text, logical
+signature, surface template, entity anchors, and program hash. A 93-row
+human audit preceded unsealing and found one systematic defect, a
+boolean-handling error in the empty-result class affecting 46 rows,
+corrected by offline re-execution before any number was read.
+
+\paragraph{Constraint-necessity audit.} Each predicate of each
+oracle program is deleted in turn and the program re-executed. A row is
+irreducible when every deletion changes the answer. 42.7 percent of
+answerable sealed rows are irreducible, and the planner scores 78.7 on
+that subset against 80.00 on the full answerable set.
+
+\paragraph{Trap-cue disclosure.} Nineteen of 2{,}285 test rows string-match
+cue phrases derived from development refusal traps. Excluding them moves
+every headline by at most 0.21 points and changes no ranking and no
+significance verdict.
+
+\paragraph{Method ladder.} Table~\ref{tab:ladder} reports the
+development-set ladder over training methods and bases under the revised
+pipeline, and the harvest yields that feed them. Preference optimisation
+helps one base and hurts the other, consistent with the near-miss hazard
+discussed in Section~\ref{sec:discussion}; the deployed fully local
+systems use the best arm per base. Self-harvest yield exceeds teacher
+harvest yield on both bases, and a second self-harvest round raises yield
+further, 76.6 to 86.3 percent on answerable questions, while adding only
+$+0.4$ evaluation points, not significant, which is where we stop the
+loop.
+
+\begin{table}[h]
+\centering
+\caption{Development ladder (n=260) and harvest yields. Yields are
+data-engine acceptance rates on answerable questions, a different metric
+from system accuracy, and are never compared against it.}
+\label{tab:ladder}
+\small
+\begin{tabular}{lcc}
+\toprule
+Arm & Qwen3-8B & Llama-3.1-8B \\
+\midrule
+Zero-shot scaffolded & 70.4 & 60.0 \\
+SFT & 81.2 & 83.1 \\
+Rejection-sampling FT & 81.5 & 82.7 \\
+DPO & 83.5 & 77.3 \\
+Fully local (best arm) & 86.2 & 84.2 \\
+\midrule
+Teacher harvest yield & \multicolumn{2}{c}{65.5} \\
+Self-harvest yield, round 1 & 76.6 & 78.1 \\
+Self-harvest yield, round 2 & 86.3 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Configuration}\label{app:config}
+
+Students are Qwen3-8B \citep{qwen3-2025} and Llama-3.1-8B, adapted with
+rank-64 LoRA \citep{hu2022lora} under 4-bit QLoRA quantisation
+\citep{dettmers2023qlora} in LLaMA-Factory \citep{zheng2024llamafactory},
+and served with vLLM \citep{kwon2023vllm} under guided JSON decoding
+compiled from the algebra grammar. All evaluations run at temperature
+zero with a single call per question. The WikiTableQuestions official
+run was executed once under a recorded manifest of commit hash, file
+checksums, decoding parameters and adapter identity, and the test set is
+treated as consumed. Full training configurations, prompts and manifests
+ship with the code.
 
 \end{document}
