@@ -1,10 +1,12 @@
 # §6 Discussion and limitations (draft 1)
 
-The evidence supports a claim about a recipe, not about model quality. The
-teacher operates zero-shot while the students are tuned in domain, so the
+The primary claim is about a task and the system that solves it. The
+teacher comparison inside that claim is scoped carefully. The teacher
+operates zero-shot while the students are tuned in domain, so the
 scoreboard shows that a verified bootstrap beats deploying the teacher it
-was distilled from, and PACS, where both sides face questions neither
-authored, shows the gap survives on independent surfaces.
+was distilled from, not that an 8B model outranks its teacher in general
+ability. PACS, where both sides face questions neither authored, shows the
+gap survives on independent surfaces.
 
 Refusal did not transfer free. On a paired legacy comparison the
 compositional planner wins the answerable subset by 4.4 points yet loses
@@ -37,17 +39,22 @@ of composition beyond demonstrated constructs is bounded, 11.5 points of
 unseen-exposure cost. The evidence remains confined to executable structured-data analytics
 over one procurement graph and one table benchmark.
 
-# §7 Conclusion (draft 1)
+# §7 Conclusion (draft 2, domain-first)
 
-A deterministic filter over an executable language replaces teacher trust.
-Trained only on outputs that compile, ground, execute, and match an
-independent oracle, an 8B local model overtakes the cloud model that
-generated its training data, by 15.89 points at home and by 27.98 on a
-sealed benchmark neither system authored. Rebuilt on web tables at the cost of a loader, a linker, and one
-operator, the recipe turns a 22.5 percent floor into 44.4 without a
-single gold program and 51.8 with them. Language coverage is now the
-dominant measured bottleneck, while program discovery remains incomplete,
-and the audits in this paper are what make that distinction measurable.
+UK public procurement is public data that the public cannot reliably
+analyse in natural language. We defined that task end to end, a
+convention-explicit knowledge graph, a program-first benchmark with
+refusal as scored behaviour, a typed compositional program language, and
+oracles whose correctness is measured by an independent second
+implementation. On that foundation a verified bootstrap, deterministic
+checks deciding what a model may learn from, trains an 8B local system to
+85.65 percent, past the cloud teacher that generated its training data,
+and to 78.31 on a sealed challenge set neither system authored. Rebuilt
+on web tables at the cost of a data layer, the same recipe turns a 22.5
+percent floor into 44.4 without a single gold program and 51.8 with them.
+Language coverage is now the dominant measured bottleneck, while program
+discovery remains incomplete, and the audits in this paper are what make
+that distinction measurable.
 
 ---
 ## Reviewer pass
