@@ -127,7 +127,7 @@ def main() -> None:
         shim, catalog = universes[csv_rel]
         orig = [c for c in catalog if "__" not in c[0]]
         colmap = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
-        colmap[0] = {c[0] for c in catalog if "__" in c[0]}
+        colmap[0] = {c[0] for c in catalog if "__" in c[0] or c[0] == "row_index"}
 
         ref, ref_err = ref_execute(e["tbl"], sql_text(e["sql"]))
         targets = e["tgt"].split("|")

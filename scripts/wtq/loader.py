@@ -137,7 +137,7 @@ def load_universe(csv_rel: str):
     #   Two-digit shorthand ("1998-99") is NOT expanded: yields [1998] only —
     #   fixed pre-declared convention. Parse failure -> null, never guessed.
     import os as _os
-    _views_on = _os.environ.get("WTQ_VIEWS", "v3") == "v3"
+    _views_on = _os.environ.get("WTQ_VIEWS", "v4") in ("v3", "v4")
     _year_re = re.compile(r"\b(1[0-9]{3}|20[0-9]{2})\b")
     for col, dtype, _ in (list(catalog) if _views_on else []):
         if dtype == "number" or col.endswith("__num"):
@@ -170,6 +170,36 @@ def load_universe(csv_rel: str):
                 raw_df[aux] = records_df[aux].map(
                     lambda v: "" if pd.isna(v) else (f"{int(v)}" if float(v).is_integer() else f"{v:g}"))
                 catalog.append((aux, "number", [n[idx] for n in allnums if len(n) > idx][:3]))
+
+    # v4 views (WTQ_VIEWS=v4): row order as DATA plus typed composite parts.
+    # row_index = 1-based source-table position, a semantic field of the table
+    # (distinct from the opaque synthetic id below, which stays internal).
+    # __part_k = k-th cell segment under a FIXED delimiter priority
+    # (newline, then " - "/en-dash with spaces, then ", "), added when >=50%
+    # of non-empty cells split; no semantic claim (part, not surname);
+    # parse failure -> null; raw preserved.
+    if _os.environ.get("WTQ_VIEWS", "v4") == "v4":
+        n_rows = len(records_df)
+        records_df["row_index"] = [float(i + 1) for i in range(n_rows)]
+        raw_df["row_index"] = [str(i + 1) for i in range(n_rows)]
+        catalog.append(("row_index", "number", [1, 2, 3]))
+        _delim = re.compile(r"\n| [-\u2013\u2014] |, ")
+        for col, dtype, _ in list(catalog):
+            if dtype == "number" or "__" in col or col == "row_index":
+                continue
+            series = raw_df[col].astype(str).str.strip()
+            non_empty = series[series != ""]
+            if len(non_empty) == 0:
+                continue
+            parts = non_empty.map(lambda s: [x.strip() for x in _delim.split(s) if x.strip()])
+            if parts.map(lambda x: len(x) >= 2).mean() >= 0.5:
+                for k in (0, 1):
+                    aux = f"{col}__part_{k+1}"
+                    vals = series.map(lambda s, i=k: (lambda seg: seg[i] if len(seg) > i else "")(
+                        [x.strip() for x in _delim.split(s) if x.strip()]))
+                    records_df[aux] = vals
+                    raw_df[aux] = vals
+                    catalog.append((aux, "text", [p2[k] for p2 in parts if len(p2) > k][:3]))
 
     # synthetic row id: internal to the evaluator (dedup key); NOT in catalog.
     records_df["contract_node_id"] = [f"row{i}" for i in range(len(records_df))]

@@ -55,19 +55,21 @@ _COL_RE = re.compile(r"^c(\d+)(?:_(\w+))?$")
 
 def resolve_col(tok: str, colmap: dict) -> str:
     if tok == "id":
+        if "row_index" in colmap.get(0, set()):
+            return "row_index"
         raise Skip("row_id_navigation")
     m = _COL_RE.match(tok)
     if not m:
         raise Skip(f"unknown_column_token")
     idx, suffix = int(m.group(1)), m.group(2)
-    if suffix not in (None, "number", "year", "minimum_year", "maximum_year"):
+    if suffix not in (None, "number", "year", "minimum_year", "maximum_year", "first", "second"):
         raise Skip(f"column_transform:{suffix}")
     entry = colmap.get(idx)
     if entry is None:
         raise Skip("column_index_out_of_range")
     name, dtype = entry
     _SUFFIX_VIEWS = {"number": "__num", "year": "__min_year", "minimum_year": "__min_year",
-                     "maximum_year": "__max_year"}  # first/second stay censused: ambiguous parse rejected
+                     "maximum_year": "__max_year", "first": "__part_1", "second": "__part_2"}  # first/second stay censused: ambiguous parse rejected
     if suffix in _SUFFIX_VIEWS and not (suffix == "number" and dtype == "number"):
         aux = f"{name}{_SUFFIX_VIEWS[suffix]}"
         if aux in colmap.get(0, set()):
@@ -401,7 +403,7 @@ def main() -> None:
                 shim, catalog = load_universe(csv_rel)
                 orig = [c for c in catalog if "__" not in c[0]]
                 cm = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
-                cm[0] = {c[0] for c in catalog if "__" in c[0]}
+                cm[0] = {c[0] for c in catalog if "__" in c[0] or c[0] == "row_index"}
                 universes[csv_rel] = (shim, cm)
             except Exception as exc:
                 universes[csv_rel] = None

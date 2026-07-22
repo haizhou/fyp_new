@@ -138,3 +138,18 @@ construction. Full-run projection: ~1,250 new questions over the remaining
 pool at ~$3.5 total (+38% A-pool growth on the uncovered distribution).
 DECISION PENDING: full-run spend approval (user gate).
 Artifact: data/qa/wtq/harvest_grok_pilot.jsonl.
+
+## E13e. Representation layer (v4: row_index + typed parts) — STATUS: POST-PRISTINE DIAGNOSTIC
+User architecture critique adopted: row order is table DATA (the procurement
+KG built such conveniences at ingest); dropping the understanding stage in
+transfer had hidden representation debt inside the "language gap".
+Audit: coverage 61.03->65.49 train / 60.06->64.96 dev (+4.5/+4.9), newly
+expressible 509, REGRESSIONS 0, fidelity/executor held 92.9/92.5.
+row_id_navigation bucket ELIMINATED (525->0). Composite-parts recovery
+minimal by design: tight-hyphen cells ("5-14", "1998-99") deliberately not
+split under the fixed conservative delimiter rule (ambiguity the user
+flagged); assigned to the future understanding arm. Cumulative arc with
+algebra frozen: 54.66 -> 61.03 -> 65.49. Next free steps: C-v4/A-v4
+retrain+eval; two-stage understanding pilot with LOCAL model. SPEND GATE:
+any nano/grok call requires prior user approval; grok full-run decision
+deferred until v4 re-harvest resizes the zero-hit pool.

@@ -62,7 +62,7 @@ def build_c():
         shim, catalog = universes[csv_rel]
         orig = [c for c in catalog if "__" not in c[0]]
         colmap = {i + 1: (c[0], c[1]) for i, c in enumerate(orig)}
-        colmap[0] = {c[0] for c in catalog if "__" in c[0]}
+        colmap[0] = {c[0] for c in catalog if "__" in c[0] or c[0] == "row_index"}
         try:
             tree = translate(e["sql"], colmap, shim.records_df)
             if validate_tree(tree) == "RECORDS":
