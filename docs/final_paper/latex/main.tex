@@ -1,0 +1,95 @@
+\documentclass{article}
+
+\usepackage[preprint]{tmlr}
+% \usepackage{tmlr}            % anonymized submission
+% \usepackage[accepted]{tmlr}  % camera-ready
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{url}
+
+\title{Auditable Compositional Question Answering over UK Public Procurement}
+
+% TODO final author block
+\author{\name Anonymous \email anonymous@example.com \\
+ \addr University College London}
+
+\def\month{07}
+\def\year{2026}
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The United Kingdom publishes hundreds of thousands of contract award
+notices, yet the public cannot reliably analyse them in natural language,
+because the questions that matter are exhaustive aggregations where a
+fluent wrong answer is worse than none. We introduce, to the best of our
+knowledge, the first systematic benchmark and executable framework for
+auditable compositional question answering over UK public procurement. The
+task ships complete. A convention-explicit knowledge graph of 215{,}221
+contract awards, a benchmark of 12{,}828 questions each carrying an
+executable gold program, a typed compositional operator algebra that
+formalises real procurement analytics, refusal on ambiguous, unsupported
+and empty questions as scored behaviour, and answer oracles validated by
+an independent second implementation at 99.88 percent over 14{,}770
+audited answers. Because no annotator pool can label compositional
+procurement programs at scale, training uses a verified bootstrap. Models
+propose candidate programs and deterministic checks, compilation,
+grounding, execution and oracle agreement, decide what may be learned
+from. An 8-billion-parameter local model trained this way reaches 85.65
+percent against 69.76 for the cloud teacher that generated its training
+data (paired McNemar $p < 10^{-15}$), and 78.31 percent on a sealed
+challenge set with an independent surface grammar, a constraint-necessity
+audit, and a 28-point margin over the same teacher. Transplanted to
+WikiTableQuestions by exchanging only the data-representation layer, the
+recipe lifts a 22.5 percent zero-shot floor to 44.4 with answer-only
+supervision and 51.8 with gold programs on the official sealed test,
+while a four-way attribution audit shows a substantial share of the
+apparent expressiveness gap to be representation and compilation debt
+rather than missing reasoning capability. We claim no state of the art.
+The claim is a task built end to end, and audits strong enough to say
+precisely what its system can and cannot yet do.
+\end{abstract}
+
+% ---------------------------------------------------------------
+\section{Introduction}\label{sec:intro}
+% TODO convert docs/final_paper/draft_01_introduction.md
+
+\section{Related Work}\label{sec:related}
+% TODO convert docs/final_paper/draft_02_related.md
+
+\section{The Task and the System}\label{sec:system}
+% TODO convert docs/final_paper/draft_03_system.md
+% Figure 1 (architecture) goes here.
+
+\section{Benchmarks and Audits}\label{sec:benchmarks}
+% TODO convert docs/final_paper/draft_04_benchmarks.md
+
+\section{Experiments}\label{sec:experiments}
+% TODO convert docs/final_paper/draft_05_experiments.md
+% Figure 2 (scoreboard ladder), Figure 3 (attribution matrix), Tables 1-3.
+
+\section{Discussion}\label{sec:discussion}
+% TODO convert docs/final_paper/draft_06_07_discussion_conclusion.md (§6)
+
+\section{Conclusion}\label{sec:conclusion}
+% TODO convert docs/final_paper/draft_06_07_discussion_conclusion.md (§7)
+
+\bibliography{references}
+\bibliographystyle{tmlr}
+
+\appendix
+\section{Operator Algebra Reference}\label{app:algebra}
+% TODO
+\section{Audit Protocols}\label{app:audits}
+% TODO
+\section{Prompt and Serving Configuration}\label{app:config}
+% TODO
+
+\end{document}

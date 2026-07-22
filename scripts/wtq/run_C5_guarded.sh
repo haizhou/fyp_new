@@ -3,12 +3,14 @@ export OPENBLAS_NUM_THREADS=4 OMP_NUM_THREADS=4
 cd /home/uceeh01/fyp_new/fyp_new
 export HF_HOME=/var/tmp/cicada/hf
 for i in $(seq 1 72); do
-  QF=$(quota -s 2>/dev/null | awk '/Free space/{print $3}' | tr -d 'GbMb')
-  GPU=$(nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader,nounits | awk -F', ' '$2 < 39000 && $3 <= 30 {print $1; exit}')
-  echo "poll $i: quotafree=$QF gpu=${GPU:-none}"
+  GPU=$(nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader,nounits | awk -F', ' '$2 < 39000 && $3 <= 60 {print $1; exit}')
+  echo "poll $i: gpu=${GPU:-none}"
   if [ -n "$GPU" ]; then
-    Q=$(quota -s 2>/dev/null | awk '/Free space/{print $3}')
-    case "$Q" in *G*) ;; *) echo "quota low ($Q), waiting"; sleep 600; continue;; esac
+    if dd if=/dev/zero of="$HOME/.qprobe" bs=64M count=20 conv=fsync 2>/dev/null; then
+      rm -f "$HOME/.qprobe"; echo "quota probe OK (1.25G writable)"
+    else
+      rm -f "$HOME/.qprobe"; echo "quota probe FAILED, waiting"; sleep 600; continue
+    fi
     rm -rf outputs/wtq_C_v5/checkpoint-1000 outputs/wtq_C_v5
     CUDA_VISIBLE_DEVICES=$GPU .venv/bin/llamafactory-cli train configs/training/wtq_C_v5_qlora.yaml || { echo "train failed"; sleep 600; continue; }
     .venv/bin/python - << 'PYEOF' || { echo "INTEGRITY FAIL"; exit 1; }
