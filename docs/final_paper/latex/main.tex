@@ -232,7 +232,7 @@ successors improving further \citep{liu2022tapex,jiang2022omnitab}. Binder
 generating SQL or Python against the table. These works calibrate our
 transfer numbers, and our answer-only result of 44.4 percent sits inside
 the classical band while our gold-program result of 51.8 exceeds
-TAPAS-large. They are not enough for our purpose because the program
+TaPas-large. They are not enough for our purpose because the program
 language is chosen for coverage, not for verifiability. Open-ended Python
 generation does not by itself provide a type checker that a second
 implementation can replay, a closed grammar that decoding can enforce, or
@@ -292,8 +292,9 @@ become training data; the oracle filters and never authors.}
 \label{fig:architecture}
 \end{figure}
 
-\paragraph{The algebra.} Programs are trees over five value types, record
-sets, value sets, group tables, scalars, and booleans. Seventeen node
+\paragraph{The algebra.} Programs are trees over seven value types, record
+sets, value sets, group tables, rankings, numbers, scalar values, and
+booleans. Seventeen node
 types cover filtering with negation, disjunction and computed-set
 membership, projection, counting, guarded money summation, unique lookup,
 extremum records, grouping with count or sum metrics, group reduction by
@@ -435,7 +436,7 @@ constraints, the untrained base produces question-grounded plans in an
 invented schema on 98 of 100 questions and matches the executable contract
 on 3. The tuned models match it on 98 and 99. Fine-tuning contributes
 contract conformance and planning quality within it, and constrained
-decoding grants the contract to every system equally, so the table
+decoding grants the contract to every system equally, so the ladder
 measures planning.
 
 \begin{figure}[t]
