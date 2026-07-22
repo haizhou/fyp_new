@@ -408,33 +408,15 @@ seeds.
 
 \subsection{Verified Bootstrap on the Home Benchmark}\label{sec:home}
 
-Table~\ref{tab:home} reports the five-system comparison on the held-out
-test set of 2{,}285 questions. The teacher is the strongest cloud
+Figure~\ref{fig:scoreboard}(a) reports the five-system comparison on the
+held-out test set of 2{,}285 questions. The teacher is the strongest cloud
 configuration we could deploy. The hybrid systems use the cloud model for
 question understanding and a local 8B adapter for planning. The fully
 local systems use 8B LoRA adapters \citep{hu2022lora,dettmers2023qlora}
 for both stages, trained only on harvest survivors of the deterministic
 filter.
 
-\begin{table}[t]
-\centering
-\caption{Held-out accuracy on the procurement benchmark (2{,}285
-questions). Every pairing is significant at McNemar $p < 10^{-14}$.}
-\label{tab:home}
-\begin{tabular}{lc}
-\toprule
-System & Accuracy \\
-\midrule
-Cloud teacher & 69.76 \\
-Llama-3.1-8B hybrid & 75.97 \\
-Qwen3-8B hybrid & 78.03 \\
-Llama-3.1-8B fully local & 83.33 \\
-Qwen3-8B fully local & \textbf{85.65} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Every pairing in the table is significant at McNemar $p < 10^{-14}$. The
+Every pairing in the figure is significant at McNemar $p < 10^{-14}$. The
 fully local Qwen system \citep{qwen3-2025} exceeds its teacher by 15.89
 points with a 95 percent confidence interval of 14.07 to 17.70. The result
 replicates on the second base model at 13.57 points. Because the teacher
@@ -454,8 +436,7 @@ invented schema on 98 of 100 questions and matches the executable contract
 on 3. The tuned models match it on 98 and 99. Fine-tuning contributes
 contract conformance and planning quality within it, and constrained
 decoding grants the contract to every system equally, so the table
-measures planning. Figure~\ref{fig:scoreboard} places both scoreboards
-side by side.
+measures planning.
 
 \begin{figure}[t]
 \centering
@@ -469,48 +450,32 @@ margin. Dashed lines mark the teacher.}
 \end{figure}
 
 Two further slices report what the headline hides
-(Table~\ref{tab:decay}). First, moving from development to the 2{,}285-row
-test costs the hybrid systems 5.5 and 7.1 points but the fully local
-systems only 0.5 and 0.9, on both base models. Training on verified
-survivors appears to remove exactly the brittleness that shows up as
-dev-to-test decay. Second, on a composite hard slice of the development
-set the fully local student is flat, moving $+0.8$ points where the
-teacher loses 6 to 12 and a preference-tuned hybrid loses 7.7, so the
-student advantage is largest, 18 to 20 points, precisely where questions
-are hardest. Third, the bootstrap converges. A second self-harvest round
-lifts harvest yield from 76.6 to 86.3 percent, yet the evaluation gain is
-$+0.4$ points and not significant, so the verifier-gated loop has a
-natural ceiling on this task and we report it rather than iterate past
-it.
+(Figure~\ref{fig:slices}). First, moving from development to the
+2{,}285-row test costs the hybrid systems 5.5 and 7.1 points but the
+fully local systems only 0.5 and 0.9, on both base models. Training on
+verified survivors appears to remove exactly the brittleness that shows
+up as dev-to-test decay. Second, on a composite hard slice of the
+development set the fully local student is flat, moving $+0.8$ points
+where the teacher loses 6 to 12 and a preference-tuned hybrid loses 7.7,
+so the student advantage is largest, 18 to 20 points, precisely where
+questions are hardest. Third, the bootstrap converges. A second
+self-harvest round lifts harvest yield from 76.6 to 86.3 percent, yet the
+evaluation gain is $+0.4$ points and not significant, so the
+verifier-gated loop has a natural ceiling on this task and we report it
+rather than iterate past it.
 
-\begin{table}[t]
+\begin{figure}[t]
 \centering
-\caption{What the headline hides. Left, development-to-test decay by
-system class, both bases. Right, accuracy on the iid and composite hard
-slices of the development set.}
-\label{tab:decay}
-\small
-\begin{tabular}{lccc}
-\toprule
-System & Dev & Test & Decay \\
-\midrule
-Llama hybrid & 83.1 & 75.97 & $-7.1$ \\
-Qwen hybrid & 83.5 & 78.03 & $-5.5$ \\
-Llama fully local & 84.2 & 83.33 & $-0.9$ \\
-Qwen fully local & 86.2 & 85.65 & $-0.5$ \\
-\bottomrule
-\end{tabular}
-\hspace{1.5em}
-\begin{tabular}{lccc}
-\toprule
-System & iid & hard & slope \\
-\midrule
-Teacher (3 runs) & 73.8--78.6 & 65.4--67.6 & $-6$ to $-12$ \\
-Qwen hybrid (DPO) & 86.4 & 78.7 & $-7.7$ \\
-Qwen fully local & 84.5 & 85.3 & $+0.8$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\linewidth]{figs/slices.pdf}
+\caption{What the headline hides. (a) Development-to-test movement per
+system. Hybrid systems decay steeply on both bases while fully local
+systems barely move, so verified-survivor training removes the
+brittleness that surfaces as dev-to-test decay. (b) On the composite hard
+slice the teacher and the preference-tuned hybrid fall while the fully
+local student is flat, so its advantage is largest where questions are
+hardest.}
+\label{fig:slices}
+\end{figure}
 
 \subsection{A Sealed Benchmark the System Did Not Author}\label{sec:pacs}
 
@@ -522,31 +487,20 @@ and the cloud teacher 50.33. The verified-bootstrap student exceeds its
 teacher by 27.98 points here. The comparison is a system-level one between
 deployable configurations, not a model comparison under equal decoding,
 because the teacher's API offers no constrained decoding and 23.1 percent
-of its rows fail on format alone. Table~\ref{tab:pacs} collects the
-headline and the audits that defend it.
+of its rows fail on format alone. Figure~\ref{fig:pacsaudit} collects the
+audits that attack the headline from both directions.
 
-\begin{table}[t]
+\begin{figure}[t]
 \centering
-\caption{PACS results and integrity audits. The sealed test was evaluated
-once; all audit rows are computed offline from the frozen run.}
-\label{tab:pacs}
-\small
-\begin{tabular}{lc}
-\toprule
-Measurement & Value \\
-\midrule
-Strict accuracy, all 922 sealed rows & 78.31 \\
-Answerable subset & 80.00 \; [77.06, 82.92] \\
-\;\; same rows: untrained base / retrieval / cloud teacher & 36.01 / 21.90 / 50.33 \\
-\midrule
-Irreducible rows (every predicate load-bearing) & 42.7\% of answerable \\
-Planner accuracy on the irreducible subset & 78.7 \\
-Unseen-exposure cost (intent shapes absent from training) & $-11.5$ \; [5.6, 17.2] \\
-Typed-feedback repair variant (development, not primary) & $+1.7$ \\
-Teacher rows failing on format alone & 23.1\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=0.86\linewidth]{figs/pacs_audits.pdf}
+\caption{PACS integrity audits around the answerable headline (dashed
+line, cluster bootstrap interval shown). The planner loses only 1.3
+points on the shortcut-resistant irreducible subset, gains 1.7 from a
+typed-feedback repair variant that is reported but not primary, and pays
+11.5 points (interval 5.6 to 17.2) on intent shapes never demonstrated in
+training.}
+\label{fig:pacsaudit}
+\end{figure}
 
 Two audits attack this headline from opposite directions. Deleting each
 oracle-program predicate in turn and re-executing shows that 42.7 percent
@@ -575,7 +529,7 @@ baseline while random cells lose 1.7, so the gain is grounding rather than
 added context.
 
 On the official test set, evaluated once under a recorded manifest, the
-four rungs of Table~\ref{tab:wtq} are each significant at
+four rungs of Figure~\ref{fig:wtqladder}(a) are each significant at
 $p < 5 \times 10^{-18}$. The checkpoint carries a 4.8-point zero-shot
 prior, and the recipe carries 17 to 24.5 points beyond it. The
 answer-only figure matches classical weakly-supervised parsers on this
@@ -585,34 +539,16 @@ recent specialised systems
 \citep{cheng2023binder,ye2023dater,wang2024chainoftable}, a gap the next
 paragraph explains rather than excuses.
 
-\begin{table}[t]
+\begin{figure}[t]
 \centering
-\caption{WikiTableQuestions transfer. Left, the official sealed test,
-touched once. Right, the development fold before and after
-representation-and-compilation closure, showing capability tracking the
-coverage boundary in both supervision regimes.}
-\label{tab:wtq}
-\small
-\begin{tabular}{lc}
-\toprule
-System (official test, $n$=4{,}344) & Acc \\
-\midrule
-Untrained base & 22.51 \\
-Procurement checkpoint & 27.33 \\
-Answer-only bootstrap & 44.43 \\
-Gold-program training & \textbf{51.80} \\
-\bottomrule
-\end{tabular}
-\hspace{1.5em}
-\begin{tabular}{lcc}
-\toprule
-Dev fold & Before & After closure \\
-\midrule
-Answer-only & 31.7 & 40.0 \\
-Gold-program & 40.0 & 51.0 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\linewidth]{figs/wtq_ladder.pdf}
+\caption{WikiTableQuestions transfer. (a) The four rungs on the official
+sealed test, touched once; each step is significant at
+$p < 5 \times 10^{-18}$. (b) Retraining after
+representation-and-compilation closure lifts the development fold in both
+supervision regimes, so capability tracks the coverage boundary.}
+\label{fig:wtqladder}
+\end{figure}
 
 A differential audit against 11{,}276 gold SQL programs
 \citep{shi2020squall} separates where the remaining gap actually lives.
@@ -629,7 +565,7 @@ that lowers SQL constructs onto existing nodes and adds typed loader views
 raises coverage to 61.0 percent with zero regressions. One seventh of the
 apparent expressiveness gap was compiler and representation debt.
 Retraining after closure lifts the development fold in both supervision
-regimes (Table~\ref{tab:wtq}, right), so capability tracks the coverage
+regimes (Figure~\ref{fig:wtqladder}b), so capability tracks the coverage
 boundary.
 
 \begin{table}[t]
