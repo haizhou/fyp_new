@@ -248,3 +248,14 @@ matches gold perfectly; the v6 rewrite's only error was targeting view column ve
 ("Bangkok") instead of original venue ("Bangkok, Thailand"). fast plausibly assembled the tree AS
 INSTRUCTED. Assembly-is-the-constraint claim is falsified for this exhibit; v6 ceiling unknown
 pending v6.1 (rewrite prompt: report values from ORIGINAL columns only; repair: new de-base variant).
+
+## E13l — teacher ensemble union analysis (2026-07-23, closes the two-step investigation)
+
+v6.1 (rewrite prompt: answers from ORIGINAL columns only + de-base repair variant) = 5/20, new
+two-step best; nt-1 rescued mechanically. Three-lane overlap on the same 20 hardest residue:
+local C-v5 6 (0 unique), reasoning-direct 7 (2 unique: nt-14 nt-25), two-step v6.1 5 (1 unique:
+nt-12 via operand-swap repair). UNION 9/20 = 45% of the both-samplers-zero-hit tail.
+Final cascade (evidence-based): C-v5 free sweep -> reasoning-direct -> two-step v6.1 mop-up;
+rewrite_impossible flags prune the paid pool. The user's two-step strategy earns its ensemble seat
+with a unique contribution; protocol v6.1 + tree_repair de-base are the production versions.
+Artifacts: pilot_twostep_v61.json; union computed from pilot_barm_local/grok_reasoning artifacts.

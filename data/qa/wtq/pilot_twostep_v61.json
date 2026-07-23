@@ -1,0 +1,244 @@
+[
+ {
+  "id": "nt-1",
+  "original": "in what city did piotr's last 1st place finish occur?",
+  "rewrite": "What is the venue__part_1 in the row with the largest year among rows where position is 1st?",
+  "status": "verified",
+  "via": "repair",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "position",
+       "op": "eq",
+       "value": "1st"
+      }
+     ]
+    },
+    "op": "argmax",
+    "field": "year"
+   },
+   "field": "venue"
+  }
+ },
+ {
+  "id": "nt-3",
+  "original": "how many more passengers flew to los angeles than to saskatoon from manzanillo airport in 2013?",
+  "rewrite": "Report the passengers where city__part_2 is Los Angeles minus the passengers where city__part_2 is Saskatoon.",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "sum",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city__part_2",
+       "op": "eq",
+       "value": "Los Angeles"
+      }
+     ]
+    },
+    "field": "passengers"
+   },
+   "right": {
+    "node": "sum",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city__part_2",
+       "op": "eq",
+       "value": "Saskatoon"
+      }
+     ]
+    },
+    "field": "passengers"
+   }
+  }
+ },
+ {
+  "id": "nt-4",
+  "original": "who was the opponent in the first game of the season?",
+  "rewrite": "Report the opponent in the row with the smallest date__date.",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "date__date",
+       "op": "exists"
+      }
+     ]
+    },
+    "op": "argmin",
+    "field": "date__date"
+   },
+   "field": "opponent"
+  }
+ },
+ {
+  "id": "nt-5",
+  "original": "how many people stayed at least 3 years in office?",
+  "rewrite": "Report the count of rows where left_office__min_year minus took_office__min_year is at least 3.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-6",
+  "original": "who is the first away team on the chart",
+  "rewrite": "What is the away_team in the row with the smallest row_index?",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-7",
+  "original": "which is deeper, lake tuz or lake palas tuzla?",
+  "rewrite": "Report the depth__num for the row where name_in_english is Lake Tuz. Report the depth__num for the row where name_in_english is Lake Palas Tuzla.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-9",
+  "original": "which players played the same position as ardo kreek?",
+  "rewrite": "Report the player for all rows where position equals the position where player is Ardo Kreek.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-10",
+  "original": "how many times did an italian cyclist win a round?",
+  "rewrite": "REWRITE_IMPOSSIBLE: no column for rider nationality or \"Italian\" (cannot ground without external knowledge of names).",
+  "status": "rewrite_impossible"
+ },
+ {
+  "id": "nt-12",
+  "original": "what is the difference in the number of temples between imabari and matsuyama?",
+  "rewrite": "Report the absolute difference between the number of rows where city_town_village is Imabari and the number of rows where city_town_village is Matsuyama.",
+  "status": "verified",
+  "via": "repair",
+  "tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "count",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city_town_village",
+       "op": "eq",
+       "value": "Matsuyama"
+      }
+     ]
+    }
+   },
+   "right": {
+    "node": "count",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city_town_village",
+       "op": "eq",
+       "value": "Imabari"
+      }
+     ]
+    }
+   }
+  }
+ },
+ {
+  "id": "nt-14",
+  "original": "which athlete was from south korea after the year 2010?",
+  "rewrite": "Report the athlete in rows where nation is South Korea (KOR) and olympics__min_year is greater than 2010. \n(The value to report is exactly the athlete cell.)",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-18",
+  "original": "how many movies have links to other wikipedia pages about them?",
+  "rewrite": "REWRITE_IMPOSSIBLE: no column indicates presence of wikipedia links<|eos|>",
+  "status": "rewrite_impossible"
+ },
+ {
+  "id": "nt-20",
+  "original": "which album released by the band schnell fenster produced the most singles appearing on the australian peak chart?",
+  "rewrite": "REWRITE_IMPOSSIBLE\nRequires grouping by album then counting rows with non-empty peak_chart_positions_aus (or peak_chart_positions_aus__num) to find max count; no single sortable column achieves this.",
+  "status": "rewrite_impossible"
+ },
+ {
+  "id": "nt-23",
+  "original": "what counties had the least participants for the race?",
+  "rewrite": "Which value in the nationality column occurs the smallest number of times?",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-24",
+  "original": "who ranked right after turkey?",
+  "rewrite": "Report the nation in the row with the smallest rank among rows where rank is greater than the rank in the row where nation is Turkey.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-25",
+  "original": "what's the number of parishes founded in the 1800s?",
+  "rewrite": "Report the count of rows where the founded column is greater than or equal to 1800 and less than 1900. \nThe value to report is that count.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-27",
+  "original": "in 1996 the sc house of representatives had a republican majority. how many years had passed since the last time this happened?",
+  "rewrite": "Report 1996 minus the largest year among rows where year < 1996 and majority equals republican_party.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-30",
+  "original": "what was the average number of years served by a coach?",
+  "rewrite": "Report the average of all values in the years column.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-31",
+  "original": "how many beta versions were released before the first full release?",
+  "rewrite": "Report the number of rows where development_cycle is Beta or Beta-pre and date__date is less than the minimum date__date among rows where development_cycle is Release or release.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-37",
+  "original": "what is the total amount of processors that have both an integrated color display and an enhanced keyboard?",
+  "rewrite": "Report the count of rows where case is Desktop with integrated Color display and notes__part_2 is enhanced keyboard.",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "case",
+      "op": "eq",
+      "value": "Desktop with integrated Color display"
+     },
+     {
+      "field": "notes__part_2",
+      "op": "eq",
+      "value": "enhanced keyboard"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-38",
+  "original": "how many consecutive friendly competitions did chalupny score in?",
+  "rewrite": "REWRITE_IMPOSSIBLE\nRequires determining length of streak of consecutive rows (ordered by date or row_index) where competition= Friendly; cannot be expressed as reporting a single column value from one row without relative/sequence terms or code.",
+  "status": "rewrite_impossible"
+ }
+]
