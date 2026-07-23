@@ -238,6 +238,21 @@ def load_universe(csv_rel: str):
                 raw_df[aux] = records_df[aux].fillna("")
                 catalog.append((aux, "text", list(records_df[aux].dropna().head(3))))
 
+    # v4c normalization views: __norm casefolded twin for text columns whose
+    # values SPLIT under casefold (same category, different case/spacing) --
+    # the WTQ port of the main pipeline's grounding/normalisation discipline.
+    if _os.environ.get("WTQ_VIEWS", "v4") == "v4":
+        for col, dtype, _samples in list(catalog):
+            if dtype != "text" or "__" in col:
+                continue
+            series = raw_df[col].astype(str)
+            folded = series.str.strip().str.casefold().str.replace(r"\s+", " ", regex=True)
+            if folded[series.str.strip() != ""].nunique() < series[series.str.strip() != ""].nunique():
+                aux = f"{col}__norm"
+                records_df[aux] = folded
+                raw_df[aux] = folded
+                catalog.append((aux, "text", list(folded[series.str.strip() != ""].unique()[:3])))
+
     # synthetic row id: internal to the evaluator (dedup key); NOT in catalog.
     records_df["contract_node_id"] = [f"row{i}" for i in range(len(records_df))]
     shim = SimpleNamespace(records_df=records_df, raw_df=raw_df, integrity=integrity)

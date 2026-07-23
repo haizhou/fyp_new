@@ -259,3 +259,16 @@ Final cascade (evidence-based): C-v5 free sweep -> reasoning-direct -> two-step 
 rewrite_impossible flags prune the paid pool. The user's two-step strategy earns its ensemble seat
 with a unique contribution; protocol v6.1 + tree_repair de-base are the production versions.
 Artifacts: pilot_twostep_v61.json; union computed from pilot_barm_local/grok_reasoning artifacts.
+
+## E13m — v4c normalization views: the grounding port (2026-07-23, user-driven)
+
+User challenge "主实验不就有grounding吗" was correct: the transfer ported the data loader but NOT the
+main pipeline's normalisation discipline (procurement side: 131,502 canonical orgs, ER phases,
+normalise.py; WTQ side: raw-cell exact matching). Exhibit nt-9: the PERFECT in_expr semijoin plan
+returns only 1 of 2 gold players because position cells split as "Middle blocker"/"Middle Blocker";
+runtime eq/in_expr is exact (casefold only in sort keys). No prompt protocol can fix a representation
+gap. v4c: __norm casefolded/whitespace-collapsed twin views, created ONLY where a text column's
+values actually merge under folding (conservative trigger). nt-9 tree via position__norm: exact gold
+match. Census: 26/703 zero-hit tables (3.7%) gain views; 37/1000 zero-hit questions on affected
+tables. Misattribution corrected: nt-9 was representation debt, not planning failure — same taxonomy
+as the paper's one-seventh finding. Gated reharvest runs under v4b+v4c views from here on.
