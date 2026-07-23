@@ -183,3 +183,18 @@ Artifacts: pilot_grok_reasoning.jsonl, pilot_grok_wtq_brief.json, pilot_fast_wit
 Fast pilot economics (E13c artifact recomputed): 155/1000 = 15.5% incremental, zero-hit pool 8,049/11,332.
 Pricing tier of grok-4-20-reasoning UNRESOLVED (dashboard shows GBP 0 across 66 req / 45.1k tk —
 free preview or billing lag; deployment blade check pending).
+
+## E13i — two-stage v2 (faithful main-experiment card port) + template census (2026-07-23)
+
+| Arm (same 20 fast-failed) | Rescue |
+|---|---|
+| two-stage v2: 8-section brief + template shells | **1/20** (v1 prose brief: 3/20; reasoning direct: 7/20) |
+
+Template distribution on the 20: ordered_navigation 6, filter_aggregate 7, comparison 4, grouped_extreme 2, row_lookup 1.
+Mechanism: brief classified 6 as out-of-language -> shell steers Step-2 to abstain -> dead by construction,
+while reasoning-direct SOLVES some of the same questions by recasting in-flight. Frontier questions need
+JOINT understanding+planning search; any Step-1->Step-2 freeze kills the recast. Replicates the main
+pipeline's own lean-beats-card finding for strong planners. Understanding-arm CLOSED for zero-hit pool.
+Template vocabulary validated: 9,663 verified trees classify 99.9% into 8 templates
+(filter_aggregate 40.2, row_lookup 29.3, superlative_row 20.0, grouped_extreme 7.0, comparison 2.8, rest 0.5).
+Artifacts: pilot_brief_v2.jsonl, scripts/wtq/pilot_brief_v2.py.
