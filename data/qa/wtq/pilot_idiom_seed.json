@@ -1,0 +1,294 @@
+[
+ {
+  "id": "nt-5",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "size",
+   "of": {
+    "node": "keys_where",
+    "of": {
+     "node": "gcombine",
+     "op": "diff",
+     "left": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "exists"
+        }
+       ]
+      },
+      "key": "name",
+      "metric": "sum",
+      "field": "left_office__min_year"
+     },
+     "right": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "exists"
+        }
+       ]
+      },
+      "key": "name",
+      "metric": "sum",
+      "field": "took_office__min_year"
+     }
+    },
+    "op": "ge",
+    "value": 3
+   }
+  }
+ },
+ {
+  "id": "nt-6",
+  "status": "wrong",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 1
+     }
+    ]
+   },
+   "field": "away_team"
+  }
+ },
+ {
+  "id": "nt-9",
+  "status": "wrong",
+  "tree": {
+   "node": "values",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "position",
+      "op": "in_expr",
+      "expr": {
+       "node": "values",
+       "of": {
+        "node": "filter",
+        "where": [
+         {
+          "field": "player",
+          "op": "eq",
+          "value": "Ardo Kreek"
+         }
+        ]
+       },
+       "field": "position"
+      }
+     }
+    ]
+   },
+   "field": "player"
+  }
+ },
+ {
+  "id": "nt-10",
+  "status": "no_tree"
+ },
+ {
+  "id": "nt-18",
+  "status": "no_tree"
+ },
+ {
+  "id": "nt-23",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "keys_where",
+   "of": {
+    "node": "groupby",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "row_index",
+       "op": "exists"
+      }
+     ]
+    },
+    "key": "nationality",
+    "metric": "count"
+   },
+   "op": "le",
+   "value": 1
+  }
+ },
+ {
+  "id": "nt-24",
+  "status": "wrong",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "rank",
+      "op": "eq",
+      "value": {
+       "node": "combine",
+       "op": "add",
+       "left": {
+        "node": "select",
+        "of": {
+         "node": "filter",
+         "where": [
+          {
+           "field": "nation",
+           "op": "eq",
+           "value": "Turkey"
+          }
+         ]
+        },
+        "field": "rank"
+       },
+       "right": {
+        "node": "num",
+        "value": 1
+       }
+      }
+     }
+    ]
+   },
+   "field": "nation"
+  }
+ },
+ {
+  "id": "nt-27",
+  "status": "wrong",
+  "tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "num",
+    "value": 1996
+   },
+   "right": {
+    "node": "select",
+    "of": {
+     "node": "extreme_rows",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "year",
+        "op": "in_expr",
+        "expr": {
+         "node": "keys_where",
+         "of": {
+          "node": "gcombine",
+          "op": "diff",
+          "left": {
+           "node": "groupby",
+           "of": {
+            "node": "filter",
+            "where": [
+             {
+              "field": "year",
+              "op": "lte",
+              "value": 1995
+             }
+            ]
+           },
+           "key": "year",
+           "metric": "sum",
+           "field": "republican_party"
+          },
+          "right": {
+           "node": "groupby",
+           "of": {
+            "node": "filter",
+            "where": [
+             {
+              "field": "year",
+              "op": "lte",
+              "value": 1995
+             }
+            ]
+           },
+           "key": "year",
+           "metric": "sum",
+           "field": "majority"
+          }
+         },
+         "op": "eq",
+         "value": 0
+        }
+       }
+      ]
+     },
+     "op": "argmax",
+     "field": "year"
+    },
+    "field": "year"
+   }
+  }
+ },
+ {
+  "id": "nt-30",
+  "status": "wrong",
+  "tree": {
+   "node": "combine",
+   "op": "ratio",
+   "left": {
+    "node": "sum",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "row_index",
+       "op": "exists"
+      }
+     ]
+    },
+    "field": "years"
+   },
+   "right": {
+    "node": "count",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "row_index",
+       "op": "exists"
+      }
+     ]
+    }
+   }
+  }
+ },
+ {
+  "id": "nt-31",
+  "status": "no_tree"
+ },
+ {
+  "id": "nt-38",
+  "status": "wrong",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "competition",
+      "op": "eq",
+      "value": "Friendly"
+     }
+    ]
+   }
+  }
+ }
+]

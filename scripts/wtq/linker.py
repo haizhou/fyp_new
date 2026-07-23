@@ -55,3 +55,24 @@ def render(links) -> str:
         else:
             lines.append(f"- column={col}")
     return "\n".join(lines)
+
+
+def render_with_rows(links, raw_df) -> str:
+    """Like render(), but each matched cell also reports its row_index values --
+    the anchor information positional-navigation plans need for literal inlining."""
+    if not links:
+        return ""
+    lines = ["Relevant grounded candidates (copy values EXACTLY; row_index shown for anchors):"]
+    for col, cells in links:
+        if cells:
+            annotated = []
+            for c in cells:
+                try:
+                    rows = raw_df.loc[raw_df[col].astype(str) == str(c), "row_index"].tolist()[:4]
+                    annotated.append(f"{c!r} (row_index {','.join(str(int(r)) for r in rows)})" if rows else repr(c))
+                except Exception:  # noqa: BLE001
+                    annotated.append(repr(c))
+            lines.append(f"- column={col}: [" + ", ".join(annotated) + "]")
+        else:
+            lines.append(f"- column={col}")
+    return "\n".join(lines)

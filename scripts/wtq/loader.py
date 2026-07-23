@@ -253,6 +253,22 @@ def load_universe(csv_rel: str):
                 raw_df[aux] = folded
                 catalog.append((aux, "text", list(folded[series.str.strip() != ""].unique()[:3])))
 
+    # v4c __noparen: strip a trailing parenthetical " (...)" from text cells --
+    # division/qualifier suffixes ("Varbergs GIF (D3)") that answers never carry.
+    if _os.environ.get("WTQ_VIEWS", "v4") == "v4":
+        import re as _re
+        _paren = _re.compile(r"\s*\([^)]*\)\s*$")
+        for col, dtype, _samples in list(catalog):
+            if dtype != "text" or "__" in col:
+                continue
+            series = raw_df[col].astype(str)
+            stripped = series.map(lambda v: _paren.sub("", v))
+            if (stripped != series).mean() >= 0.3 and (stripped.str.strip() != "").any():
+                aux = f"{col}__noparen"
+                records_df[aux] = stripped
+                raw_df[aux] = stripped
+                catalog.append((aux, "text", list(stripped[stripped.str.strip() != ""].unique()[:3])))
+
     # synthetic row id: internal to the evaluator (dedup key); NOT in catalog.
     records_df["contract_node_id"] = [f"row{i}" for i in range(len(records_df))]
     shim = SimpleNamespace(records_df=records_df, raw_df=raw_df, integrity=integrity)

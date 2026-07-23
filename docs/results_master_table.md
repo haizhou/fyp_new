@@ -293,3 +293,16 @@ keys_where tied extremum, literal-inline navigation) are <0.5% of training pools
 what no pool taught (circular). Break: seed harvest prompts with these idiom exemplars (zero cost).
 Note: comparison-op vocabulary split (pred gte/lte vs keys_where ge/le) tripped the auditor too —
 prompt should state both vocabularies explicitly.
+
+## E13o — idiom seeding breaks the search circularity; infrastructure suite complete (2026-07-23)
+
+Idiom-seeded harvest prompt (3 exemplars: gcombine rowwise arithmetic, keys_where tied extremum,
+literal-inline navigation): reasoning AUTONOMOUSLY wins nt-5 and nt-23 (taught idioms transfer to
+unseen tables). Round 2 with linker row_index annotation: nt-24 autonomous. Twin-view repair
+(base->__noparen/__norm): nt-6 repaired-win offline. Final tally of the 20 hardest-tail questions:
+15/20 proven winnable (13 machine-autonomous incl. repairs), residual = nt-9 (needs self-exclusion
+idiom #4), nt-31 (semantic anchor), nt-30 (gold noise), nt-10/18 (info absent), nt-27/38 (true wall).
+Shipped infrastructure: v4c __norm + __noparen loader views, linker render_with_rows (anchor
+row_index), tree_repair 8 variant classes incl. twin-view upgrades, idiom-seeded prompt block.
+All harvest stages (local cascade + harvest_teacher) inherit these by default.
+Artifacts: pilot_idiom_seed.json, pilot_idiom_seed_r2.json.

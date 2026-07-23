@@ -82,6 +82,40 @@ def _debase_answer_column(tree: dict, fields: list[str]) -> dict | None:
     return None
 
 
+def _fold_norm_values(tree: dict) -> dict | None:
+    """Filter preds on __norm fields: casefold/strip the literal to match folded cells."""
+    t = copy.deepcopy(tree)
+    changed = False
+    for node in _walk(t):
+        f = node.get("field")
+        v = node.get("value")
+        if isinstance(f, str) and f.endswith("__norm") and isinstance(v, str):
+            fv = " ".join(v.strip().casefold().split())
+            if fv != v:
+                node["value"] = fv
+                changed = True
+    return t if changed else None
+
+
+def _twin_view_upgrade(tree: dict, fields: list[str]) -> list[dict]:
+    """Text field with a __noparen or __norm twin: try the twin (folding the value for __norm)."""
+    out = []
+    for suffix in ("__noparen", "__norm"):
+        t = copy.deepcopy(tree)
+        changed = False
+        for node in _walk(t):
+            f = node.get("field")
+            if isinstance(f, str) and "__" not in f and f + suffix in fields:
+                node["field"] = f + suffix
+                v = node.get("value")
+                if suffix == "__norm" and isinstance(v, str):
+                    node["value"] = " ".join(v.strip().casefold().split())
+                changed = True
+        if changed:
+            out.append(t)
+    return out
+
+
 def _swap_answer_shape(tree: dict) -> dict | None:
     """select <-> values at the root (unique-value vs list mismatch)."""
     if tree.get("node") in ("select", "values"):
@@ -122,6 +156,7 @@ def repair_variants(tree: dict, fields: list[str], name_hints: list[str] | None 
     variants: list[dict] = []
     for fn in (lambda t: _fix_strict_ops(t),
                lambda t: _debase_answer_column(t, fields),
+               lambda t: _fold_norm_values(t),
                lambda t: _fix_column_names(t, fields),
                lambda t: _numeric_view_upgrade(t, fields),
                lambda t: _swap_answer_shape(t),
@@ -134,6 +169,9 @@ def repair_variants(tree: dict, fields: list[str], name_hints: list[str] | None 
                 v2 = fn2(v)
                 if v2:
                     variants.append(v2)
+    variants.extend(_twin_view_upgrade(tree, fields))
+    for v in list(variants):
+        variants.extend(_twin_view_upgrade(v, fields))
     variants.extend(_wrap_records_root(tree, fields, name_hints))
     seen, out = set(), []
     for v in variants:

@@ -1,0 +1,92 @@
+[
+ {
+  "id": "nt-6",
+  "status": "wrong",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 1
+     }
+    ]
+   },
+   "field": "away_team"
+  }
+ },
+ {
+  "id": "nt-9",
+  "status": "wrong",
+  "tree": {
+   "node": "values",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "position",
+      "op": "in_expr",
+      "expr": {
+       "node": "values",
+       "of": {
+        "node": "filter",
+        "where": [
+         {
+          "field": "player",
+          "op": "eq",
+          "value": "Ardo Kreek"
+         }
+        ]
+       },
+       "field": "position"
+      }
+     }
+    ]
+   },
+   "field": "player"
+  }
+ },
+ {
+  "id": "nt-24",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 7
+     }
+    ]
+   },
+   "field": "nation"
+  }
+ },
+ {
+  "id": "nt-31",
+  "status": "wrong",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "development_cycle__norm",
+      "op": "eq",
+      "value": "beta"
+     },
+     {
+      "field": "row_index",
+      "op": "lte",
+      "value": 10
+     }
+    ]
+   }
+  }
+ }
+]
