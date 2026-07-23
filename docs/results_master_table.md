@@ -202,3 +202,18 @@ E13i amendment: v3 (free-composition + advisory brief + explicit recast rules) =
 recast guidance did rescue 1/6 ordered_navigation. Three handoff protocols (tight/loose/advisory)
 all plateau at 1-3/20 vs reasoning-direct 7/20 -> bottleneck is fast's in-algebra planning, not
 brief quality or handoff format. Understanding-arm verdict FINAL. Artifact: pilot_brief_v3.json.
+
+## E13j — local B-arm paired trial: trained planner vs briefs (2026-07-23)
+
+| Arm (same 20 zero-hit fast-failed, k=2 t=1.0, strict schema) | Rescue |
+|---|---|
+| LOCAL C-v5 bare | **6/20** |
+| LOCAL C-v5 + reasoning brief | 6/20 (identical question set: brief-only 0, bare-only 0) |
+
+In-grammar training (~1000 steps) nearly matches cloud reasoning-direct (7/20) at zero marginal cost;
+the brief is fully redundant for a trained planner (+0, perfect overlap). Understanding-arm closed from
+both ends: weak planner can't exploit briefs (3/20 ceiling), strong planner doesn't need them.
+Harvest chain implication: LOCAL C-v5 resample of zero-hit pool FIRST (free), grok-fast on residue,
+reasoning-direct on the hard core. Correction to language-boundary claim: v4 views already made row
+order DATA; the true wall is Predicate<Expr,Expr> (literal-only filters), and anchor-visible navigation
+questions are winnable via plan-time literal inlining. Artifact: pilot_barm_local.json.
