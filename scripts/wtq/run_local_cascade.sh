@@ -53,5 +53,8 @@ open('/tmp/claude-1847/teacher_pool.ids', 'w').write('\n'.join(residue))
 print(f"C5 rescued {len(c5win)}; teacher pool (residue): {len(residue)}")
 PYEOF
 
+# Stage 5: holdout local B-arm matrix (uses the same served wtq_C5)
+.venv/bin/python scripts/wtq/holdout_local_barm.py http://127.0.0.1:8001/v1 || echo "holdout barm failed (non-fatal)"
+
 kill $SPID
 echo "LOCAL CASCADE DONE"
