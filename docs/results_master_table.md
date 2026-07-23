@@ -272,3 +272,24 @@ values actually merge under folding (conservative trigger). nt-9 tree via positi
 match. Census: 26/703 zero-hit tables (3.7%) gain views; 37/1000 zero-hit questions on affected
 tables. Misattribution corrected: nt-9 was representation debt, not planning failure — same taxonomy
 as the paper's one-seventh finding. Gated reharvest runs under v4b+v4c views from here on.
+
+## E13n — hand-audit of the 10 unrescued: taxonomy flips from wall to search failure (2026-07-23)
+
+| Case | Verdict | Class |
+|---|---|---|
+| nt-5 | WON by hand: gcombine(diff, groupby-sum, groupby-sum) -> keys_where ge 3 -> size | search failure |
+| nt-23 | WON: keys_where le 1 (tied minimum, literal-inlined) | search failure |
+| nt-24 | WON: row_index literal inline (right-after navigation) | search failure |
+| nt-31 | WON: row_index lte inline (before-first-full) | search failure |
+| nt-9 | WON: v4c __norm (E13m) | representation debt, fixed |
+| nt-6 | one view away: paren-suffix "(D3)" needs __noparen | representation debt, open |
+| nt-30 | true mean 3.87 vs gold "4" | gold noise |
+| nt-10, nt-18 | nationality / hyperlinks absent from table | info-absent |
+| nt-38, nt-27 | run-length; cross-column majority comparison | true language wall |
+
+14/20 of the hardest tail now DEMONSTRATED winnable (union 9 + 4 hand + nt-9), 15 with __noparen.
+Language wall shrank 6 -> 2. Dominant failure = SEARCH: winning idioms (gcombine rowwise arithmetic,
+keys_where tied extremum, literal-inline navigation) are <0.5% of training pools; no sampler proposes
+what no pool taught (circular). Break: seed harvest prompts with these idiom exemplars (zero cost).
+Note: comparison-op vocabulary split (pred gte/lte vs keys_where ge/le) tripped the auditor too —
+prompt should state both vocabularies explicitly.
