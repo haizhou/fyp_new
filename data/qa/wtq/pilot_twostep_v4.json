@@ -1,0 +1,140 @@
+[
+ {
+  "id": "nt-1",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-3",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-4",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "date__min_year",
+       "op": "eq",
+       "value": 1987
+      }
+     ]
+    },
+    "op": "argmin",
+    "field": "row_index"
+   },
+   "field": "opponent"
+  }
+ },
+ {
+  "id": "nt-5",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-6",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-7",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-9",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-10",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-12",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-14",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-18",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-20",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-23",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-24",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-25",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "founded",
+      "op": "gte",
+      "value": 1800
+     },
+     {
+      "field": "founded",
+      "op": "lte",
+      "value": 1899
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-27",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-30",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-31",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-37",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "case",
+      "op": "eq",
+      "value": "Desktop with integrated Color display"
+     },
+     {
+      "field": "notes__part_2",
+      "op": "eq",
+      "value": "enhanced keyboard"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-38",
+  "status": "unrescued"
+ }
+]

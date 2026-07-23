@@ -217,3 +217,20 @@ Harvest chain implication: LOCAL C-v5 resample of zero-hit pool FIRST (free), gr
 reasoning-direct on the hard core. Correction to language-boundary claim: v4 views already made row
 order DATA; the true wall is Predicate<Expr,Expr> (literal-only filters), and anchor-visible navigation
 questions are winnable via plan-time literal inlining. Artifact: pilot_barm_local.json.
+
+## E13k — two-step coupling engineering, five-protocol convergence (2026-07-23)
+
+| Protocol (same 20 fast-failed) | Rescue | Mechanism added |
+|---|---|---|
+| v1 prose brief | 3/20 | brief |
+| v2 template shells | 1/20 | structured protocol (backfired) |
+| v3 advisory + recast rules | 3/20 | free composition |
+| v4 hard rules + mech repair | 3/20 | Step-2.5 deterministic adapter |
+| v5 + typed-feedback loop | 4/20 | full reflector (1 via repair, 1 via feedback) |
+
+Linkage machinery WORKS (repairs and feedback each converted trees); the ceiling is grok-fast's
+multi-fault tree assembly (~20% on this residue). Two-step is not dead but FUSED: reasoning-direct
+(7/20) performs understanding->planning jointly inside one forward pass, immune to handoff freezing.
+Teacher config: fused reasoning for cloud, in-grammar-trained local planner (C-v5 6/20) for free tier.
+Infrastructure committed: tree_repair.py (5 deterministic variant classes), typed-diagnosis feedback loop.
+Artifacts: pilot_twostep_v4.json, pilot_twostep_v5.json, linkage_debug.json (six-case fault traces).

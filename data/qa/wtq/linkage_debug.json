@@ -1,0 +1,702 @@
+[
+ {
+  "id": "nt-7",
+  "question": "which is deeper, lake tuz or lake palas tuzla?",
+  "target": "Lake Palas Tuzla",
+  "catalog_cols": [
+   "name_in_english",
+   "name_in_turkish",
+   "area_km2",
+   "depth",
+   "location_districts_and_or_provinces",
+   "area_km2__num",
+   "depth__num",
+   "area_km2__number_1",
+   "area_km2__number_2",
+   "row_index"
+  ],
+  "attempts": [
+   {
+    "raw_head": "{\"tree\":{\"node\":\"extreme_rows\",\"of\":{\"node\":\"filter\",\"where\":[{\"op\":\"any\",\"preds\":[{\"field\":\"name_in_english\",\"op\":\"eq\",",
+    "tree": {
+     "node": "extreme_rows",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "any",
+        "preds": [
+         {
+          "field": "name_in_english",
+          "op": "eq",
+          "value": "Lake Tuz"
+         },
+         {
+          "field": "name_in_turkish",
+          "op": "eq",
+          "value": "Tuz G\u00f6l\u00fc"
+         },
+         {
+          "field": "name_in_english",
+          "op": "eq",
+          "value": "Lake Palas Tuzla"
+         },
+         {
+          "field": "name_in_turkish",
+          "op": "eq",
+          "value": "Palas Tuzla G\u00f6l\u00fc"
+         }
+        ]
+       }
+      ]
+     },
+     "op": "argmax",
+     "field": "depth__num"
+    },
+    "type": "RECORDS",
+    "exec_status": "ok",
+    "answer": "     name_in_english   name_in_turkish  ... row_index contract_node_id\n10  Lake ",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"extreme_rows\",\"of\":{\"node\":\"filter\",\"where\":[{\"op\":\"any\",\"preds\":[{\"field\":\"name_in_english\",\"op\":\"eq\",",
+    "fail": "bad_json"
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"extreme_rows\",\"of\":{\"node\":\"filter\",\"where\":[{\"op\":\"any\",\"preds\":[{\"field\":\"name_in_english\",\"op\":\"eq\",",
+    "tree": {
+     "node": "extreme_rows",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "any",
+        "preds": [
+         {
+          "field": "name_in_english",
+          "op": "eq",
+          "value": "Lake Tuz"
+         },
+         {
+          "field": "name_in_turkish",
+          "op": "eq",
+          "value": "Tuz G\u00f6l\u00fc"
+         },
+         {
+          "field": "name_in_english",
+          "op": "eq",
+          "value": "Lake Palas Tuzla"
+         },
+         {
+          "field": "name_in_turkish",
+          "op": "eq",
+          "value": "Palas Tuzla G\u00f6l\u00fc"
+         }
+        ]
+       }
+      ]
+     },
+     "op": "argmax",
+     "field": "depth__num"
+    },
+    "type": "RECORDS",
+    "exec_status": "ok",
+    "answer": "     name_in_english   name_in_turkish  ... row_index contract_node_id\n10  Lake ",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"select\",\"of\":{\"node\":\"extreme_rows\",\"of\":{\"node\":\"setop\",\"op\":\"union\",\"left\":{\"node\":\"filter\",\"where\":[",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "extreme_rows",
+      "of": {
+       "node": "setop",
+       "op": "union",
+       "left": {
+        "node": "filter",
+        "where": [
+         {
+          "field": "name_in_english",
+          "op": "eq",
+          "value": "Lake Tuz"
+         },
+         {
+          "field": "name_in_turkish",
+          "op": "eq",
+          "value": "Tuz G\u00f6l\u00fc"
+         }
+        ]
+       },
+       "right": {
+        "node": "filter",
+        "where": [
+         {
+          "field": "name_in_english",
+          "op": "eq",
+          "value": "Lake Palas Tuzla"
+         },
+         {
+          "field": "name_in_turkish",
+          "op": "eq",
+          "value": "Palas Tuzla G\u00f6l\u00fc"
+         }
+        ]
+       }
+      },
+      "op": "argmax",
+      "field": "depth__num"
+     },
+     "field": "name_in_english"
+    },
+    "fail": "invalid: setop_left_expects_VALUES_got_RECORDS at $.of.of"
+   }
+  ]
+ },
+ {
+  "id": "nt-9",
+  "question": "which players played the same position as ardo kreek?",
+  "target": "Siim Ennemuist|Andri Aganits",
+  "catalog_cols": [
+   "no",
+   "player",
+   "birth_date",
+   "weight",
+   "height",
+   "position",
+   "current_club",
+   "birth_date__num",
+   "birth_date__min_year",
+   "birth_date__number_1",
+   "birth_date__number_2",
+   "row_index",
+   "birth_date__part_1",
+   "birth_date__part_2",
+   "birth_date__month"
+  ],
+  "attempts": [
+   {
+    "raw_head": "{\"tree\":{\"node\":\"select\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"position\",\"op\":\"in_expr\",\"expr\":{\"node\":\"values\",\"of\":",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "position",
+        "op": "in_expr",
+        "expr": {
+         "node": "values",
+         "of": {
+          "node": "filter",
+          "where": [
+           {
+            "field": "player",
+            "op": "eq",
+            "value": "Ardo Kreek"
+           }
+          ]
+         },
+         "field": "position"
+        }
+       }
+      ]
+     },
+     "field": "player"
+    },
+    "type": "VALUE",
+    "exec_status": "failed",
+    "answer": "None",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"select\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"position\",\"op\":\"in_expr\",\"expr\":{\"node\":\"values\",\"of\":",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "position",
+        "op": "in_expr",
+        "expr": {
+         "node": "values",
+         "of": {
+          "node": "filter",
+          "where": [
+           {
+            "field": "player",
+            "op": "eq",
+            "value": "Ardo Kreek"
+           }
+          ]
+         },
+         "field": "position"
+        }
+       }
+      ]
+     },
+     "field": "player"
+    },
+    "type": "VALUE",
+    "exec_status": "failed",
+    "answer": "None",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"select\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"position\",\"op\":\"eq\",\"value\":{\"node\":\"select\",\"of\":{\"no",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "position",
+        "op": "eq",
+        "value": {
+         "node": "select",
+         "of": {
+          "node": "filter",
+          "where": [
+           {
+            "field": "player",
+            "op": "eq",
+            "value": "Ardo Kreek"
+           }
+          ]
+         },
+         "field": "position"
+        }
+       }
+      ]
+     },
+     "field": "player"
+    },
+    "type": "VALUE",
+    "exec_status": "failed",
+    "answer": "None",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"select\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"position\",\"op\":\"in_expr\",\"expr\":{\"node\":\"values\",\"of\":",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "position",
+        "op": "in_expr",
+        "expr": {
+         "node": "values",
+         "of": {
+          "node": "filter",
+          "where": [
+           {
+            "field": "player",
+            "op": "eq",
+            "value": "Ardo Kreek"
+           }
+          ]
+         },
+         "field": "position"
+        }
+       }
+      ]
+     },
+     "field": "player"
+    },
+    "type": "VALUE",
+    "exec_status": "failed",
+    "answer": "None",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-12",
+  "question": "what is the difference in the number of temples between imabari and matsuyama?",
+  "target": "2",
+  "catalog_cols": [
+   "no",
+   "temple",
+   "honzon_main_image",
+   "city_town_village",
+   "prefecture",
+   "row_index"
+  ],
+  "attempts": [
+   {
+    "raw_head": "{\"tree\":{\"node\":\"combine\",\"op\":\"diff\",\"left\":{\"node\":\"count\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"city_town_village\"",
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Imabari"
+        }
+       ]
+      }
+     },
+     "right": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Matsuyama"
+        }
+       ]
+      }
+     }
+    },
+    "type": "NUMBER",
+    "exec_status": "ok",
+    "answer": "-2.0",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"combine\",\"op\":\"diff\",\"left\":{\"node\":\"count\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"city_town_village\"",
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Imabari"
+        }
+       ]
+      }
+     },
+     "right": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Matsuyama"
+        }
+       ]
+      }
+     }
+    },
+    "type": "NUMBER",
+    "exec_status": "ok",
+    "answer": "-2.0",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"combine\",\"op\":\"diff\",\"left\":{\"node\":\"count\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"city_town_village\"",
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Imabari"
+        }
+       ]
+      }
+     },
+     "right": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Matsuyama"
+        }
+       ]
+      }
+     }
+    },
+    "type": "NUMBER",
+    "exec_status": "ok",
+    "answer": "-2.0",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"combine\",\"op\":\"diff\",\"left\":{\"node\":\"count\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"city_town_village\"",
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Imabari"
+        }
+       ]
+      }
+     },
+     "right": {
+      "node": "count",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "city_town_village",
+         "op": "eq",
+         "value": "Matsuyama"
+        }
+       ]
+      }
+     }
+    },
+    "type": "NUMBER",
+    "exec_status": "ok",
+    "answer": "-2.0",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-14",
+  "question": "which athlete was from south korea after the year 2010?",
+  "target": "Kim Yu-na",
+  "catalog_cols": [
+   "athlete",
+   "nation",
+   "olympics",
+   "gold",
+   "silver",
+   "bronze",
+   "total",
+   "olympics__num",
+   "olympics__min_year",
+   "olympics__max_year",
+   "olympics__number_1",
+   "olympics__number_2",
+   "row_index"
+  ],
+  "attempts": [
+   {
+    "raw_head": "{\"tree\": {\"node\":\"select\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"nation\",\"op\":\"eq\",\"value\":\"South Korea\"},{\"field\":\"ol",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "nation",
+        "op": "eq",
+        "value": "South Korea"
+       },
+       {
+        "field": "olympics__min_year",
+        "op": "gt",
+        "value": 2010
+       }
+      ]
+     },
+     "field": "athlete"
+    },
+    "fail": "invalid: unknown_pred_op:gt at $.of.where[1]"
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"values\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"nation\",\"op\":\"eq\",\"value\":\"south korea\"},{\"field\":\"oly",
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "nation",
+        "op": "eq",
+        "value": "south korea"
+       },
+       {
+        "field": "olympics__min_year",
+        "op": "gt",
+        "value": 2010
+       }
+      ]
+     },
+     "field": "athlete"
+    },
+    "fail": "invalid: unknown_pred_op:gt at $.of.where[1]"
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"select\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"nation\",\"op\":\"eq\",\"value\":\"south korea\"},{\"field\":\"oly",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "nation",
+        "op": "eq",
+        "value": "south korea"
+       },
+       {
+        "field": "olympics__min_year",
+        "op": "gt",
+        "value": 2010
+       }
+      ]
+     },
+     "field": "athlete"
+    },
+    "fail": "invalid: unknown_pred_op:gt at $.of.where[1]"
+   },
+   {
+    "raw_head": "{\"tree\": {\"node\":\"select\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"nation\",\"op\":\"eq\",\"value\":\"South Korea\"},{\"field\":\"ol",
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "nation",
+        "op": "eq",
+        "value": "South Korea"
+       },
+       {
+        "field": "olympics__min_year",
+        "op": "gt",
+        "value": 2010
+       }
+      ]
+     },
+     "field": "athlete"
+    },
+    "fail": "invalid: unknown_pred_op:gt at $.of.where[1]"
+   }
+  ]
+ },
+ {
+  "id": "nt-5",
+  "question": "how many people stayed at least 3 years in office?",
+  "target": "4",
+  "catalog_cols": [
+   "col",
+   "name",
+   "took_office",
+   "left_office",
+   "party",
+   "notes_events",
+   "took_office__num",
+   "left_office__num",
+   "took_office__min_year",
+   "took_office__number_1",
+   "took_office__number_2",
+   "left_office__min_year",
+   "left_office__number_1",
+   "left_office__number_2",
+   "row_index",
+   "took_office__part_1",
+   "took_office__part_2",
+   "left_office__part_1",
+   "left_office__part_2",
+   "took_office__month",
+   "took_office__date",
+   "left_office__month",
+   "left_office__date"
+  ],
+  "attempts": [
+   {
+    "raw_head": "{\"tree\":{\"node\":\"count\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"left_office__min_year\",\"op\":\"gte\",\"value\":3},{\"field\":\"",
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "left_office__min_year",
+        "op": "gte",
+        "value": 3
+       },
+       {
+        "field": "left_office__date",
+        "op": "gte",
+        "value": "1803-03-04"
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec_status": "failed",
+    "answer": "None",
+    "match": false
+   },
+   {
+    "raw_head": "{\"tree\": {\"node\": \"count\", \"of\": {\"node\": \"filter\", \"where\": [{\"field\": \"left_office__min_year\", \"op\": \"gte\", \"value\": {",
+    "fail": "bad_json"
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"count\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"left_office__min_year\",\"op\":\"gte\",\"value\":3},{\"field\":\"",
+    "fail": "bad_json"
+   },
+   {
+    "raw_head": "{\"tree\":{\"node\":\"count\",\"of\":{\"node\":\"filter\",\"where\":[{\"field\":\"left_office__min_year\",\"op\":\"gte\",\"value\":3},{\"field\":\"",
+    "fail": "bad_json"
+   }
+  ]
+ },
+ {
+  "id": "nt-10",
+  "question": "how many times did an italian cyclist win a round?",
+  "target": "6",
+  "catalog_cols": [
+   "round",
+   "round_2",
+   "circuit",
+   "date",
+   "pole_position",
+   "fastest_lap",
+   "winning_rider",
+   "round_2__num",
+   "date__num",
+   "row_index",
+   "date__month"
+  ],
+  "attempts": [
+   {
+    "raw_head": "{\"abstain\": true, \"reason\": \"No column indicates cyclist nationality (e.g. italian); cannot filter for italian cyclist.\"",
+    "tree": null,
+    "fail": "no_tree"
+   },
+   {
+    "raw_head": "{\"abstain\":true,\"reason\":\"No column indicates cyclist nationality; cannot filter for 'italian' cyclist.\"}",
+    "tree": null,
+    "fail": "no_tree"
+   },
+   {
+    "raw_head": "{\"abstain\":true,\"reason\":\"No column contains cyclist names or 'italian' values; cannot map 'cyclist = italian' to availa",
+    "tree": null,
+    "fail": "no_tree"
+   },
+   {
+    "raw_head": "{\"abstain\":true,\"reason\":\"No column identifies cyclist nationality as Italian\"}",
+    "tree": null,
+    "fail": "no_tree"
+   }
+  ]
+ }
+]
