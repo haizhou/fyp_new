@@ -69,6 +69,19 @@ def _wrap_records_root(tree: dict, fields: list[str], name_hints: list[str]) -> 
     return out
 
 
+def _debase_answer_column(tree: dict, fields: list[str]) -> dict | None:
+    """Root select/values on a __part/__num/__date view -> try the base column."""
+    if tree.get("node") in ("select", "values"):
+        f = tree.get("field")
+        if isinstance(f, str) and "__" in f:
+            base = f.split("__")[0]
+            if base in fields:
+                t = copy.deepcopy(tree)
+                t["field"] = base
+                return t
+    return None
+
+
 def _swap_answer_shape(tree: dict) -> dict | None:
     """select <-> values at the root (unique-value vs list mismatch)."""
     if tree.get("node") in ("select", "values"):
@@ -108,6 +121,7 @@ def repair_variants(tree: dict, fields: list[str], name_hints: list[str] | None 
     name_hints = name_hints or []
     variants: list[dict] = []
     for fn in (lambda t: _fix_strict_ops(t),
+               lambda t: _debase_answer_column(t, fields),
                lambda t: _fix_column_names(t, fields),
                lambda t: _numeric_view_upgrade(t, fields),
                lambda t: _swap_answer_shape(t),

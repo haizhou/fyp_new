@@ -242,3 +242,9 @@ and fast STILL fails to assemble it -> assembly, not question indirection, is th
 Six protocols now: 3/1/3/3/4/4 vs reasoning-direct 7, local C-v5 6. Byproduct adopted: the rewriter's
 REWRITE_IMPOSSIBLE flag becomes a free out-of-language detector to prune the paid teacher pool.
 Artifact: pilot_twostep_v6.json.
+E13k CORRECTION (user-driven ground-truth check): the nt-1 "decisive exhibit" was MISATTRIBUTED.
+Table inspection shows position cells are exactly "1st" and the hand-built tree with field=venue
+matches gold perfectly; the v6 rewrite's only error was targeting view column venue__part_1
+("Bangkok") instead of original venue ("Bangkok, Thailand"). fast plausibly assembled the tree AS
+INSTRUCTED. Assembly-is-the-constraint claim is falsified for this exhibit; v6 ceiling unknown
+pending v6.1 (rewrite prompt: report values from ORIGINAL columns only; repair: new de-base variant).
