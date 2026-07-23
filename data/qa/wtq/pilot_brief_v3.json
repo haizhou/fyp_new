@@ -1,0 +1,171 @@
+[
+ {
+  "id": "nt-1",
+  "status": "unrescued",
+  "template": "ordered_navigation"
+ },
+ {
+  "id": "nt-3",
+  "status": "verified",
+  "tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "sum",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city",
+       "op": "eq",
+       "value": "United States, Los Angeles"
+      }
+     ]
+    },
+    "field": "passengers"
+   },
+   "right": {
+    "node": "sum",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city",
+       "op": "eq",
+       "value": "Canada, Saskatoon"
+      }
+     ]
+    },
+    "field": "passengers"
+   }
+  },
+  "template": "comparison"
+ },
+ {
+  "id": "nt-4",
+  "status": "verified",
+  "tree": {
+   "node": "values",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "date__min_year",
+       "op": "eq",
+       "value": 1987
+      }
+     ]
+    },
+    "op": "argmin",
+    "field": "row_index"
+   },
+   "field": "opponent"
+  },
+  "template": "ordered_navigation"
+ },
+ {
+  "id": "nt-5",
+  "status": "unrescued",
+  "template": "filter_aggregate"
+ },
+ {
+  "id": "nt-6",
+  "status": "unrescued",
+  "template": "ordered_navigation"
+ },
+ {
+  "id": "nt-7",
+  "status": "unrescued",
+  "template": "comparison"
+ },
+ {
+  "id": "nt-9",
+  "status": "unrescued",
+  "template": "comparison"
+ },
+ {
+  "id": "nt-10",
+  "status": "unrescued",
+  "template": "filter_aggregate"
+ },
+ {
+  "id": "nt-12",
+  "status": "unrescued",
+  "template": "comparison"
+ },
+ {
+  "id": "nt-14",
+  "status": "unrescued",
+  "template": "row_lookup"
+ },
+ {
+  "id": "nt-18",
+  "status": "unrescued",
+  "template": "filter_aggregate"
+ },
+ {
+  "id": "nt-20",
+  "status": "unrescued",
+  "template": "grouped_extreme"
+ },
+ {
+  "id": "nt-23",
+  "status": "unrescued",
+  "template": "grouped_extreme"
+ },
+ {
+  "id": "nt-24",
+  "status": "unrescued",
+  "template": "ordered_navigation"
+ },
+ {
+  "id": "nt-25",
+  "status": "verified",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "founded",
+      "op": "gte",
+      "value": 1800
+     },
+     {
+      "field": "founded",
+      "op": "lte",
+      "value": 1899
+     }
+    ]
+   }
+  },
+  "template": "filter_aggregate"
+ },
+ {
+  "id": "nt-27",
+  "status": "unrescued",
+  "template": "ordered_navigation"
+ },
+ {
+  "id": "nt-30",
+  "status": "unrescued",
+  "template": "filter_aggregate"
+ },
+ {
+  "id": "nt-31",
+  "status": "unrescued",
+  "template": "filter_aggregate"
+ },
+ {
+  "id": "nt-37",
+  "status": "unrescued",
+  "template": "filter_aggregate"
+ },
+ {
+  "id": "nt-38",
+  "status": "unrescued",
+  "template": "ordered_navigation"
+ }
+]

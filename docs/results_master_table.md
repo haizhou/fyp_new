@@ -198,3 +198,7 @@ pipeline's own lean-beats-card finding for strong planners. Understanding-arm CL
 Template vocabulary validated: 9,663 verified trees classify 99.9% into 8 templates
 (filter_aggregate 40.2, row_lookup 29.3, superlative_row 20.0, grouped_extreme 7.0, comparison 2.8, rest 0.5).
 Artifacts: pilot_brief_v2.jsonl, scripts/wtq/pilot_brief_v2.py.
+E13i amendment: v3 (free-composition + advisory brief + explicit recast rules) = 3/20, ties v1;
+recast guidance did rescue 1/6 ordered_navigation. Three handoff protocols (tight/loose/advisory)
+all plateau at 1-3/20 vs reasoning-direct 7/20 -> bottleneck is fast's in-algebra planning, not
+brief quality or handoff format. Understanding-arm verdict FINAL. Artifact: pilot_brief_v3.json.
