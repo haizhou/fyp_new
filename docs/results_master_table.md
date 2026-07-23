@@ -335,3 +335,15 @@ does-A-or-B wants a NAME not a boolean, Totals-row-as-answer (inverse of nt-30),
 the asset is not a static idiom list but the audit->distill->bank LOOP, growing coverage batch by
 batch. Stable planning number: bare reasoning-direct ~35% replicated across both 20s (7/20, 7/20) —
 use for Job A+ yield forecasts. Artifacts: pilot_holdout20.json.
+
+## E13r — two-step replicates its ensemble seat on the holdout; union 45% is STABLE (2026-07-23)
+
+User-contract two-step (Step-1: algebra spec + not-available list + world-knowledge duty + trap
+catalog incl. this morning's new species -> Step-2 fast + repair) on the SAME holdout 20:
+6/20 (5 direct, 1 repair) vs reasoning-direct 7/20. Complementarity REPLICATES: two-step-only wins
+nt-46 (direct's bad_json) and nt-48 (Totals-row-as-answer — the trap entry distilled from this very
+morning's holdout audit fed forward and won same-day). Union 9/20 = 45%, IDENTICAL to the original
+20's ensemble union. Two independent hard-tail batches converge on 45% ensemble coverage — adopt as
+the production budget constant. Cascade validated on held-out data: direct + two-step (+ local C-v5,
+untested here, GPU busy). The audit->distill->bank loop closed its first same-day cycle.
+Artifacts: pilot_holdout_twostep.json.

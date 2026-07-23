@@ -1,0 +1,470 @@
+[
+ {
+  "id": "nt-40",
+  "brief": "(1) REWRITE: select the silver column value for the unique row where nation__noparen exactly matches 'Ukraine' (use nation__noparen view only for this match).\n(2) VALUES: 'Ukraine'\n(3) TRAPS: nation column uses suffixed form 'Ukraine\\xa0(UKR)' (non-breaking space); dodge by matching only on nation__noparen='Ukraine'. No Totals row present. Answer is raw integer from silver column (no units).\n(4) CHAIN: filter(eq(nation__noparen,\"Ukraine\"))->R; select(R,silver)",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "nation__noparen",
+      "op": "eq",
+      "value": "Ukraine"
+     }
+    ]
+   },
+   "field": "silver"
+  }
+ },
+ {
+  "id": "nt-43",
+  "brief": "REWRITE: find unique division_three values that also appear in division_two for records where season__min_year gte 1980 and lte 1989 (use only original columns; season__min_year solely for the 1980s filter).\nVALUES: 1980, 1989\nTRAPS: dodge season text variants (e.g. 1983\u201384) by filtering exclusively on season__min_year numeric; no Totals rows present; avoid any row_index navigation or same-row multi-division assumption; dodge multi-column union by taking values(...,division_three) and values(...,division_two) then applying setop intersect.\nCHAIN: filter(gte,season__min_year,1980)->R1; filter(lte,R1,season__min_year,1989)->R; values(R,division_three)->V3; values(R,division_two)->V2; setop(intersect,V3,V2)",
+  "tree": {
+   "node": "setop",
+   "op": "intersect",
+   "left": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "season__min_year",
+       "op": "gte",
+       "value": 1980
+      },
+      {
+       "field": "season__min_year",
+       "op": "lte",
+       "value": 1989
+      }
+     ]
+    },
+    "field": "division_three"
+   },
+   "right": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "season__min_year",
+       "op": "gte",
+       "value": 1980
+      },
+      {
+       "field": "season__min_year",
+       "op": "lte",
+       "value": 1989
+      }
+     ]
+    },
+    "field": "division_two"
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-44",
+  "brief": "(1) REWRITE: compute difference of rugby_league_debut for row where name contains \"farrell\" versus row where name contains \"carne\" (use original name and rugby_league_debut columns only).\n(2) VALUES: \"farrell\", \"carne\".\n(3) TRAPS: case/suffix variants in name (e.g. \"Farrell\" vs \"farrell\", full-name vs surname); dodge by using contains on original name (planner must not assume normalized name column). Skip any Totals rows via name filter. Answer must be unitless integer (no \"years\" appended).\n(4) CHAIN: filter(contains(name,\"farrell\"))->R1; values(R1,rugby_league_debut)->V1; filter(contains(name,\"carne\"))->R2; values(R2,rugby_league_debut)->V2; combine(diff,V1,V2).",
+  "tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "name",
+       "op": "contains",
+       "value": "farrell"
+      }
+     ]
+    },
+    "field": "rugby_league_debut"
+   },
+   "right": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "name",
+       "op": "contains",
+       "value": "carne"
+      }
+     ]
+    },
+    "field": "rugby_league_debut"
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-45",
+  "brief": "(1) REWRITE: select title where release_date__date is before the release_date__date of the row with title exactly \"Devakanya\" (answer must come from original title column).\n(2) VALUES: \"Devakanya\"; row_index=4 (anchor only).\n(3) TRAPS: spelling/case variants of Devakanya (match exact grounded spelling only); rows with release_date containing / (rely on release_date__date view for normalized first/min value in all compare/extreme); multiple films before (use argmax to get the latest one before); dodge by using release_date__date exclusively for all ordering/comparison and filter out Devakanya row itself.\n(4) CHAIN: filter(eq,title,\"Devakanya\")->Rdev; values(Rdev,release_date__date)->Vdate; filter(lte,release_date__date,Vdate)->Rle; filter(not,eq,title,\"Devakanya\")->Rbefore; extreme_rows(Rbefore,argmax,release_date__date)->Rlast; select(Rlast,title)",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "op": "not",
+       "pred": {
+        "field": "title",
+        "op": "eq",
+        "value": "Devakanya"
+       }
+      },
+      {
+       "field": "release_date__date",
+       "op": "lt",
+       "value": {
+        "node": "values",
+        "of": {
+         "node": "filter",
+         "where": [
+          {
+           "field": "title",
+           "op": "eq",
+           "value": "Devakanya"
+          }
+         ]
+        },
+        "field": "release_date__date"
+       }
+      }
+     ]
+    },
+    "op": "argmax",
+    "field": "release_date__date"
+   },
+   "field": "title"
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-46",
+  "brief": "REWRITE: find penalties_p_p_s_s of row with max penalties_p_p_s_s__num (use __num view only for argmax; answer must come from original penalties_p_p_s_s column)\nVALUES: none\nTRAPS: Totals/summary rows (dodge via filter(exists(rank))); __num/__noparen suffixes (use only for compare, never as final output); variant spellings like \"penalty\" vs column name (stick to exact penalties_p_p_s_s)\nCHAIN: filter(exists(rank))->R; extreme_rows(R,argmax,penalties_p_p_s_s__num)->ER; select(ER,penalties_p_p_s_s)",
+  "status": "verified",
+  "via": "repair",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "rank",
+       "op": "exists"
+      }
+     ]
+    },
+    "op": "argmax",
+    "field": "penalties_p_p_s_s__num"
+   },
+   "field": "penalties_p_p_s_s__noparen"
+  }
+ },
+ {
+  "id": "nt-48",
+  "brief": "(1) REWRITE: from the row with maximum election_year, select the unique value in of_overall_seats_won__number_2 as the current total seats in the federal parliament.\n(2) VALUES: no literals or row_index anchors needed.\n(3) TRAPS: dodge any summary/\"Total\" rows by filtering only on rows where election_year exists; if totals vary across years then latest year must be used (do not pick arbitrary row or first row); do not parse of_overall_seats_won text directly, use the grounded __number_2 numeric view.\n(4) CHAIN: R=extreme_rows(filter(exists(election_year)),argmax,election_year); select(R,of_overall_seats_won__number_2)",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "election_year",
+       "op": "exists"
+      }
+     ]
+    },
+    "op": "argmax",
+    "field": "election_year"
+   },
+   "field": "of_overall_seats_won__number_2"
+  }
+ },
+ {
+  "id": "nt-53",
+  "brief": "ABSTAIN because no column gives pylon counts per row (remarks only mentions them in free text); algebra cannot parse/extract/sum those numbers.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-54",
+  "brief": "(1) REWRITE: using original name and position columns, check whether any record with name exactly \"David Watson\" or \"Theodis Tarver\" has position exactly \"Center\" (return yes if at least one match exists).\n(2) VALUES: names=[\"David Watson\",\"Theodis Tarver\"], pos=[\"Center\"] (exact spellings only; row_index 3 and 5 as optional anchors if positional wording appears).\n(3) TRAPS: question uses lowercase first-name fragments \"theodis\"/\"david\" while cells contain full names (dodge by supplying only exact full-name literals above, never partial matches or contains); position variants like \"Forward/ Center\" exist (dodge by requiring exact eq \"Center\", never substring); no Totals rows but confirm filter never includes row_index of any summary row.\n(4) CHAIN: filter(in(name,names))->R; filter(eq(position,\"Center\"),R)->R2; exists(R2)",
+  "tree": {
+   "node": "exists",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "name",
+      "op": "in",
+      "value": [
+       "David Watson",
+       "Theodis Tarver"
+      ]
+     },
+     {
+      "field": "position",
+      "op": "eq",
+      "value": "Center"
+     }
+    ]
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-55",
+  "brief": "(1) REWRITE: Filter to rows where title exactly matches 'Whitney' and format_s exactly matches 'Album' and result_s exactly matches 'Won', group by year to count those rows per year, then return the year with the maximum count.\n(2) VALUES: 'Whitney', 'Album', 'Won'\n(3) TRAPS: dodge title/format_s/result_s spelling variants or partial matches by using exact eq on grounded strings only; skip any Totals/summary rows via the filter; answer must be the year value itself (not the count or award_description_s__num); \"rewards\" maps only to counting result_s='Won' rows (do not sum award_description_s__num or use other columns).\n(4) CHAIN: filter(eq(title,\"Whitney\"),eq(format_s,\"Album\"),eq(result_s,\"Won\"))->R; groupby(R,\"year\",count)->G; argext(G,argmax)->key",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "argext",
+   "of": {
+    "node": "groupby",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "title",
+       "op": "eq",
+       "value": "Whitney"
+      },
+      {
+       "field": "format_s",
+       "op": "eq",
+       "value": "Album"
+      },
+      {
+       "field": "result_s",
+       "op": "eq",
+       "value": "Won"
+      }
+     ]
+    },
+    "key": "year",
+    "metric": "count"
+   },
+   "op": "argmax"
+  }
+ },
+ {
+  "id": "nt-58",
+  "brief": "REWRITE: Count rows where attendance >= 1500 (use original numeric attendance column).\nVALUES: 1500\nTRAPS: attendance values contain commas (e.g. 1,912); use the numeric attendance column (not text or __num variants) for gte comparison. No Totals row present; ignore any derived result__*/goalie_saves__* columns.\nCHAIN: filter(gte(attendance,1500))->R; count(R)",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "attendance",
+      "op": "gte",
+      "value": 1500
+     }
+    ]
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-61",
+  "brief": "(1) REWRITE: Sum all values in the senators column across every row (departments La Paz, Santa Cruz, Cochabamba and any others present).\n(2) VALUES: none needed\n(3) TRAPS: dodge any Totals row (if department=\"Total\") by filtering only rows where senators exists and department is not \"Total\"; never use total_deputies column; answer is pure integer (no \"senators\" suffix).\n(4) CHAIN: R=filter(exists(senators)); sum(R,senators)",
+  "tree": {
+   "node": "sum",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "senators",
+      "op": "exists"
+     }
+    ]
+   },
+   "field": "senators"
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-66",
+  "brief": "(1) REWRITE: select the title from the row where row_index equals 1.\n(2) VALUES: [1] (row_index literal for top row anchor).\n(3) TRAPS: dodge any header row by requiring row_index>=1; ignore all __num/__norm views of title (use original text column only); no Totals row present.\n(4) CHAIN: filter(eq(row_index,1))->R; select(R,title)",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 1
+     }
+    ]
+   },
+   "field": "title"
+  }
+ },
+ {
+  "id": "nt-67",
+  "brief": "REWRITE: count distinct rows where winner_s contains \"Charmaine Sheh\" (exact spelling from table cells) OR other_guests contains \"Charmaine Sheh\" (use original columns only).\nVALUES: \"Charmaine Sheh\"; row_index values as needed for deduplication anchors.\nTRAPS: dodge \"Charmaine Li\" (different person, never match); multi-name cells like \"Charmaine Sheh, Julian Cheung\" (use contains not eq); possible overlap in both columns for same row (dedup via row_index union not raw count-add); no Totals row but skip any summary-looking name_of_show.\nCHAIN: filter(contains(winner_s,\"Charmaine Sheh\"))->R1; filter(contains(other_guests,\"Charmaine Sheh\"))->R2; values(R1,row_index)->V1; values(R2,row_index)->V2; setop(union,V1,V2)->V; size(V)",
+  "tree": {
+   "node": "size",
+   "of": {
+    "node": "setop",
+    "op": "union",
+    "left": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "winner_s",
+        "op": "contains",
+        "value": "Charmaine Sheh"
+       }
+      ]
+     },
+     "field": "row_index"
+    },
+    "right": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "other_guests",
+        "op": "contains",
+        "value": "Charmaine Sheh"
+       }
+      ]
+     },
+     "field": "row_index"
+    }
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-70",
+  "brief": "(1) REWRITE: Extract the exact value from the original \"years\" column for the single row where \"coach\" exactly equals \"Joseph Black\".\n(2) VALUES: [\"Joseph Black\"]\n(3) TRAPS: question uses lowercase name variant (dodge: enforce exact table spelling \"Joseph Black\"); possible multi-row coach tenures (dodge: filter returns all matching records then select the years value); avoid any __num views since no numeric compare/sort needed.\n(4) CHAIN: filter(eq(coach,\"Joseph Black\"))->R; select(R,years)",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "coach",
+      "op": "eq",
+      "value": "Joseph Black"
+     }
+    ]
+   },
+   "field": "years"
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-72",
+  "brief": "REWRITE: sum races__num for all rows where series exactly matches 'Formula One' (ignore any Test driver text entries via the num view)  \nVALUES: ['Formula One']  \nTRAPS: races text mixes \"Test driver\"/NC strings (dodge by using only races__num view for numeric sum; skip any season=Total or pos=NC summary rows via explicit series filter); case variants like \"formula 1\" (dodge by mandating exact grounded spelling 'Formula One'); multi-row Formula One entries (dodge by summing rather than select)  \nCHAIN: filter(eq(series,'Formula One'))->R; sum(R,races__num)",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-73",
+  "brief": "(1) REWRITE: sum the matches column for the single row that has the minimal row_index among rows where league exactly equals \"V\u30fbPremier\".\n(2) VALUES: \"V\u30fbPremier\"; row_index literals [7,8,9,10] for the V\u30fbPremier block.\n(3) TRAPS: dodge \"V.League\" vs \"V\u30fbPremier\" spelling (use only exact grounded \"V\u30fbPremier\"); avoid any Totals rows by filtering on league column only; do not union with league_2__noparen or position columns; answer is raw integer from matches (no units).\n(4) CHAIN: filter(eq(league,\"V\u30fbPremier\"))->R; extreme_rows(R,argmin,row_index)->R1; values(R1,matches).",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "sum",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "league",
+       "op": "eq",
+       "value": "V\u30fbPremier"
+      }
+     ]
+    },
+    "op": "argmin",
+    "field": "row_index"
+   },
+   "field": "matches"
+  }
+ },
+ {
+  "id": "nt-74",
+  "brief": "(1) REWRITE: find the exact value from the driver column that occurs with the highest frequency across all rows.\n(2) VALUES: none required.\n(3) TRAPS: dodge any Totals/summary rows (if present) by operating only on rows that contain a nonempty driver entry; ignore constructor/location variants or multi-column unions since we count solely on the driver column.\n(4) CHAIN: G=groupby(RECORDS,\"driver\",count); argext(G,argmax)",
+  "tree": {
+   "node": "argext",
+   "of": {
+    "node": "groupby",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "driver",
+       "op": "exists"
+      }
+     ]
+    },
+    "key": "driver",
+    "metric": "count"
+   },
+   "op": "argmax"
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-75",
+  "brief": "ABSTAIN: table column catalog lacks upper_zip_code (only lower_zip_code present) so neither-field check inexpressible.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-76",
+  "brief": "ABSTAIN: no \"notes\" column (or similar) in catalog; question inexpressible with available fields.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-78",
+  "brief": "REWRITE: group all rows by exact \"year\" column then find the single largest count of \"title\" entries sharing any one year value (this gives max compilations per year).\nVALUES: none (no thresholds/anchors/world-knowledge lists needed).\nTRAPS: dodge any \"Total\" summary row by filtering on exists(\"title\"); never use peak_chart_positions_ger or artist for grouping; answer must be the numeric count (not the year); years are plain numbers so no __norm/__noparen views required.\nCHAIN: filter(exists(\"title\"))->R; groupby(R,\"year\",count)->G; argext(G,argmax)->maxY; filter(eq(\"year\",maxY))->Rmax; count(Rmax)",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "groupby",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "title",
+        "op": "exists"
+       }
+      ]
+     },
+     "key": "year",
+     "metric": "count"
+    },
+    "op": "argmax",
+    "field": "count"
+   }
+  },
+  "status": "unrescued"
+ }
+]
