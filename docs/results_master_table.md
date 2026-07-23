@@ -407,3 +407,7 @@ Prompt-space is now formally exhausted (8 protocols, E13h->E13v, consistent conv
 The frame's real product: the Step-1 OUTPUT CONTRACT for B2-arm training data (catalog + toddler
 brief -> tree), completing the user-designed spec for the trained two-step WTQ system.
 Artifacts: pilot_toddler_step1.json.
+E13v addendum: toddler brief on LOCAL C-v5, both placements (appended block / AS the question,
+in-distribution injection) = 0/7 and 0/7 on the structural residue. Ninth and final prompt protocol.
+The structural-residue diagnosis holds against every phrasing; prompt-space verdict now covers both
+planners and both injection sites. All roads lead to training space (C-v6 / B2 / combined).
