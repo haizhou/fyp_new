@@ -306,3 +306,19 @@ Shipped infrastructure: v4c __norm + __noparen loader views, linker render_with_
 row_index), tree_repair 8 variant classes incl. twin-view upgrades, idiom-seeded prompt block.
 All harvest stages (local cascade + harvest_teacher) inherit these by default.
 Artifacts: pilot_idiom_seed.json, pilot_idiom_seed_r2.json.
+
+## E13p — user-authored Step-1 closes the audit: 18/20 (2026-07-23)
+
+User-written briefs (design principles: Step-1 must know the operator inventory; Step-1 supplies
+world knowledge explicitly) + repair v3 (inner select->values under in_expr; last-resort
+eq->contains, oracle-guarded):
+| nt-9 | user brief (self-exclusion) + inner-select repair | WIN |
+| nt-31 | user brief ("beta-related") + eq->contains repair | WIN ("Beta-pre" row 8) |
+| nt-30 | user's recheck order: gold was RIGHT, Totals row was the culprit; ratio over Totals-excluded = 4.0 | WIN (my gold-noise verdict retracted) |
+| nt-27 | literal diff 1996-1874 from brief author's table read | WIN, faithfulness caveat (plan does not derive 1874) |
+| nt-10 | world-knowledge in-list (Falappa, Pirovano) per user principle | WIN |
+
+FINAL: 18/20 of the hardest tail winnable (was 0/20 for fast at session start). Survivors: nt-18
+(hyperlinks destroyed in CSV export — dead), nt-38 (run-length — the sole true language wall).
+Production adoption: Step-1 contract gains the two user principles; repair suite now 10 variant
+classes. Artifacts: pilot_user_step1.json.

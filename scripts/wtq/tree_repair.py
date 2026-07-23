@@ -116,6 +116,30 @@ def _twin_view_upgrade(tree: dict, fields: list[str]) -> list[dict]:
     return out
 
 
+def _fix_inner_select_in_expr(tree: dict) -> dict | None:
+    """in_expr.expr must be VALUES: inner select -> values."""
+    t = copy.deepcopy(tree)
+    changed = False
+    for node in _walk(t):
+        if node.get("op") == "in_expr" and isinstance(node.get("expr"), dict) \
+                and node["expr"].get("node") == "select":
+            node["expr"]["node"] = "values"
+            changed = True
+    return t if changed else None
+
+
+def _eq_to_contains(tree: dict) -> dict | None:
+    """Last-resort: string eq -> contains (catches suffix/prefix cell variants);
+    oracle verification decides whether the loosening was semantically right."""
+    t = copy.deepcopy(tree)
+    changed = False
+    for node in _walk(t):
+        if node.get("op") == "eq" and isinstance(node.get("value"), str) and node.get("field"):
+            node["op"] = "contains"
+            changed = True
+    return t if changed else None
+
+
 def _swap_answer_shape(tree: dict) -> dict | None:
     """select <-> values at the root (unique-value vs list mismatch)."""
     if tree.get("node") in ("select", "values"):
@@ -157,6 +181,7 @@ def repair_variants(tree: dict, fields: list[str], name_hints: list[str] | None 
     for fn in (lambda t: _fix_strict_ops(t),
                lambda t: _debase_answer_column(t, fields),
                lambda t: _fold_norm_values(t),
+               lambda t: _fix_inner_select_in_expr(t),
                lambda t: _fix_column_names(t, fields),
                lambda t: _numeric_view_upgrade(t, fields),
                lambda t: _swap_answer_shape(t),
@@ -172,6 +197,9 @@ def repair_variants(tree: dict, fields: list[str], name_hints: list[str] | None 
     variants.extend(_twin_view_upgrade(tree, fields))
     for v in list(variants):
         variants.extend(_twin_view_upgrade(v, fields))
+    v_eq = _eq_to_contains(tree)
+    if v_eq:
+        variants.append(v_eq)
     variants.extend(_wrap_records_root(tree, fields, name_hints))
     seen, out = set(), []
     for v in variants:

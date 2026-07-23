@@ -1,0 +1,128 @@
+[
+ {
+  "id": "nt-9",
+  "status": "unrescued",
+  "tree": {
+   "node": "setop",
+   "op": "difference",
+   "left": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "position__norm",
+       "op": "in_expr",
+       "expr": {
+        "node": "select",
+        "of": {
+         "node": "filter",
+         "where": [
+          {
+           "field": "player",
+           "op": "eq",
+           "value": "Ardo Kreek"
+          }
+         ]
+        },
+        "field": "position__norm"
+       }
+      }
+     ]
+    },
+    "field": "player"
+   },
+   "right": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "player",
+       "op": "eq",
+       "value": "Ardo Kreek"
+      }
+     ]
+    },
+    "field": "player"
+   }
+  }
+ },
+ {
+  "id": "nt-31",
+  "status": "unrescued",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "op": "not",
+      "pred": {
+       "field": "row_index",
+       "op": "gte",
+       "value": 10
+      }
+     },
+     {
+      "field": "development_cycle",
+      "op": "eq",
+      "value": "Beta"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-27",
+  "status": "unrescued",
+  "tree": null
+ },
+ {
+  "id": "nt-38",
+  "status": "unrescued",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "competition",
+      "op": "eq",
+      "value": "Friendly"
+     },
+     {
+      "field": "goal",
+      "op": "exists"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-30",
+  "status": "unrescued",
+  "tree": null
+ },
+ {
+  "id": "nt-10",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "winning_rider",
+      "op": "in",
+      "value": [
+       "Giancarlo Falappa",
+       "Fabrizio Pirovano"
+      ]
+     }
+    ]
+   }
+  }
+ }
+]
