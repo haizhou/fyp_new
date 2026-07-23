@@ -421,3 +421,18 @@ C5self trees are C-lineage (self-harvest downstream of gold translations) -> C-v
 gains the fresh Av4b harvest under current views. Orphan vLLM cleaned; GPU3 freed for training.
 Economics final: Job A fast on 4,027 ~ $2.7; Job A+ reasoning on post-fast residue (~35% stable)
 ~ $6 fast-tier / ~$290 full-tier / $0 if preview. Training fork now fully fueled.
+
+## E14a — C-v6 (combined fork stage 1): 59.00, ladder new top (2026-07-23)
+
+| Arm | n=300 clean-eval-devfold | Paired vs C-v5 |
+|---|---|---|
+| C-v6 | **59.00% (177/300)** | +14/-4, exact McNemar p=0.0309 |
+
+Ladder: C-v1 40.0 -> C-v2 47.67 -> C-v3 51.0 -> C-v5 55.67 -> **C-v6 59.00**; ceiling est ~64.6.
+Pool 10,158 (fresh gold base 5,641 — itself +109 questions from v4c views + first-line parse —
++ C5self supplement + 7 idiom exemplars x10). Fixed-compute convention held (1000 steps).
+Outcomes: answered 291, eval_failed 8, invalid 1, abstain 0. Teacher-harvest economics on the
+double-failed core: fast 4.5% ($0.91/4,027), reasoning tranche-1 14.0% (42/300, ~3,020 think tk/q,
+$0.51 fast-tier est). Remaining residue 3,544 gated on the user's dashboard tier reading.
+Pending: rerun the 20-hard set with C-v6 to measure idiom internalization directly.
+Artifacts: eval_wtq_clean_C6.jsonl, harvest_teacher_fast.jsonl, harvest_teacher_reasoning.jsonl.
