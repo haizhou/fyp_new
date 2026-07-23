@@ -395,3 +395,15 @@ ignore. The user's two-step instinct survives in TRAINING space: the procurement
 (85.65) trains step1+step2 together on briefing-formatted data; WTQ never did. Fork for next train:
 C-v6 (idiom exemplars + teacher rescues into the pool, format unchanged) vs B2-arm (catalog+brief->
 tree format, planner LEARNS to consume briefs) vs combined. Artifacts: pilot_targeted_step1.json.
+
+## E13v — toddler-framed Step-1 (user-designed): 0/7 on the structural residue; adopted as the B2 output contract (2026-07-23)
+
+Audience-forcing frame ("your reader is a toddler planner: only these operators, cannot read the
+table, no long logic, no common sense — translate exhaustively, worked example included") produced
+the HIGHEST-precision briefs of all eight protocols (nt-43 sample: cross-column same-spelling
+semantics, decade bounds, anchor rows all exact). Still 0/7 on the all-lane-dead set — their deaths
+are structural (date wall, missing gcombine add, gold quirks, assembly ceiling), beyond any brief.
+Prompt-space is now formally exhausted (8 protocols, E13h->E13v, consistent convergence).
+The frame's real product: the Step-1 OUTPUT CONTRACT for B2-arm training data (catalog + toddler
+brief -> tree), completing the user-designed spec for the trained two-step WTQ system.
+Artifacts: pilot_toddler_step1.json.

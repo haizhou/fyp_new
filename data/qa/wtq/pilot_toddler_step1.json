@@ -1,0 +1,165 @@
+[
+ {
+  "id": "nt-43",
+  "brief": "The table has columns like season, division_one, division_two, division_three, season__min_year. \"During the 1980s\" means all rows where column season contains \"198\" exactly (or column season__min_year gte 1980 and lte 1989). A \"division three team\" is any exact cell spelling from column division_three. \"Also played in the division two\" means that same exact spelling appears in column division_two. \"Three Bridges\" is the exact cell in column division_one at row_index 29 but is not used here. Do: filter where column season contains \"198\", then setop intersect on the values from column=division_three with the values from column=division_two. The answer is that common value.",
+  "last_tree": {
+   "node": "setop",
+   "op": "intersect",
+   "left": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "season",
+       "op": "contains",
+       "value": "198"
+      }
+     ]
+    },
+    "field": "division_three"
+   },
+   "right": {
+    "node": "values",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "season",
+       "op": "contains",
+       "value": "198"
+      }
+     ]
+    },
+    "field": "division_two"
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-44",
+  "brief": "The table has column name (cells like Karmichael Hunt) and column rugby_league_debut (with number years). \"farrell\" exact spelling is the name cell containing Farrell. \"carne\" exact spelling is the name cell containing Carne. League debut date means the rugby_league_debut numbers. \"difference\" means combine diff on the two numbers. Do: filter where name contains Farrell or contains Carne, then values of rugby_league_debut, then combine with diff. The answer is that diff value.",
+  "last_tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "select",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "name",
+       "op": "contains",
+       "value": "Farrell"
+      }
+     ]
+    },
+    "field": "rugby_league_debut"
+   },
+   "right": {
+    "node": "select",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "name",
+       "op": "contains",
+       "value": "Carne"
+      }
+     ]
+    },
+    "field": "rugby_league_debut"
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-70",
+  "brief": "The table has a column coach with exact cell \"Joseph Black\" at row_index 7. \"How long\" means the exact number in column years for that same row_index 7 (this is never a tenure value or a sum across rows). \"Joseph Black\" is never in any other column or row_index. Do: filter where row_index eq 7, then select column years. The answer is that years value.",
+  "last_tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 7
+     }
+    ]
+   },
+   "field": "years"
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-74",
+  "brief": "The table has a column named \"driver\". \"Appears the most\" means the exact text value in column driver that has the biggest count of rows where it shows up (no Totals row exists so use all rows). Do: groupby count on column driver then extreme_rows argmax on that count. Then select column driver. The answer is that driver value.",
+  "last_tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "groupby",
+     "of": {
+      "node": "values",
+      "of": {
+       "node": "table"
+      },
+      "field": "driver"
+     },
+     "key": "driver",
+     "metric": "count"
+    },
+    "op": "argmax",
+    "field": "count"
+   },
+   "field": "driver"
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-75",
+  "brief": "The table has column lower_zip_code but no column named upper_zip_code. Every row therefore lists no upper zip code. \"No zip code in either the lower or upper zip code\" means the exact cell in column lower_zip_code looks like it has no number value at all. Do: filter where not exists lower_zip_code, then count. \nThe answer is that count value.",
+  "last_tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "lower_zip_code",
+      "op": "not"
+     }
+    ]
+   }
+  },
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-76",
+  "brief": "The table lists places with columns name (text), hanzi (text), population_2005 (number), area_km2 (number), row_index (number). No \"notes\" column exists in the table so \"have any notes\" means filter where column notes exists (or is not empty like in the e.g. cells). \"how many populations at most\" means count those rows then apply extreme_rows(argmax). Do: filter(exists notes), then count that size. The answer is that count value.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-78",
+  "brief": "The table lists all compilation albums with their release year shown exactly in column year. Every row is a compilation album (including exact title cells like \"Savoir faire\" and \"Spanish Stroll 1977-1987\" and \"Les inoubliables de Willy DeVi\"). \"The most compilation albums released in one year\" means the single largest count of rows that share any one exact year value. Do: groupby column year using count, then extreme_rows with argmax on that count. The answer is that count value.",
+  "last_tree": {
+   "node": "values",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "groupby",
+     "of": {
+      "node": "table"
+     },
+     "key": "year",
+     "metric": "count"
+    },
+    "op": "argmax",
+    "field": "count"
+   },
+   "field": "count"
+  },
+  "status": "unrescued"
+ }
+]
