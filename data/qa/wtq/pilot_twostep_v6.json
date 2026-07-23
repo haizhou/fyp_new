@@ -1,0 +1,221 @@
+[
+ {
+  "id": "nt-1",
+  "original": "in what city did piotr's last 1st place finish occur?",
+  "rewrite": "What is the venue__part_1 in the row with the largest year among rows where position is 1st?",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-3",
+  "original": "how many more passengers flew to los angeles than to saskatoon from manzanillo airport in 2013?",
+  "rewrite": "Subtract the passengers where city__part_2 is Saskatoon from the passengers where city__part_2 is Los Angeles.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-4",
+  "original": "who was the opponent in the first game of the season?",
+  "rewrite": "Report the opponent in the row with the smallest date__date among all rows.",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "date__date",
+       "op": "exists"
+      }
+     ]
+    },
+    "op": "argmin",
+    "field": "date__date"
+   },
+   "field": "opponent"
+  }
+ },
+ {
+  "id": "nt-5",
+  "original": "how many people stayed at least 3 years in office?",
+  "rewrite": "Count the rows where left_office__min_year minus took_office__min_year is at least 3; report that count.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-6",
+  "original": "who is the first away team on the chart",
+  "rewrite": "Report the away_team from the row with the smallest row_index.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-7",
+  "original": "which is deeper, lake tuz or lake palas tuzla?",
+  "rewrite": "Among rows where name_in_english is 'Lake Tuz' or 'Lake Palas Tuzla', report the name_in_english of the row with the largest depth__num.",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "extreme_rows",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "op": "any",
+       "preds": [
+        {
+         "field": "name_in_english",
+         "op": "eq",
+         "value": "Lake Tuz"
+        },
+        {
+         "field": "name_in_english",
+         "op": "eq",
+         "value": "Lake Palas Tuzla"
+        }
+       ]
+      }
+     ]
+    },
+    "op": "argmax",
+    "field": "depth__num"
+   },
+   "field": "name_in_english"
+  }
+ },
+ {
+  "id": "nt-9",
+  "original": "which players played the same position as ardo kreek?",
+  "rewrite": "Report all player column values for rows where position equals the position in the row with player Ardo Kreek.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-10",
+  "original": "how many times did an italian cyclist win a round?",
+  "rewrite": "REWRITE_IMPOSSIBLE: no column indicates rider nationality (e.g. Italian) or type (cyclist).",
+  "status": "rewrite_impossible"
+ },
+ {
+  "id": "nt-12",
+  "original": "what is the difference in the number of temples between imabari and matsuyama?",
+  "rewrite": "Count the rows where city_town_village is Imabari and count the rows where city_town_village is Matsuyama. Report the absolute difference between these two counts.",
+  "status": "verified",
+  "via": "repair",
+  "tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "count",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city_town_village",
+       "op": "eq",
+       "value": "Matsuyama"
+      }
+     ]
+    }
+   },
+   "right": {
+    "node": "count",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "city_town_village",
+       "op": "eq",
+       "value": "Imabari"
+      }
+     ]
+    }
+   }
+  }
+ },
+ {
+  "id": "nt-14",
+  "original": "which athlete was from south korea after the year 2010?",
+  "rewrite": "Report the athlete for the row with the smallest olympics__min_year among rows where nation is South Korea (KOR) and olympics__min_year > 2010.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-18",
+  "original": "how many movies have links to other wikipedia pages about them?",
+  "rewrite": "REWRITE_IMPOSSIBLE: table has no column with info on wikipedia links.",
+  "status": "rewrite_impossible"
+ },
+ {
+  "id": "nt-20",
+  "original": "which album released by the band schnell fenster produced the most singles appearing on the australian peak chart?",
+  "rewrite": "Which value in the album column appears most frequently among rows where peak_chart_positions_aus__num contains a number? Report that album value.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-23",
+  "original": "what counties had the least participants for the race?",
+  "rewrite": "REWRITE_IMPOSSIBLE: no column for participant counts per nationality; requires aggregation (group-by count then min) not direct cell lookup via sortable column.",
+  "status": "rewrite_impossible"
+ },
+ {
+  "id": "nt-24",
+  "original": "who ranked right after turkey?",
+  "rewrite": "Report the nation in the row with the smallest rank among rows where rank is greater than the rank in the row with nation Turkey.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-25",
+  "original": "what's the number of parishes founded in the 1800s?",
+  "rewrite": "What is the count of rows where founded is >=1800 and <=1899? Report that count.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-27",
+  "original": "in 1996 the sc house of representatives had a republican majority. how many years had passed since the last time this happened?",
+  "rewrite": "Report 1996 minus the largest year among rows where year is less than 1996 and republican_party equals majority.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-30",
+  "original": "what was the average number of years served by a coach?",
+  "rewrite": "Report the average of all values in the years column.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-31",
+  "original": "how many beta versions were released before the first full release?",
+  "rewrite": "Report the number of rows where development_cycle is Beta and date__date is less than the smallest date__date among rows where development_cycle is Release.",
+  "status": "unrescued"
+ },
+ {
+  "id": "nt-37",
+  "original": "what is the total amount of processors that have both an integrated color display and an enhanced keyboard?",
+  "rewrite": "Report the count of rows where case is exactly \"Desktop with integrated Color display\" and notes__part_2 is exactly \"enhanced keyboard\".",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "case",
+      "op": "eq",
+      "value": "Desktop with integrated Color display"
+     },
+     {
+      "field": "notes__part_2",
+      "op": "eq",
+      "value": "enhanced keyboard"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-38",
+  "original": "how many consecutive friendly competitions did chalupny score in?",
+  "rewrite": "REWRITE_IMPOSSIBLE\nCannot rephrase \"consecutive\" without positional/relative terms or multi-row streak logic even with row_index or date__min_year.",
+  "status": "rewrite_impossible"
+ }
+]

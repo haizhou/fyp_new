@@ -234,3 +234,11 @@ multi-fault tree assembly (~20% on this residue). Two-step is not dead but FUSED
 Teacher config: fused reasoning for cloud, in-grammar-trained local planner (C-v5 6/20) for free tier.
 Infrastructure committed: tree_repair.py (5 deterministic variant classes), typed-diagnosis feedback loop.
 Artifacts: pilot_twostep_v4.json, pilot_twostep_v5.json, linkage_debug.json (six-case fault traces).
+E13k amendment 2 (v6, user-designed rewrite protocol): table-grounded question REWRITE by reasoning
+(sees catalog, eliminates ordinals via sortable columns) -> fast standard prompt = 4/20 + 4 honest
+REWRITE_IMPOSSIBLE flags. Decisive exhibit nt-1: rewrite is a word-perfect English rendering of the
+winning tree ("the venue__part_1 in the row with the largest year among rows where position is 1st")
+and fast STILL fails to assemble it -> assembly, not question indirection, is the binding constraint.
+Six protocols now: 3/1/3/3/4/4 vs reasoning-direct 7, local C-v5 6. Byproduct adopted: the rewriter's
+REWRITE_IMPOSSIBLE flag becomes a free out-of-language detector to prune the paid teacher pool.
+Artifact: pilot_twostep_v6.json.
