@@ -41,6 +41,10 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=500)
     ap.add_argument("--n", type=int, default=8)
     ap.add_argument("--concurrency", type=int, default=6)
+    ap.add_argument("--model", default="cicada-qwen3-composev3",
+                    help="served model/adapter name to sample from")
+    ap.add_argument("--ids-file", default=None,
+                    help="optional file with one question id per line; restricts the pool")
     args = ap.parse_args()
 
     rows = []
@@ -49,6 +53,9 @@ def main() -> None:
             tbl = rec["context"].removeprefix("csv/").replace("-csv/", "_").removesuffix(".csv")
             if (tbl in DEV_TBLS) == args.dev_fold:
                 rows.append(rec)
+    if args.ids_file:
+        keep = set(l.strip() for l in open(args.ids_file) if l.strip())
+        rows = [r for r in rows if r["id"] in keep]
     total_pool = len(rows)
     rows = rows[args.start: args.start + args.limit]
 
@@ -68,7 +75,7 @@ def main() -> None:
         prompt = PROMPT.format(catalog=catalog_text(catalog), q=rec["utterance"])
         try:
             resp = client.chat.completions.create(
-                model="cicada-qwen3-composev3", temperature=1.0, n=args.n,
+                model=args.model, temperature=1.0, n=args.n,
                 max_tokens=900, messages=[{"role": "user", "content": prompt}],
                 response_format=schema)
         except Exception as exc:  # noqa: BLE001
