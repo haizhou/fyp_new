@@ -347,3 +347,21 @@ morning's holdout audit fed forward and won same-day). Union 9/20 = 45%, IDENTIC
 the production budget constant. Cascade validated on held-out data: direct + two-step (+ local C-v5,
 untested here, GPU busy). The audit->distill->bank loop closed its first same-day cycle.
 Artifacts: pilot_holdout_twostep.json.
+
+## E13s — holdout four-lane matrix complete: local C-v5 wins, grand union 55% (2026-07-23)
+
+| Lane (same holdout 20) | Rescue | Unique |
+|---|---|---|
+| LOCAL C-v5 bare (free) | **9/20** | 2 (nt-67, nt-72) |
+| reasoning direct | 7/20 | 2 |
+| two-step -> fast | 6/20 | 1 |
+| C-v5 + contract brief | 8/20 | 1 (nt-73) |
+| GRAND UNION | **11/20 = 55%** | |
+
+The free local trained planner is the single strongest teacher on fresh hard questions and adds
+cloud-impossible wins; brief-on-local near-neutral again (second independent confirmation of E13j),
+retained only as a free second shot after bare failure. Ensemble budget constant revised 45% -> 55%
+with the local lane. Cascade stage-3 (C-v5 self-harvest) promoted from cost-saver to primary yield.
+Ops note: cascade stage-1 crash root-caused same hour (squall-main layout divergence on turin;
+symlink fix; smoke 1/2 pass); orphan vLLM adopted as the serving substrate; duplicate gate stopped.
+Artifacts: pilot_holdout_local.json.
