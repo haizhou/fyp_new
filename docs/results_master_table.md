@@ -158,3 +158,13 @@ skipped: NOT because it would be null (Qwen convergence does not imply Llama con
 - r2 rung
 - schema-valid diagnostic
 - OOD-slice table (computed 2026-07-06: student advantage LARGEST on ood_candidate: +18-20pt vs teacher)
+## E13g — C-v5 (v4b pool, 5,532 ex, retrained on turin after save corruption) 2026-07-23
+
+| Arm | n | Metric | Value | Paired vs C-v3 | Artifact |
+|---|---|---|---|---|---|
+| C-v5 (gold-program, v4b pool) | 300 clean-eval-devfold | internal denotation match | **55.67% (167/300)** | +21/-7, exact McNemar p=0.0125 | data/qa/wtq/eval_wtq_clean_C5.jsonl |
+
+Ladder: C-v1 40.0 -> C-v2 47.67 -> C-v3 51.00 -> C-v5 55.67; slice ceiling ~64.6 (coverage-bounded).
+Outcomes: answered 288, eval_failed 10, truncated 1, invalid_tree 1, abstain 0 (expected for C arm).
+Provenance note: first C-v5 save was quota-corrupted (443/504 zero tensors, 23.33% garbage number DISCARDED, never ledgered);
+retrained clean on turin GPU3 (3h08m shared card), integrity assertion 0 zero tensors, eval against curated 300 slice.
