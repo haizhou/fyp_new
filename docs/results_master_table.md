@@ -383,3 +383,15 @@ Fixes shipped: loader first-line numeric parse (v4c family); repair twin-upgrade
 preds. Recommendation: local lane k=4. Note: cascade shards started before/after the loader patch
 verify under slightly different parse strictness (all outputs remain oracle-verified per-run).
 Artifacts: c5_failure_traces.json.
+
+## E13u — seventh and final understanding-arm trial: targeted briefs still +0; the mechanism (2026-07-23)
+
+Blind-spot-checklist Step-1 (8-class diagnosis from E13t, node shapes + grounded literals) -> C-v5,
+k=4, her own 11 failures: bare 2/11 vs briefed 2/11, IDENTICAL sets (the 2 = nt-58 loader fix and
+nt-73 k=4 depth, confirming both mechanical recoveries live). Third independent zero (E13j, E13s,
+E13u): a fine-tuned planner cannot be steered by prompt-side semantics outside her training format —
+catalog->tree SFT contains no brief field, so briefs are out-of-distribution matter she learned to
+ignore. The user's two-step instinct survives in TRAINING space: the procurement fully-local system
+(85.65) trains step1+step2 together on briefing-formatted data; WTQ never did. Fork for next train:
+C-v6 (idiom exemplars + teacher rescues into the pool, format unchanged) vs B2-arm (catalog+brief->
+tree format, planner LEARNS to consume briefs) vs combined. Artifacts: pilot_targeted_step1.json.

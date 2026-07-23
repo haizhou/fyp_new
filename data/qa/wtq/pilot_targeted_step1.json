@@ -1,0 +1,68 @@
+[
+ {
+  "id": "nt-43",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "CROSS-COLUMN INTERSECT (appears in both): setop(intersect, values(division_three), values(division_two))\n1980s filter: season__min_year gte 1980 + lte 1989 (on both)\nGARBLED: restate as intersect unique teams appearing in division_three col and division_two col during 1980s\nPLAN: setop(intersect, values(division_three, filter(season__min_year, gte, 1980), filter(season__min_year, lte, 1989)), values(division_two, filter(season__min_year, gte, 1980), filter(season__min_year, lte, 1989)))"
+ },
+ {
+  "id": "nt-44",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "8. SECOND ENTITIES: ground BOTH to exact name col spellings (use contains \"Farrell\", contains \"Carne\")\n5. EMPTY/MISSING: none here (debuts are numeric years)\nPLAN: num(combine(values(rugby_league_debut, filter(name contains \"Farrell\")), values(rugby_league_debut, filter(name contains \"Carne\")), \"-\"))"
+ },
+ {
+  "id": "nt-45",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "2. ORDERED NAVIGATION: before \"Devakanya\" (row_index 4); literal neighbour row_index=3 (row order=data)\nPLAN: values(select(title, filter(eq(row_index, 3))))"
+ },
+ {
+  "id": "nt-58",
+  "bare": "verified",
+  "brief_arm": "verified",
+  "brief": "No checklist hits.\nPLAN: count(filter(attendance gte 1500))"
+ },
+ {
+  "id": "nt-61",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "6. GARBLED: sum senators column over all depts/rows\nPLAN: sum(senators)"
+ },
+ {
+  "id": "nt-70",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "8. ground coach=\"Joseph Black\" (exact cell from row_index 7)\nPLAN: values(years, filter(coach eq \"Joseph Black\"))"
+ },
+ {
+  "id": "nt-73",
+  "bare": "verified",
+  "brief_arm": "verified",
+  "brief": "2. ORDERED NAVIGATION (first premier): anchor 'V\u30fbPremier' literal row_index=7 (first of hinted 7,8,9,10)\nPLAN: values(matches, filter(eq(row_index, 7)))"
+ },
+ {
+  "id": "nt-74",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "No cures applicable\nPLAN: groupby(driver, count=size()); argext(max, count); select(driver)"
+ },
+ {
+  "id": "nt-75",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "5. EMPTY/MISSING MARKERS: lower_zip_code & upper_zip_code use literal \"-\" (or \"\"/n/a per cells)\nPLAN: count(filter(and(eq(lower_zip_code, \"-\"), eq(upper_zip_code, \"-\"))))"
+ },
+ {
+  "id": "nt-76",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "6. GARBLED: rephrase \"how many populations at most have any notes?\" as \"max population_2005\"\nPLAN: select(extreme_rows(population_2005, max), population_2005)"
+ },
+ {
+  "id": "nt-78",
+  "bare": "unrescued",
+  "brief_arm": "unrescued",
+  "brief": "4. GROUP-MAX VALUE (\"most compilation albums released in one year\" wants count not year): column=year for groupby\nCure: argext gives year KEY; read literal argmax year from data then count(filter(year eq <that_literal>))\nPLAN: count(filter(year eq argext(groupby(year, count), year)))"
+ }
+]
