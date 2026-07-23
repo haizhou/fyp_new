@@ -35,7 +35,7 @@ def _norm_header(h: str, seen: set) -> tuple[str, bool]:
 
 
 def _to_num(cell: str):
-    s = str(cell).strip()
+    s = str(cell).strip().split("\n")[0].strip()
     if not _NUM_RE.match(s):
         return None
     s = re.sub(r"[,$£€%\s]", "", s)

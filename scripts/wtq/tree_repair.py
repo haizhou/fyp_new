@@ -173,6 +173,13 @@ def _numeric_view_upgrade(tree: dict, fields: list[str]) -> dict | None:
                         and f + "__num" in fields:
                     node[key] = f + "__num"
                     changed = True
+        # numeric comparison preds on a text column with a __num twin
+        if node.get("op") in ("gte", "lte") and isinstance(node.get("value"), (int, float)):
+            f = node.get("field")
+            if isinstance(f, str) and f in fields and not f.endswith("__num") \
+                    and f + "__num" in fields:
+                node["field"] = f + "__num"
+                changed = True
     return t if changed else None
 
 

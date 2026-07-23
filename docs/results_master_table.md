@@ -365,3 +365,21 @@ with the local lane. Cascade stage-3 (C-v5 self-harvest) promoted from cost-save
 Ops note: cascade stage-1 crash root-caused same hour (squall-main layout divergence on turin;
 symlink fix; smoke 1/2 pass); orphan vLLM adopted as the serving substrate; duplicate gate stopped.
 Artifacts: pilot_holdout_local.json.
+
+## E13t — C-v5 failure attribution: the trained planner's errors mirror its pool's blind spots (2026-07-23)
+
+11 holdout failures, 4-sample traces, schema-enforced (zero format faults possible):
+| Step | Cases | Note |
+|---|---|---|
+| idiom blind spots (pool echo) | nt-43 intersect, nt-45 navigation, nt-61 Totals, nt-78 key-vs-value | absent from gold-translation pool -> absent from C-v5; C-v6 pool seeding targets exactly these |
+| representation debt | nt-58 | model's tree was CORRECT; loader's full-cell numeric match dropped multiline cells ("2,219\nKnight...") -> first-line parse fix, original tree now 11/11 |
+| literal grounding | nt-44 second entity, nt-75 empty markers | |
+| understanding (garbled question) | nt-76 | count(notes exists)=0 was trivially expressible |
+| sampling depth | nt-73 | correct tree appears at k=4; free lane k=2 -> k=4 |
+| missing node (spec'd extension) | nt-74 | gcombine lacks 'add' (cross-column occurrence sums) |
+| gold quirk | nt-70 | annotator-added unit "1 year" not present in any cell |
+
+Fixes shipped: loader first-line numeric parse (v4c family); repair twin-upgrade extended to filter
+preds. Recommendation: local lane k=4. Note: cascade shards started before/after the loader patch
+verify under slightly different parse strictness (all outputs remain oracle-verified per-run).
+Artifacts: c5_failure_traces.json.

@@ -1,0 +1,1051 @@
+[
+ {
+  "id": "nt-43",
+  "q": "which division three team also played in the division two season during the 1980s?",
+  "gold": "Seaford Town",
+  "attempts": [
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "division_three",
+        "op": "exists"
+       }
+      ]
+     },
+     "field": "division_three"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['Bosham', 'Clymping', 'Crowborough Athletic', 'Dorking Wanderers', 'E",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "division_three",
+        "op": "eq",
+        "value": "Worthing"
+       },
+       {
+        "field": "division_two",
+        "op": "exists"
+       }
+      ]
+     },
+     "field": "season"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "[]",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "division_three",
+        "op": "exists"
+       }
+      ]
+     },
+     "field": "division_three"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['Bosham', 'Clymping', 'Crowborough Athletic', 'Dorking Wanderers', 'E",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "season",
+        "op": "eq",
+        "value": "1980\u201381"
+       }
+      ]
+     },
+     "field": "division_three"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "[]",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-44",
+  "q": "what is the difference in league debut date between farrell and carne?",
+  "gold": "1",
+  "attempts": [
+   {
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "Kane Farrell"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     },
+     "right": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "Carne"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0.0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "Kane Farrell"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     },
+     "right": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "Luke Carney"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0.0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "Farrell"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     },
+     "right": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "Carne"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0.0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "combine",
+     "op": "diff",
+     "left": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "Paul Farrell"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     },
+     "right": {
+      "node": "sum",
+      "of": {
+       "node": "filter",
+       "where": [
+        {
+         "field": "name",
+         "op": "eq",
+         "value": "David Carne"
+        }
+       ]
+      },
+      "field": "rugby_league_debut"
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0.0",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-45",
+  "q": "what film was released before \"devakanya?\"",
+  "gold": "Dhaasippen or Jothi Malar",
+  "attempts": [
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "not",
+        "pred": {
+         "field": "title",
+         "op": "eq",
+         "value": "Devakanya"
+        }
+       }
+      ]
+     },
+     "field": "title"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['Achayam (Vaarai Sena, Vamuna Therai & Thillana)', 'Arunthathi', 'Dha",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "not",
+        "pred": {
+         "field": "title",
+         "op": "eq",
+         "value": "Devakanya"
+        }
+       },
+       {
+        "op": "not",
+        "pred": {
+         "field": "release_date__date",
+         "op": "gte",
+         "value": "1943-02-07"
+        }
+       }
+      ]
+     },
+     "field": "title"
+    },
+    "type": "VALUES",
+    "exec": "failed",
+    "ans": "None",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "not",
+        "pred": {
+         "field": "title",
+         "op": "eq",
+         "value": "Devakanya"
+        }
+       }
+      ]
+     },
+     "field": "title"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['Achayam (Vaarai Sena, Vamuna Therai & Thillana)', 'Arunthathi', 'Dha",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "not",
+        "pred": {
+         "field": "title",
+         "op": "eq",
+         "value": "Devakanya"
+        }
+       },
+       {
+        "field": "release_date__date",
+        "op": "lte",
+        "value": "1943-04-01"
+       }
+      ]
+     },
+     "field": "title"
+    },
+    "type": "VALUES",
+    "exec": "failed",
+    "ans": "None",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-58",
+  "q": "how many games did at least 1500 people attend?",
+  "gold": "11",
+  "attempts": [
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "attendance",
+        "op": "gte",
+        "value": 1500
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "8",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "attendance",
+        "op": "gte",
+        "value": 1500
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "8",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "attendance",
+        "op": "gte",
+        "value": 1500
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "8",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "attendance",
+        "op": "gte",
+        "value": 1500
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "8",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-61",
+  "q": "what is the total amount of senators i all departments?",
+  "gold": "36",
+  "attempts": [
+   {
+    "tree": {
+     "node": "sum",
+     "of": {
+      "node": "filter",
+      "where": []
+     },
+     "field": "senators"
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "72.0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "sum",
+     "of": {
+      "node": "filter",
+      "where": []
+     },
+     "field": "senators"
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "72.0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "sum",
+     "of": {
+      "node": "filter",
+      "where": []
+     },
+     "field": "senators"
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "72.0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "sum",
+     "of": {
+      "node": "filter",
+      "where": []
+     },
+     "field": "senators"
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "72.0",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-70",
+  "q": "how long was joseph black a coach?",
+  "gold": "1 year",
+  "attempts": [
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "coach",
+        "op": "eq",
+        "value": "Joseph Black"
+       }
+      ]
+     },
+     "field": "years"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['1']",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "coach",
+        "op": "eq",
+        "value": "Joseph Black"
+       }
+      ]
+     },
+     "field": "years"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['1']",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "coach",
+        "op": "eq",
+        "value": "Joseph Black"
+       }
+      ]
+     },
+     "field": "years"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['1']",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "coach",
+        "op": "eq",
+        "value": "Joseph Black"
+       }
+      ]
+     },
+     "field": "years"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['1']",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-73",
+  "q": "how many matches took place in the first premier?",
+  "gold": "27",
+  "attempts": [
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "row_index",
+        "op": "eq",
+        "value": 1
+       }
+      ]
+     },
+     "field": "matches"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['18']",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "row_index",
+        "op": "eq",
+        "value": 7
+       }
+      ]
+     },
+     "field": "matches"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['27']",
+    "match": true
+   },
+   {
+    "tree": {
+     "node": "sum",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "row_index",
+        "op": "eq",
+        "value": 1
+       }
+      ]
+     },
+     "field": "matches"
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "18.0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "values",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "league",
+        "op": "eq",
+        "value": "V\u30fbPremier"
+       },
+       {
+        "field": "row_index",
+        "op": "eq",
+        "value": 7
+       }
+      ]
+     },
+     "field": "matches"
+    },
+    "type": "VALUES",
+    "exec": "ok",
+    "ans": "['27']",
+    "match": true
+   }
+  ]
+ },
+ {
+  "id": "nt-74",
+  "q": "which driver appears the most?",
+  "gold": "Jim Clark",
+  "attempts": [
+   {
+    "tree": {
+     "node": "argext",
+     "of": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "key": "driver",
+      "metric": "count"
+     },
+     "op": "argmax"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "Alain Prost",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "argext",
+     "of": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "key": "driver",
+      "metric": "count"
+     },
+     "op": "argmax"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "Alain Prost",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "argext",
+     "of": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "key": "driver",
+      "metric": "count"
+     },
+     "op": "argmax"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "Alain Prost",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "argext",
+     "of": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "key": "driver",
+      "metric": "count"
+     },
+     "op": "argmax"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "Alain Prost",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-75",
+  "q": "how many places list no zip code in either the lower or upper zip code?",
+  "gold": "18",
+  "attempts": [
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "not",
+        "pred": {
+         "field": "lower_zip_code",
+         "op": "exists"
+        }
+       },
+       {
+        "op": "not",
+        "pred": {
+         "field": "lower_zip_code",
+         "op": "exists"
+        }
+       },
+       {
+        "field": "name_of_place",
+        "op": "exists"
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "not",
+        "pred": {
+         "field": "lower_zip_code",
+         "op": "exists"
+        }
+       },
+       {
+        "op": "not",
+        "pred": {
+         "field": "lower_zip_code",
+         "op": "exists"
+        }
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "field": "lower_zip_code",
+        "op": "eq",
+        "value": null
+       },
+       {
+        "field": "name_of_place",
+        "op": "exists"
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "count",
+     "of": {
+      "node": "filter",
+      "where": [
+       {
+        "op": "not",
+        "pred": {
+         "field": "lower_zip_code",
+         "op": "exists"
+        }
+       },
+       {
+        "field": "name_of_place",
+        "op": "exists"
+       }
+      ]
+     }
+    },
+    "type": "NUMBER",
+    "exec": "ok",
+    "ans": "0",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-76",
+  "q": "how many populations at most have any notes?",
+  "gold": "0",
+  "attempts": [
+   {
+    "tree": {
+     "node": "argext",
+     "of": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "key": "name",
+      "metric": "count"
+     },
+     "op": "argmax"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "Daping",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "extreme_rows",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "op": "argmax",
+      "field": "population_2005"
+     },
+     "field": "population_2005"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "20,600",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "extreme_rows",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "op": "argmax",
+      "field": "population_2005"
+     },
+     "field": "population_2005"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "20,600",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "extreme_rows",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "op": "argmax",
+      "field": "population_2005"
+     },
+     "field": "population_2005"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "20,600",
+    "match": false
+   }
+  ]
+ },
+ {
+  "id": "nt-78",
+  "q": "what is the most compilation albums released in one year?",
+  "gold": "4",
+  "attempts": [
+   {
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "extreme_rows",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "op": "argmax",
+      "field": "row_index"
+     },
+     "field": "title"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "Introducing Willy DeVille",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "argext",
+     "of": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "key": "year",
+      "metric": "count"
+     },
+     "op": "argmax"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "1996",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "select",
+     "of": {
+      "node": "extreme_rows",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "op": "argmax",
+      "field": "year"
+     },
+     "field": "title"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "Introducing Willy DeVille",
+    "match": false
+   },
+   {
+    "tree": {
+     "node": "argext",
+     "of": {
+      "node": "groupby",
+      "of": {
+       "node": "filter",
+       "where": []
+      },
+      "key": "year",
+      "metric": "count"
+     },
+     "op": "argmax"
+    },
+    "type": "VALUE",
+    "exec": "ok",
+    "ans": "1996",
+    "match": false
+   }
+  ]
+ }
+]
