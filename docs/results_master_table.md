@@ -411,3 +411,13 @@ E13v addendum: toddler brief on LOCAL C-v5, both placements (appended block / AS
 in-distribution injection) = 0/7 and 0/7 on the structural residue. Ninth and final prompt protocol.
 The structural-residue diagnosis holds against every phrasing; prompt-space verdict now covers both
 planners and both injection sites. All roads lead to training space (C-v6 / B2 / combined).
+
+## E13w — local cascade complete: C5 self-harvest clears half the zero-hit pool (2026-07-23)
+
+v4b+v4c reharvest (composev3): ~31% yield per shard (v3: 28.7%) -> new zero-hit pool 7,853.
+C5 self-harvest over that pool: 3,826/7,853 = 48.72% rescued, 5,057 verified trees — the holdout
+prediction (9/20 = 45%) confirmed at scale. Teacher residue: 4,027 ids (paid work halved).
+C5self trees are C-lineage (self-harvest downstream of gold translations) -> C-v6 fuel; A-pool
+gains the fresh Av4b harvest under current views. Orphan vLLM cleaned; GPU3 freed for training.
+Economics final: Job A fast on 4,027 ~ $2.7; Job A+ reasoning on post-fast residue (~35% stable)
+~ $6 fast-tier / ~$290 full-tier / $0 if preview. Training fork now fully fueled.
