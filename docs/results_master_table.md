@@ -322,3 +322,16 @@ FINAL: 18/20 of the hardest tail winnable (was 0/20 for fast at session start). 
 (hyperlinks destroyed in CSV export — dead), nt-38 (run-length — the sole true language wall).
 Production adoption: Step-1 contract gains the two user principles; repair suite now 10 variant
 classes. Artifacts: pilot_user_step1.json.
+
+## E13q — holdout-20 replication: toolkit gain does NOT transfer as-is; method does (2026-07-23)
+
+Production config (reasoning + 6 idioms + v4c views + row-index hints + 10-variant repair) on a
+FRESH 20 from the same fast-failed pool: 7/20, all direct, repair fired zero times — exactly the
+bare-reasoning baseline. Pre-registered read: the original-20's 13/20 was substantially fitted
+(idioms/repairs were distilled FROM those failures). Fresh failures are NEW species: pred-layer
+ge/le vocab error (mechanical variant added), argext key-vs-value ("most per year" wants the count),
+does-A-or-B wants a NAME not a boolean, Totals-row-as-answer (inverse of nt-30), unit-carrying gold
+("1 year"), multi-column union counts, date arithmetic. Conclusion: the hard tail is a LONG TAIL;
+the asset is not a static idiom list but the audit->distill->bank LOOP, growing coverage batch by
+batch. Stable planning number: bare reasoning-direct ~35% replicated across both 20s (7/20, 7/20) —
+use for Job A+ yield forecasts. Artifacts: pilot_holdout20.json.

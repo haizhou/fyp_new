@@ -1,0 +1,436 @@
+[
+ {
+  "id": "nt-40",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "nation__noparen",
+      "op": "eq",
+      "value": "Ukraine"
+     }
+    ]
+   },
+   "field": "silver"
+  }
+ },
+ {
+  "id": "nt-43",
+  "status": "unrescued",
+  "tree": {
+   "node": "values",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "division_three",
+      "op": "in_expr",
+      "expr": {
+       "node": "values",
+       "of": {
+        "node": "filter",
+        "where": [
+         {
+          "field": "season__min_year",
+          "op": "ge",
+          "value": 1980
+         },
+         {
+          "field": "season__min_year",
+          "op": "lt",
+          "value": 1990
+         }
+        ]
+       },
+       "field": "division_two"
+      }
+     }
+    ]
+   },
+   "field": "division_three"
+  }
+ },
+ {
+  "id": "nt-44",
+  "status": "unrescued",
+  "tree": {
+   "node": "combine",
+   "op": "diff",
+   "left": {
+    "node": "select",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "name",
+       "op": "eq",
+       "value": "Farrell"
+      }
+     ]
+    },
+    "field": "rugby_league_debut"
+   },
+   "right": {
+    "node": "select",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "name",
+       "op": "eq",
+       "value": "Carne"
+      }
+     ]
+    },
+    "field": "rugby_league_debut"
+   }
+  }
+ },
+ {
+  "id": "nt-45",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 3
+     }
+    ]
+   },
+   "field": "title"
+  }
+ },
+ {
+  "id": "nt-46",
+  "status": "bad_json"
+ },
+ {
+  "id": "nt-48",
+  "status": "unrescued",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 1
+     }
+    ]
+   },
+   "field": "of_overall_seats_won__number_2"
+  }
+ },
+ {
+  "id": "nt-53",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "exists"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-54",
+  "status": "unrescued",
+  "tree": {
+   "node": "exists",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "op": "any",
+      "preds": [
+       {
+        "field": "name",
+        "op": "eq",
+        "value": "David Watson"
+       },
+       {
+        "field": "name",
+        "op": "eq",
+        "value": "Theodis Tarver"
+       }
+      ]
+     },
+     {
+      "field": "position",
+      "op": "eq",
+      "value": "Center"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-55",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "argext",
+   "of": {
+    "node": "groupby",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "title",
+       "op": "eq",
+       "value": "Whitney"
+      },
+      {
+       "field": "format_s",
+       "op": "eq",
+       "value": "Album"
+      },
+      {
+       "field": "result_s",
+       "op": "eq",
+       "value": "Won"
+      }
+     ]
+    },
+    "key": "year",
+    "metric": "count"
+   },
+   "op": "argmax"
+  }
+ },
+ {
+  "id": "nt-58",
+  "status": "unrescued",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "attendance",
+      "op": "gte",
+      "value": 1500
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-61",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "sum",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "op": "not",
+      "pred": {
+       "field": "department",
+       "op": "eq",
+       "value": "Total"
+      }
+     }
+    ]
+   },
+   "field": "senators"
+  }
+ },
+ {
+  "id": "nt-66",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 1
+     }
+    ]
+   },
+   "field": "title"
+  }
+ },
+ {
+  "id": "nt-67",
+  "status": "unrescued",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "op": "any",
+      "preds": [
+       {
+        "field": "winner_s",
+        "op": "contains",
+        "value": "Charmaine Sheh"
+       },
+       {
+        "field": "other_guests",
+        "op": "contains",
+        "value": "Charmaine Sheh"
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-70",
+  "status": "unrescued",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "coach",
+      "op": "eq",
+      "value": "Joseph Black"
+     }
+    ]
+   },
+   "field": "years"
+  }
+ },
+ {
+  "id": "nt-72",
+  "status": "unrescued",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "series",
+      "op": "eq",
+      "value": "Formula One"
+     },
+     {
+      "field": "team",
+      "op": "eq",
+      "value": "Cochet"
+     }
+    ]
+   },
+   "field": "races__num"
+  }
+ },
+ {
+  "id": "nt-73",
+  "status": "verified",
+  "via": "direct",
+  "tree": {
+   "node": "select",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "field": "row_index",
+      "op": "eq",
+      "value": 7
+     }
+    ]
+   },
+   "field": "matches"
+  }
+ },
+ {
+  "id": "nt-74",
+  "status": "unrescued",
+  "tree": {
+   "node": "argext",
+   "of": {
+    "node": "groupby",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "row_index",
+       "op": "exists"
+      }
+     ]
+    },
+    "key": "driver",
+    "metric": "count"
+   },
+   "op": "argmax"
+  }
+ },
+ {
+  "id": "nt-75",
+  "status": "unrescued",
+  "tree": {
+   "node": "count",
+   "of": {
+    "node": "filter",
+    "where": [
+     {
+      "op": "not",
+      "pred": {
+       "field": "lower_zip_code",
+       "op": "exists"
+      }
+     },
+     {
+      "op": "not",
+      "pred": {
+       "field": "upper_zip_code",
+       "op": "exists"
+      }
+     }
+    ]
+   }
+  }
+ },
+ {
+  "id": "nt-76",
+  "status": "no_tree"
+ },
+ {
+  "id": "nt-78",
+  "status": "unrescued",
+  "tree": {
+   "node": "argext",
+   "of": {
+    "node": "groupby",
+    "of": {
+     "node": "filter",
+     "where": [
+      {
+       "field": "year",
+       "op": "exists"
+      }
+     ]
+    },
+    "key": "year",
+    "metric": "count"
+   },
+   "op": "argmax"
+  }
+ }
+]

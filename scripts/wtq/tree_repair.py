@@ -37,6 +37,9 @@ def _fix_strict_ops(tree: dict) -> dict | None:
             node["op"] = "gte" if op == "gt" else "lte"
             node["value"] = node["value"] + (1 if op == "gt" else -1)
             changed = True
+        elif op in ("ge", "le") and "field" in node:
+            node["op"] = "gte" if op == "ge" else "lte"
+            changed = True
     return t if changed else None
 
 
