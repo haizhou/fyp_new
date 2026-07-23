@@ -1,0 +1,162 @@
+[
+ {
+  "id": "nt-1",
+  "status": "ok",
+  "in": 697,
+  "out": 63,
+  "reasoning": 2536,
+  "brief": "ANSWER_TYPE: scalar value from venue__part_1\nFILTER_ATOMS:\nposition = 1st\nORDER_SEMANTICS: last = max(year)\nTRAPS:\nposition/position__num and venue/venue__part_1 header quirks\nnone\nSKETCH: filter->extreme_rows->select"
+ },
+ {
+  "id": "nt-3",
+  "status": "ok",
+  "in": 490,
+  "out": 84,
+  "reasoning": 2576,
+  "brief": "ANSWER_TYPE: scalar value from passengers\nFILTER_ATOMS:\ncity__part_2 = Los Angeles\ncity__part_2 = Saskatoon\nORDER_SEMANTICS: none\nTRAPS:\ncity stores compound \"United States, Los Angeles\" requiring city__part_2 match\nno manzanillo/2013 column (table context only)\nSKETCH: filter->select->filter->select->combine"
+ },
+ {
+  "id": "nt-4",
+  "status": "ok",
+  "in": 662,
+  "out": 40,
+  "reasoning": 2546,
+  "brief": "ANSWER_TYPE: scalar value from opponent\nFILTER_ATOMS:\nnone\nORDER_SEMANTICS: first = min over date__date\nTRAPS: none\nSKETCH: extreme_rows->select"
+ },
+ {
+  "id": "nt-5",
+  "status": "ok",
+  "in": 888,
+  "out": 62,
+  "reasoning": 2956,
+  "brief": "ANSWER_TYPE: count / row_index\nFILTER_ATOMS: left_office__min_year - took_office__min_year >= 3\nORDER_SEMANTICS: none\nTRAPS: notes_events signal non-full terms (e.g. \"Resigned to accept position as\")\nSKETCH: filter->count"
+ },
+ {
+  "id": "nt-6",
+  "status": "ok",
+  "in": 561,
+  "out": 68,
+  "reasoning": 2120,
+  "brief": "ANSWER_TYPE: scalar value from away_team\nFILTER_ATOMS: none\nORDER_SEMANTICS: first = min tie_no (equiv. row_index 1)\nTRAPS: team cols embed (D3) etc in text strings\nTRAPS: __num cols parse only the division int\nSKETCH: extreme_rows->select"
+ },
+ {
+  "id": "nt-7",
+  "status": "ok",
+  "in": 646,
+  "out": 81,
+  "reasoning": 2406,
+  "brief": "ANSWER_TYPE: scalar value from name_in_english\nFILTER_ATOMS:\nname_in_english = Lake Tuz\nname_in_english = Lake Palas Tuzla\nORDER_SEMANTICS: deeper means most over depth__num\nTRAPS:\nLake Tuz vs Lake Tuzla spelling overlap\ndepth text vs depth__num column\nSKETCH: filter->extreme_rows->select"
+ },
+ {
+  "id": "nt-9",
+  "status": "ok",
+  "in": 662,
+  "out": 37,
+  "reasoning": 2721,
+  "brief": "ANSWER_TYPE: list from player\nFILTER_ATOMS:\nplayer = Ardo Kreek\nORDER_SEMANTICS: none\nTRAPS: none\nSKETCH: filter->select"
+ },
+ {
+  "id": "nt-10",
+  "status": "ok",
+  "in": 517,
+  "out": 49,
+  "reasoning": 3227,
+  "brief": "ANSWER_TYPE: count from winning_rider\nFILTER_ATOMS: none\nORDER_SEMANTICS: none\nTRAPS: no nationality column\n'italian'/'cyclist' unmatched to any cell\nSKETCH: filter->count"
+ },
+ {
+  "id": "nt-12",
+  "status": "ok",
+  "in": 442,
+  "out": 61,
+  "reasoning": 1931,
+  "brief": "ANSWER_TYPE: scalar value (diff of counts), city_town_village\nFILTER_ATOMS:\ncity_town_village = Imabari\ncity_town_village = Matsuyama\nORDER_SEMANTICS: none\nTRAPS: none\nSKETCH: groupby->count->combine"
+ },
+ {
+  "id": "nt-14",
+  "status": "ok",
+  "in": 644,
+  "out": 86,
+  "reasoning": 5466,
+  "brief": "ANSWER_TYPE: scalar value / athlete\nFILTER_ATOMS:\nolympics__min_year > 2010\nolympics__max_year > 2010\nORDER_SEMANTICS: none\nTRAPS:\nolympics has duplicate spellings '2010-2014' vs '2010\u20132014'\nderived olympics__min_year/max_year vs raw olympics text\nSKETCH: filter->select"
+ },
+ {
+  "id": "nt-18",
+  "status": "ok",
+  "in": 383,
+  "out": 32,
+  "reasoning": 4609,
+  "brief": "ANSWER_TYPE: count from title\nFILTER_ATOMS: none\nORDER_SEMANTICS: none\nTRAPS: none\nSKETCH: values->count"
+ },
+ {
+  "id": "nt-20",
+  "status": "ok",
+  "in": 473,
+  "out": 78,
+  "reasoning": 2823,
+  "brief": "ANSWER_TYPE: scalar value from album\nFILTER_ATOMS:\npeak_chart_positions_aus != \u2014\nORDER_SEMANTICS: most means max row count per album after aus charting filter\nTRAPS:\n\u2014 denotes no chart appearance in peak_chart_positions_aus\npeak_chart_positions_aus__num vs text column for valid counts\nSKETCH: filter->groupby->size->extreme->select"
+ },
+ {
+  "id": "nt-23",
+  "status": "ok",
+  "in": 477,
+  "out": 56,
+  "reasoning": 1768,
+  "brief": "ANSWER_TYPE: list / nationality\nFILTER_ATOMS:\nnone\nORDER_SEMANTICS: least = min count over grouped nationality\nTRAPS: \"counties\" mismatches nationality col (countries); duplicates expected in nationality\nSKETCH: groupby->size->extreme->select"
+ },
+ {
+  "id": "nt-24",
+  "status": "ok",
+  "in": 398,
+  "out": 42,
+  "reasoning": 2604,
+  "brief": "ANSWER_TYPE: scalar value from nation\nFILTER_ATOMS:\nnation = Turkey\nORDER_SEMANTICS: next over rank\nTRAPS: none\nSKETCH: filter->vcompare->extreme->select"
+ },
+ {
+  "id": "nt-25",
+  "status": "ok",
+  "in": 400,
+  "out": 43,
+  "reasoning": 2417,
+  "brief": "ANSWER_TYPE: count / founded\nFILTER_ATOMS: founded >= 1800\nfounded < 1900\nORDER_SEMANTICS: none\nTRAPS: none\nSKETCH: filter->count"
+ },
+ {
+  "id": "nt-27",
+  "status": "ok",
+  "in": 424,
+  "out": 80,
+  "reasoning": 4749,
+  "brief": "ANSWER_TYPE: scalar value from year\nFILTER_ATOMS:\nyear = 1996\nORDER_SEMANTICS: last = max year (<1996, where republican_party equals majority)\nTRAPS: majority is seat count (not party ID); use vcompare for match\nindependent_other has annotated cells e.g. 24(a)\nSKETCH: vcompare->filter->extreme_rows->combine"
+ },
+ {
+  "id": "nt-30",
+  "status": "ok",
+  "in": 588,
+  "out": 50,
+  "reasoning": 2879,
+  "brief": "ANSWER_TYPE: scalar value from years\nFILTER_ATOMS: none\nORDER_SEMANTICS: none\nTRAPS: years=seasons per stint (not total per coach); tenure vs years column name overlap\nSKETCH: select->combine"
+ },
+ {
+  "id": "nt-31",
+  "status": "ok",
+  "in": 582,
+  "out": 77,
+  "reasoning": 1311,
+  "brief": "ANSWER_TYPE: count from row_index\nFILTER_ATOMS: development_cycle = Beta\ndevelopment_cycle = Release\nFILTER_ATOMS: development_cycle = Beta-pre\nORDER_SEMANTICS: first = min date__num (over Release)\nTRAPS: 'Release' vs 'release' spelling; Beta vs Beta-pre ambiguity\nSKETCH: filter->extreme_rows->filter->count"
+ },
+ {
+  "id": "nt-37",
+  "status": "ok",
+  "in": 854,
+  "out": 65,
+  "reasoning": 2801,
+  "brief": "ANSWER_TYPE: count / processor\nFILTER_ATOMS:\ncase = Desktop with integrated Color display\nnotes__part_2 = enhanced keyboard\nORDER_SEMANTICS: none\nTRAPS:\ncase abbr. variants (Monoch/Color)\nnotes split (__part_1/__part_2)\nSKETCH: filter->count"
+ },
+ {
+  "id": "nt-38",
+  "status": "ok",
+  "in": 930,
+  "out": 53,
+  "reasoning": 4557,
+  "brief": "ANSWER_TYPE: count from competition\nFILTER_ATOMS:\ncompetition == Friendly\nORDER_SEMANTICS: consecutive over date__date\nTRAPS: \"score\" ambiguous (verb vs column=score/score__num)\nSKETCH: filter->groupby->extreme"
+ }
+]

@@ -168,3 +168,18 @@ Ladder: C-v1 40.0 -> C-v2 47.67 -> C-v3 51.00 -> C-v5 55.67; slice ceiling ~64.6
 Outcomes: answered 288, eval_failed 10, truncated 1, invalid_tree 1, abstain 0 (expected for C arm).
 Provenance note: first C-v5 save was quota-corrupted (443/504 zero tensors, 23.33% garbage number DISCARDED, never ledgered);
 retrained clean on turin GPU3 (3h08m shared card), integrity assertion 0 zero tensors, eval against curated 300 slice.
+
+## E13h — grok-4-20-reasoning trials on zero-hit pool (2026-07-23, three-arm control on same 20 fast-failed questions)
+
+| Arm | Rescue | Cost/q notes |
+|---|---|---|
+| fast alone k=2 (pilot) | 0/20 by construction | $0.0007 |
+| fast + reasoning-brief k=2 | 3/20 | brief burns ~2,950 thinking tk/q |
+| reasoning direct k=1 | **7/20 (35%)** | ~2,658 thinking tk/q |
+
+Verdict: understanding-arm (brief) handoff loses most of reasoning's advantage; planning in the
+algebra, not comprehension, is the bottleneck. Reasoning-DIRECT is the pool-completion tool.
+Artifacts: pilot_grok_reasoning.jsonl, pilot_grok_wtq_brief.json, pilot_fast_with_brief.json.
+Fast pilot economics (E13c artifact recomputed): 155/1000 = 15.5% incremental, zero-hit pool 8,049/11,332.
+Pricing tier of grok-4-20-reasoning UNRESOLVED (dashboard shows GBP 0 across 66 req / 45.1k tk —
+free preview or billing lag; deployment blade check pending).

@@ -1,0 +1,20 @@
+{"id": "nt-1", "usage": {"in": 1056, "out": 54, "reasoning": 707}, "status": "wrong_answer"}
+{"id": "nt-3", "usage": {"in": 849, "out": 121, "reasoning": 2259}, "status": "verified"}
+{"id": "nt-4", "usage": {"in": 1021, "out": 39, "reasoning": 1309}, "status": "verified"}
+{"id": "nt-5", "usage": {"in": 1247, "out": 40, "reasoning": 2216}, "status": "no_tree"}
+{"id": "nt-6", "usage": {"in": 919, "out": 35, "reasoning": 1287}, "status": "wrong_answer"}
+{"id": "nt-7", "usage": {"in": 1005, "out": 67, "reasoning": 1124}, "status": "verified"}
+{"id": "nt-9", "usage": {"in": 1021, "out": 65, "reasoning": 1009}, "status": "wrong_answer"}
+{"id": "nt-10", "usage": {"in": 876, "out": 16, "reasoning": 452}, "status": "no_tree"}
+{"id": "nt-12", "usage": {"in": 801, "out": 77, "reasoning": 807}, "status": "wrong_answer"}
+{"id": "nt-14", "usage": {"in": 1003, "out": 59, "reasoning": 5987}, "status": "verified"}
+{"id": "nt-18", "usage": {"in": 742, "out": 25, "reasoning": 2978}, "status": "no_tree"}
+{"id": "nt-20", "usage": {"in": 832, "out": 52, "reasoning": 1074}, "status": "verified"}
+{"id": "nt-23", "usage": {"in": 836, "out": 38, "reasoning": 1715}, "status": "wrong_answer"}
+{"id": "nt-24", "usage": {"in": 757, "out": 116, "reasoning": 7336}, "status": "wrong_answer"}
+{"id": "nt-25", "usage": {"in": 759, "out": 45, "reasoning": 872}, "status": "verified"}
+{"id": "nt-27", "usage": {"in": 783, "out": 47, "reasoning": 9208}, "status": "no_tree"}
+{"id": "nt-30", "usage": {"in": 947, "out": 62, "reasoning": 2273}, "status": "wrong_answer"}
+{"id": "nt-31", "usage": {"in": 941, "out": 106, "reasoning": 7779}, "status": "invalid", "detail": "combine_left_expects_NUMBER_got_VALUE at $"}
+{"id": "nt-37", "usage": {"in": 1213, "out": 50, "reasoning": 1621}, "status": "verified"}
+{"id": "nt-38", "usage": {"in": 1289, "out": 24, "reasoning": 1154}, "status": "no_tree"}
