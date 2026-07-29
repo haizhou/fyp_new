@@ -423,15 +423,18 @@ with a trained local one on top of the best arm per base.
 \includegraphics[width=0.88\linewidth]{gain_ladder.pdf}
 \caption{Home-benchmark results. Colours denote the base model in both
 panels, and hatching marks systems that read questions with the cloud
-model. (a) Development decomposition. The scaffolded zero-shot rung is the
-untrained baseline, the three training arms branch from the supervised
-model, and the fully local rung replaces the cloud reader with a trained
-local one on top of the best arm per base. The preference-tuned arm shows
+model. (a) Development decomposition, from the model-independent retrieval
+baseline through the untrained scaffolded base and the three training
+arms that branch from the supervised model, to the top rung that replaces
+the cloud reader with a trained local one on top of the best arm per
+base. The preference-tuned arm shows
 the base-dependent instability discussed in
 Section~\ref{sec:planning}, and the shaded band covers three cloud-teacher
-runs. (b) Sealed-test confirmation of the five frozen systems.
-Intermediate arms never touch the sealed test, which admits one pass per
-frozen configuration.}
+runs. (b) Sealed-test confirmation of the five frozen systems. The
+retrieval baseline and the untrained base were not part of the frozen
+sealed run on this benchmark, and their sealed measurements appear on the
+challenge set in Table~\ref{tab:pacs-family}. Intermediate arms never
+touch the sealed test, which admits one pass per frozen configuration.}
 \label{fig:home-ladder}
 \end{figure}
 
@@ -474,36 +477,45 @@ none of the systems authored. The teacher API lacks the
 local constrained decoder, and 23.1\% of its rows fail on format, so the margin
 is not presented as a decoding-neutral model comparison.
 
-Table~\ref{tab:pacs-family} breaks the sealed result into the seven task
-families for all three systems, and the pattern is asymmetric rather than
-uniform. The local planner dominates spending, comparison, relational
-composition, and above all overlap and exclusion, where it scores 97.1\%
-against 27.2\% for the teacher, whose free-form programs rarely survive the
-set-operation semantics. The teacher in turn remains stronger on disclosure
-and compliance, 60.6\% against 38.8\%, where universal quantification over
-every notice of a buyer defeats the closed algebra more often than it
-defeats free generation. Training transfers what its pool demonstrates, and
-the table shows both directions of that dependence.
+Table~\ref{tab:pacs-family} breaks the sealed result into task families
+and status classes, computed for all systems on identical row sets. The
+local planner leads six of the seven families, most extremely on overlap
+and exclusion, 97.1\% against 21.4\% for the teacher, whose free-form
+programs rarely survive the set-operation semantics. The single exception
+is disclosure and compliance, the weakest family for every system, where
+the teacher edges the planner 40.8\% to 38.8\%. Universal quantification
+over every notice of a buyer defeats all systems, and the closed algebra
+does not rescue it. On the refusal axis the planner recognises every one
+of the 138 unsupported sealed questions, against 91.3\% for the teacher
+and 29.7\% for the untrained base, so scored abstention is not only a
+design feature but a measured sealed-test behaviour.
 
 \begin{table}[t]
 \centering
-\caption{Sealed PACS accuracy per task family on value-oracle rows
-(n=655). Strengths are asymmetric. The planner dominates set-heavy
-families while the teacher retains the lead on universal quantification
-over disclosure records.}
+\caption{Sealed PACS results by task family and status class, computed
+for all systems on identical row sets. Family rows use the 655 answerable
+rows with concrete value oracles. The refusal row uses the 138
+unsupported-question golds. The empty-result class was affected by the
+documented 46-row labelling defect, and only the planner was re-scored
+under the corrected labels, marked $\dagger$. The retrieval baseline was
+not run on status rows. Bold marks the best system per row.}
 \label{tab:pacs-family}
 \small
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
-Family & n & Local planner & Cloud teacher & Untrained base \\
+ & n & Local planner & Cloud teacher & Untrained base & Retrieval \\
 \midrule
-F1 spending and volume & 104 & \textbf{99.0} & 82.8 & 59.6 \\
-F2 temporal change & 107 & 96.3 & \textbf{96.7} & 70.7 \\
-F3 supplier concentration & 97 & 47.4 & \textbf{51.6} & 28.0 \\
-F4 cross-buyer comparison & 107 & \textbf{93.5} & 83.6 & 54.2 \\
-F5 overlap and exclusion & 103 & \textbf{97.1} & 27.2 & 35.6 \\
-F6 relational composition & 88 & \textbf{88.6} & 69.8 & 39.3 \\
-F7 disclosure and compliance & 49 & 38.8 & \textbf{60.6} & 41.5 \\
+F1 spending and volume & 104 & \textbf{99.0} & 69.2 & 59.6 & 12.5 \\
+F2 temporal change & 107 & \textbf{96.3} & 81.3 & 60.7 & 53.3 \\
+F3 supplier concentration & 97 & \textbf{47.4} & 38.1 & 26.8 & 11.3 \\
+F4 cross-buyer comparison & 107 & \textbf{93.5} & 43.0 & 54.2 & 34.6 \\
+F5 overlap and exclusion & 103 & \textbf{97.1} & 21.4 & 20.4 & 3.9 \\
+F6 relational composition & 88 & \textbf{88.6} & 31.8 & 36.4 & 18.2 \\
+F7 disclosure and compliance & 49 & 38.8 & \textbf{40.8} & 34.7 & 4.1 \\
+\midrule
+All answerable, value oracles & 655 & \textbf{83.8} & 47.6 & 42.9 & 21.4 \\
+Refusal, exact status & 138 & \textbf{100.0} & 91.3 & 29.7 & -- \\
+Empty result, corrected labels & 90 & 38.9$^\dagger$ & -- & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -744,8 +756,9 @@ remains outside the language.}
 \end{figure}
 
 \paragraph{PACS status axis.}
-Per-family accuracy appears in Table~\ref{tab:pacs-family} of the main
-text. On the 267 status rows
+Per-family and status-class results appear in
+Table~\ref{tab:pacs-family} of the main text. On the 267 rows whose
+serialised oracle is empty
 the planner returns the exact gold status on 138 under raw scoring, and the
 documented offline correction of the empty-result class credits a further
 35 rows, which reconciles exactly with the reported overall of 722 correct
