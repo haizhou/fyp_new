@@ -1,0 +1,2102 @@
+[
+ {
+  "id": "nt-2",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-15",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-29",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-68",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-69",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-87",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-104",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-130",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-212",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-260",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-320",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-355",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-367",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-392",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-432",
+  "k1": true,
+  "first": false,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-500",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-516",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-531",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-535",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-615",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-620",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-624",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-651",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-668",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-673",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-683",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-697",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-713",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-761",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-805",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-823",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-830",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-856",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-880",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-881",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-899",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-912",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-919",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-924",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-941",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-944",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-956",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1010",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1040",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1042",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1066",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1078",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1105",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1135",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1152",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1163",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1214",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1217",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1239",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1242",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1260",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1269",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1279",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1312",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1314",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1371",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1386",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1405",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1427",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1456",
+  "k1": true,
+  "first": false,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-1472",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1488",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1515",
+  "k1": false,
+  "first": false,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1528",
+  "k1": true,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-1529",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1607",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1618",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1624",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1626",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1642",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1682",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1700",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1702",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1711",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1782",
+  "k1": false,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-1831",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1835",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1856",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-1885",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1893",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1905",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-1919",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1977",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-1984",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2054",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2165",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2205",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2218",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2254",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2281",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2308",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2516",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2519",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2529",
+  "k1": true,
+  "first": false,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-2544",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2552",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2565",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2571",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2577",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2580",
+  "k1": true,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-2591",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2598",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2620",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2623",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2635",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2661",
+  "k1": true,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-2680",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2690",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2717",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2825",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2832",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2860",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2886",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2912",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2919",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2926",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2955",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2956",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-2967",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-2969",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3004",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3029",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3034",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3110",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3115",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3122",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3125",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3187",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3196",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3210",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3213",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3237",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3246",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3264",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3271",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3280",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3294",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3321",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3415",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3439",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3463",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3493",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3514",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3517",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3533",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3537",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3566",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3572",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3605",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3630",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-3657",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3658",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3728",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3736",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3789",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3795",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3796",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-3853",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3954",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-3964",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4000",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4074",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4112",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4181",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4202",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4209",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4220",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4221",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4262",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4278",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4301",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4347",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4363",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4371",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4382",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4401",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4409",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4425",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4441",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4447",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4461",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4474",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4488",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4496",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4522",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4530",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4566",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4572",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4583",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4627",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4651",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4662",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4670",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4677",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4713",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4736",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4761",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4820",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4824",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4849",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4864",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4892",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4951",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4953",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4975",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4980",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-4991",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-4993",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5017",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5021",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5054",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5080",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5095",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5103",
+  "k1": true,
+  "first": false,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5147",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5178",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5187",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5194",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5259",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5268",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5298",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5313",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5318",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5328",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5332",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5362",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5390",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5416",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5469",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5477",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5510",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5512",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5573",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5648",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5668",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5696",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5738",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5764",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5804",
+  "k1": false,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5807",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5817",
+  "k1": false,
+  "first": false,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5863",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5881",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5887",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5912",
+  "k1": true,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-5929",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5985",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-5990",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-5992",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6001",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6057",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6093",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6114",
+  "k1": true,
+  "first": false,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6125",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6129",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6164",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6176",
+  "k1": true,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-6183",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6185",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6196",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6206",
+  "k1": true,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-6264",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6302",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6331",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6403",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6414",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6417",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6426",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6446",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6447",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6450",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6610",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6620",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6628",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6630",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6635",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6672",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6679",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6691",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6698",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6755",
+  "k1": true,
+  "first": false,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6764",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6778",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6779",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6783",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6795",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6833",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6845",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-6893",
+  "k1": true,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-6898",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-7026",
+  "k1": true,
+  "first": true,
+  "verifier": true,
+  "oracle": true
+ },
+ {
+  "id": "nt-7052",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-7061",
+  "k1": true,
+  "first": true,
+  "verifier": false,
+  "oracle": true
+ },
+ {
+  "id": "nt-7116",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ },
+ {
+  "id": "nt-7153",
+  "k1": false,
+  "first": false,
+  "verifier": false,
+  "oracle": false
+ }
+]

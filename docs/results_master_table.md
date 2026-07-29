@@ -444,3 +444,15 @@ check, mechanism confirmed. Holdout-20 10/20 (C5: 9/20) — clean +1, positive d
 magnitude. Read: pool seeding LEARNS reliably; GENERALIZES mildly at 7 shapes x10 weight in a 10k pool.
 Scaling path: fold A+ harvest trees (new hard-core shapes) into the next pool, exemplar classes 7 -> dozens.
 Artifact: c6_idiom_test.json.
+
+## E14c — LLM-as-a-Verifier port: measured negative, mechanism clean (2026-07-23)
+
+Logit-expectation reranking (arXiv 2607.05391 port: 1-9 digit expectation, E13t-taxonomy criteria
+decomposition C=3, base-model judge, deterministic gate preserved as sole admission) on dev-300,
+C-v6 k=4: k1 59.00 (ladder reproduced) | first-verified 57.33 | verifier-pick 56.67 | oracle-best-of-4
+61.00. Two findings: (1) best-of-k headroom is 2 points — temp-0 already extracts the sharpened SFT
+distribution, so ANY judge (incl. perfect) caps at +2; (2) the judge ranks below position baseline —
+plausibility is uncorrelated with executional correctness in this domain. Quantified defense of the
+paper's design: where an executable oracle exists, it exhausts the signal; probabilistic verification
+serves domains without one. Line closed; no cloud-judge escalation (ceiling forbids ROI).
+Artifacts: verifier_rerank.json, scripts/wtq/verifier_rerank.py.
