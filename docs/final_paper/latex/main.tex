@@ -12,6 +12,7 @@
 \usepackage{url}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit}
+\graphicspath{{./}{figs/}}
 
 \title{Auditable Compositional Question Answering over UK Public Procurement}
 
@@ -28,247 +29,166 @@
 \maketitle
 
 \begin{abstract}
-The United Kingdom publishes hundreds of thousands of contract award
-notices, yet the public cannot reliably analyse them in natural language,
-because the questions that matter are exhaustive aggregations where a
-fluent wrong answer is worse than none. We introduce, to the best of our
-knowledge, the first systematic benchmark and executable framework for
-auditable compositional question answering over UK public procurement. The
-task ships complete. A convention-explicit knowledge graph of 215{,}221
-contract awards, a benchmark of 12{,}828 questions each carrying an
-executable gold program, a typed compositional operator algebra that
-formalises real procurement analytics, refusal on ambiguous, unsupported
-and empty questions as scored behaviour, and answer oracles validated by
-an independent second implementation at 99.88 percent over 14{,}770
-audited answers. Because no annotator pool can label compositional
-procurement programs at scale, training uses a verified bootstrap. Models
-propose candidate programs and deterministic checks, compilation,
-grounding, execution and oracle agreement, decide what may be learned
-from. An 8-billion-parameter local model trained this way reaches 85.65
-percent against 69.76 for the cloud teacher that generated its training
-data (paired McNemar $p < 10^{-15}$), and 78.31 percent on a sealed
-challenge set with an independent surface grammar, a constraint-necessity
-audit, and a 28-point margin over the same teacher. Transplanted to
-WikiTableQuestions by exchanging only the data-representation layer, the
-recipe lifts a 22.5 percent zero-shot floor to 44.4 with answer-only
-supervision and 51.8 with gold programs on the official sealed test,
-while a four-way attribution audit shows a substantial share of the
-apparent expressiveness gap to be representation and compilation debt
-rather than missing reasoning capability. We claim no state of the art.
-The claim is a task built end to end, and audits strong enough to say
-precisely what its system can and cannot yet do.
+UK public procurement records are public and partly structured, but reliable
+analysis remains difficult. Organisation identifiers are fragmented, monetary
+fields have different accounting meanings, and many useful questions require
+several joins, filters, and aggregations. We build an auditable question
+answering framework from 166{,}277 Open Contracting Data Standard releases.
+The framework normalises the source records, represents questions as programs
+in a closed typed algebra, and executes each program with deterministic data
+conventions. It can also abstain when a question is ambiguous, unsupported, or
+not answered by the available records. The resulting benchmark contains
+12{,}828 questions with executable gold programs. A second evaluator, written
+without shared execution code, reproduces 99.88\% of 14{,}770 audited oracle
+cases.
+
+Experiments separate the value of the executable scaffold from the value of
+model training. On development data, an untrained 8B model rises from a 31.5\%
+retrieval baseline to 70.4\% when routed through the scaffold. Task-specific
+training raises the strongest fully local system to 85.65\% on a sealed
+2{,}285-question test, compared with 69.76\% for the cloud teacher used to
+propose training candidates. The ordering holds with a second 8B base model
+and on a sealed procurement challenge set, where the local planner reaches
+78.31\%. A transfer to WikiTableQuestions raises an untrained 22.51\%
+baseline to 44.43\% with answer-only supervision and 51.80\% with gold
+programs. The transfer audit identifies program-language and representation
+coverage as the main remaining bottleneck.
 \end{abstract}
 
-% ---------------------------------------------------------------
-\section{Introduction}\label{sec:intro}
+% -----------------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
 
-Public bodies in the United Kingdom publish hundreds of thousands of
-contract award notices every year. Journalists and auditors ask analytical
-questions of this record. How much did a council spend on cleaning in 2023.
-Which supplier received the most awards under a procurement category. Did
-spending rise after a policy change. An answer to such a question carries
-the authority of official data, so a fluent but wrong answer is worse than
-no answer. A system for this task must produce answers that a reader can
-trace to specific records, and it must refuse when the data cannot support
-one.
+Large language models can interpret natural-language questions and produce
+fluent answers, but they remain unreliable when a task requires several linked
+operations. A model may retrieve the right records while applying the wrong
+relation, counting the wrong unit, or aggregating values that should remain
+separate. Structured query systems offer a different strength. Their entities,
+relations, and operations can be inspected and executed again. Their weakness
+is coverage, since they depend on a defined schema and a restricted query
+language. Reliable question answering over structured data therefore requires
+both flexible language understanding and a reproducible path from evidence to
+answer.
 
-Large language models read these questions well and answer them
-unverifiably. Nothing in generated text separates a genuine aggregation
-over all matching records from a plausible guess over a retrieved sample.
-Retrieval augmentation \citep{lewis2020rag} does not close this gap,
-because the questions are dominated by exhaustive computation. A count
-over every contract of every London borough does not fit in a context
-window. On our development set a retrieval baseline answers 31.5 percent
-of questions while an untrained 8B model that is forced to emit an
-executable plan answers 61.5 percent. Forcing an executable plan is worth
-more than retrieval before any training takes place.
+UK public procurement is a demanding setting for this problem. Contract
+notices contain buyers, suppliers, awards, dates, locations, and monetary
+values, which makes them suitable for factual, temporal, and compositional
+analysis. The records are not clean enough to query directly. One organisation
+can appear under many source identifiers and name variants. Values may be
+reported at tender, lot, award, and contract level, where some fields represent
+separate amounts and others repeat the same amount. A program can therefore be
+valid and executable while still computing the wrong quantity. Correctness
+depends on the program, the data conventions, and the link between the two.
 
-The standard route to a competent small model is distillation from a large
-one. That route assumes the teacher can be trusted, and on this task it
-cannot. The strongest cloud pipeline we evaluate answers 69.76 percent of
-held-out questions. Imitating it transfers its errors together with its
-competence. Filtered self-training methods
-\citep{zelikman2022star,gulcehre2023rest} replace trust with a pass
-criterion, but the criteria in use are proxies. A SQL query can execute
-cleanly and compute the wrong thing. A model can agree with itself and be
-wrong. Outputs that pass for the wrong reason enter the training pool
-silently, and none of these methods measures how often that happens.
+Prior work addresses parts of this setting. Retrieval-augmented generation can
+supply relevant records, but it does not guarantee correct joins, counts, or
+aggregations. Neural-symbolic question answering maps language to executable
+programs, but is usually evaluated over curated schemas and stable execution
+environments \citep{cheng2023binder,gu2023pangu,luo2024chatkbqa}. Methods such
+as STaR and rejection-sampling fine-tuning learn from selected model outputs
+\citep{zelikman2022star,yuan2023scaling,gulcehre2023rest}. These methods show
+that executable or answer-based feedback can support training. They do not
+resolve the full problem considered here, where the source semantics must first
+be audited, refusal is part of the task, and successful execution does not by
+itself establish that the program answers the question.
 
-We introduce, to the best of our knowledge, the first systematic benchmark
-and executable framework for auditable compositional question answering
-over UK public procurement data. Procurement knowledge graphs exist, and
-TheyBuyForYou \citep{soylu2022theybuyforyou} built one across EU
-procurement for integration, anomaly detection and search. What has not
-existed is the task itself in usable form. That means a knowledge graph
-whose money and identity conventions are explicit enough to verify
-against, a benchmark whose every question carries an executable gold
-program, a typed program language that expresses real analytical demands,
-refusal as a scored behaviour, and an evaluation whose oracles are
-measured rather than assumed. We build all of it, and we train a system on
-it without large-scale manual annotation.
+We build the task and system end to end. Five years of procurement releases
+are converted into a canonical data layer with explicit rules for entity
+identity, value provenance, and monetary additivity. Questions are compiled
+into a small typed algebra. A language model proposes the interpretation and
+program. Deterministic code then checks the program, grounds it to the data,
+and executes it. During training, sampled programs are retained only when their
+executed answers match the benchmark oracle. During deployment, no oracle is
+available or required. The final answer comes from execution, not free-form
+model generation.
 
-The training method follows from the setting. No annotator pool can label
-tens of thousands of compositional procurement programs, so supervision
-must come from models, and the task itself supplies a filter stronger than
-any proxy. Whether a plan compiles, grounds, executes, and matches an
-independently computed oracle are deterministic checks. We train only on
-outputs that pass all of them, whichever model produced them. An
-8-billion-parameter local model trained this way reaches 85.65 percent on
-the held-out benchmark of 2{,}285 questions, against 69.76 percent for the
-cloud teacher that generated its training data. The gap is significant at
-$p < 10^{-15}$ under a paired McNemar test \citep{mcnemar1947note} and
-survives a measured teacher noise floor of 1.1 points.
+The evaluation asks three questions. First, how much of the performance comes
+from the executable scaffold, and how much comes from task-specific model
+training? Second, does the resulting capability survive new program structures
+and question surfaces? Third, when the architecture is moved to another
+structured-data domain, which component limits performance? The experiments
+show that the scaffold establishes a strong floor, training both question
+understanding and planning improves generalisation, and cross-domain transfer
+is limited mainly by representation and program-language coverage.
 
-The recipe transfers. We rebuild only the data layer and move the system to
-WikiTableQuestions \citep{pasupat2015compositional}, a benchmark of
-crowd-written questions over web tables that we did not construct. The
-procurement checkpoint alone moves the zero-shot floor from 22.5 to 27.3
-percent. The recipe moves it to 44.4 percent when supervision comes from
-final answers only, and to 51.8 percent when gold programs exist, both on
-the official sealed test under a single frozen-configuration run. The
-checkpoint accounts for 4.8 points of the transfer gain, while verified
-training accounts for the larger subsequent improvement.
+\paragraph{Contributions.}
+This work makes three contributions.
+\begin{enumerate}
+    \item We construct an auditable procurement question-answering task with
+    explicit data conventions, executable gold programs, scored abstention,
+    and answer oracles checked by an independently implemented evaluator.
 
-We make five contributions, ordered from the task outward.
+    \item We develop a typed executable framework that separates language
+    understanding from deterministic computation. The same framework supports
+    program training from teacher and self-generated candidates without
+    making the language model the source of the final answer.
 
-First, the task. We define auditable compositional question answering over
-UK public procurement, from raw releases to a convention-explicit
-knowledge graph of 215{,}221 contract awards, with refusal on ambiguous,
-unsupported and empty questions as first-class behaviour
-(Sections~\ref{sec:system} and~\ref{sec:benchmarks}).
+    \item We provide a controlled empirical decomposition across retrieval,
+    executable scaffolding, local planning, sealed external evaluation, and
+    table-domain transfer. The analysis identifies where performance comes
+    from and where the closed language still limits coverage.
+\end{enumerate}
 
-Second, the representation. A typed compositional operator algebra
-formalises real procurement analytics, set composition, guarded money
-aggregation, grouped comparison and multi-stage analysis, as closed but
-recursively compositional executable programs (Section~\ref{sec:system}).
+% -----------------------------------------------------------------------------
+\section{Related Work}
+\label{sec:related}
 
-Third, the evaluation foundation. A program-first benchmark of 12{,}828
-questions with executable gold programs and plan-level split isolation, a
-sealed challenge set with an independent surface grammar and a
-constraint-necessity audit, and oracles validated by a second independent
-implementation at 99.88 percent over 14{,}770 audited answers
-(Sections~\ref{sec:benchmarks} and~\ref{sec:pacs}).
+\paragraph{Executable question answering.}
+Semantic parsing and knowledge-base question answering translate natural
+language into logical forms that can be executed against structured knowledge.
+Recent systems improve coverage through in-context program generation,
+graph-constrained search, retrieval-based grounding, or tool use
+\citep{cheng2023binder,gu2023pangu,luo2024chatkbqa,luo2024rog,jiang2023structgpt}.
+Table question-answering systems use SQL, Python, neural table encoders, or
+hybrid execution \citep{pasupat2015compositional,herzig2020tapas,yin2020tabert,
+liu2022tapex,jiang2022omnitab,ye2023dater,ni2023lever,wang2024chainoftable}.
+These methods establish the value of executable intermediate representations.
+Our setting adds a problem that curated benchmarks usually remove. The source
+fields and entity identities are themselves uncertain, so execution is only
+meaningful after the data conventions have been specified and audited.
 
-Fourth, the training method the setting demands. A verified bootstrap in
-which deterministic execution checks, not teacher trust and not proxy
-rewards, decide what the model may learn from, requiring no manual program
-annotation (Section~\ref{sec:home}).
+\paragraph{Learning from generated programs.}
+STaR, rejection-sampling fine-tuning, and ReST generate candidate solutions,
+retain those that satisfy an acceptance rule, and train on the survivors
+\citep{zelikman2022star,yuan2023scaling,gulcehre2023rest}. V-STaR learns a
+verifier from correct and incorrect solutions, while executable SQL systems
+use answer or execution feedback to build training data
+\citep{vstar2024,zhang2025exesql}. Weak-to-strong work studies when a student
+can generalise beyond imperfect supervision \citep{burns2024weak}. We do not
+claim the generate-filter-train loop as a new method. We use it as one part of
+an executable system and study how it behaves when a program can compile and
+run while expressing the wrong analysis.
 
-Fifth, the empirical case. The trained local system reaches 85.65 percent
-at home and 78.31 on the sealed challenge set, 28 points above its cloud
-teacher there, and the recipe transfers to WikiTableQuestions at the cost
-of a data layer, where an attribution audit separates representation debt
-from genuine language limits (Section~\ref{sec:wtq}).
+\paragraph{Procurement data, provenance, and refusal.}
+Procurement knowledge graphs such as TheyBuyForYou support data integration,
+search, and risk analysis across public records \citep{soylu2022theybuyforyou}.
+Our focus is a measurable natural-language task rather than a graph resource
+alone. Each answer is tied to an executable program and grounded records.
+Questions that are ambiguous, unsupported by the data model, or matched by no
+records are represented explicitly. This connects provenance to the execution
+trace and makes failure detection part of the benchmark rather than an
+informal property of the interface.
 
-We claim no state of the art. Recent specialised table systems score higher
-on WikiTableQuestions than we do. The claim is that a deterministic filter
-over an executable language turns weak local models into systems that beat
-their own teachers, across both the home benchmark and an independently
-constructed challenge set.
+% -----------------------------------------------------------------------------
+\section{Task and Method}
+\label{sec:method}
 
-% ---------------------------------------------------------------
-\section{Related Work}\label{sec:related}
+\subsection{Overview}
 
-The loop we use, generate candidates, filter them, retrain on the
-survivors, is standard. We do not claim it. The difference against each
-neighbour below lies on two axes. The first is what a candidate must prove
-before it becomes supervision. The second is what happens to candidates
-that pass wrongly. We state both for every cluster.
-
-\paragraph{Procurement knowledge graphs.} TheyBuyForYou
-\citep{soylu2022theybuyforyou} integrated cross-national EU procurement
-into a knowledge graph and built services for data integration, anomaly
-detection and search. Later work organises procurement documents into
-navigable knowledge bases. These efforts are relevant because they
-establish that procurement data rewards graph treatment, and they are not
-enough for our purpose because none defines question answering as an
-executable task. They ship no gold programs, no compositional query
-language, no refusal semantics, and no independently-audited oracles,
-which are exactly the components a measurable QA task needs.
-
-\paragraph{Filtered self-training.} STaR \citep{zelikman2022star} keeps
-sampled rationales whose final answer matches a gold label and retrains on
-them. Rejection-sampling fine-tuning \citep{yuan2023scaling} and ReST
-\citep{gulcehre2023rest} generalise the pattern to reward thresholds and
-iterated grow-filter-train cycles. ExeSQL \citep{zhang2025exesql}
-bootstraps text-to-SQL with execution success as the filter, and
-self-correction distillation \citep{zhu2026scd} transfers query
-generation and error-correction trajectories from a trusted teacher.
-All of these are relevant because they train small models from filtered
-model outputs, exactly our setting. The systems reviewed here are not
-enough for our task, for one measured reason. Their pass criteria are
-proxies. Execution success accepts queries that run and compute the wrong
-thing. Agreement accepts consistent errors. Gold-answer matching accepts
-right answers reached by invalid programs. During our own harvest, 86.7
-percent of generated bridge plans passed every deterministic check while
-only 52.3 percent matched the oracle. A filter blind to that stratum feeds
-a third of its pool with structurally valid wrong programs and never knows.
-We retain that stratum with its verifier diagnoses for failure analysis
-and for controlled negative-training experiments, and we report where it
-leaks.
-
-\paragraph{Agents over structured knowledge.} Pangu \citep{gu2023pangu}
-constrains an LLM to discriminate among logical-form extensions enumerated
-from the graph. ChatKBQA \citep{luo2024chatkbqa} generates a form and
-grounds it by retrieval. RoG \citep{luo2024rog} plans relation paths and
-reasons over them. StructGPT \citep{jiang2023structgpt} gives a frozen
-model iterative read access through fixed interfaces. These systems share
-our premise that the structure, not the model, is the ground. They are not
-enough for two reasons. Their training pipelines, as reported, draw no
-supervision from verifier rejections, so the training value of failure is
-discarded. And their reported evaluations do not score refusal. Questions
-that are ambiguous, unsupported by the schema, or matched by no records are
-first-class citizens of our benchmarks, with three trap families and a
-faithfulness-gated metric.
-
-\paragraph{Executable table question answering.} Classical semantic
-parsers on WikiTableQuestions reach 37 to 46 percent with weak
-supervision \citep{pasupat2015compositional}. TaPas
-\citep{herzig2020tapas} and TaBERT \citep{yin2020tabert} pre-train table
-encoders and reach the high forties to low fifties, with table-pretraining
-successors improving further \citep{liu2022tapex,jiang2022omnitab}. Binder
-\citep{cheng2023binder} and later LLM-with-code systems
-\citep{ye2023dater,ni2023lever,wang2024chainoftable} pass 65 percent by
-generating SQL or Python against the table. These works calibrate our
-transfer numbers, and our answer-only result of 44.4 percent sits inside
-the classical band while our gold-program result of 51.8 exceeds
-TaPas-large. They are not enough for our purpose because the program
-language is chosen for coverage, not for verifiability. Open-ended Python
-generation does not by itself provide a type checker that a second
-implementation can replay, a closed grammar that decoding can enforce, or
-abstention semantics. Our algebra buys those properties and pays for them
-in coverage, and Section~\ref{sec:wtq} measures the price and then
-decomposes it.
-
-\paragraph{Preference optimisation.} Direct preference optimisation
-\citep{rafailov2023dpo} and its variants are the standard way to use
-negatives. Likelihood displacement work \citep{razin2024unintentional}
-shows the objective is most destructive when chosen and rejected responses
-are similar. Our verifier produces exactly that regime, near-miss
-negatives one slot away from correct plans, and
-Section~\ref{sec:discussion} reports the resulting hazard as a bounded
-negative finding rather than a method.
-
-% ---------------------------------------------------------------
-\section{The Task and the System}\label{sec:system}
-
-This section specifies the method end to end and, for every load-bearing
-design decision, states the alternative that was considered, the reason the
-alternative was rejected, and where possible the measurement that settled the
-choice. The decisions are not independent. Each one exists to protect the same
-property, that every answer the system produces can be traced through
-deterministic code to specific records, and that every training example the
-system learns from has survived checks no language model can talk its way
-past. Figure~\ref{fig:architecture} shows the resulting pipeline. A
-language model appears in one role only, translating a question into a
-program of a small typed algebra, and everything after that point is
-deterministic code.
+Figure~\ref{fig:architecture} separates deployment from data construction. At
+deployment time, the model reads a question and emits a program under
+constrained decoding. Deterministic components check, ground, and execute the
+program, then return an answer or abstention. During training-data collection,
+candidate programs are sampled at positive temperature and compared with the
+benchmark oracle after execution. Only matching candidates enter the training
+pool. Oracle access is therefore a property of the data pipeline, not the
+runtime system.
 
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
   font=\small,
-  box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=2.1em},
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=4.5pt, minimum height=2em},
   det/.style={box, fill=blue!6},
   lm/.style={box, fill=orange!12},
   data/.style={box, fill=gray!10},
@@ -276,743 +196,477 @@ deterministic code.
   lab/.style={font=\footnotesize\itshape, text=black!60}
 ]
 \node[data] (q) {Question};
-\node[lm, right=8mm of q] (plan) {LM planner\\\footnotesize constrained decoding};
-\node[det, right=8mm of plan] (check) {Type check\\\footnotesize typed diagnostics};
-\node[det, right=8mm of check] (exec) {Ground + execute\\\footnotesize dual evaluators};
-\node[data, right=8mm of exec] (ans) {Answer\\or abstention};
-\draw[arr] (q) -- (plan);
-\draw[arr] (plan) -- (check) node[midway, above, lab, yshift=1pt] {program};
+\node[lm, right=7mm of q] (read) {Reader and planner\\\footnotesize constrained program};
+\node[det, right=7mm of read] (check) {Type check\\and grounding};
+\node[det, right=7mm of check] (exec) {Deterministic\\execution};
+\node[data, right=7mm of exec] (out) {Answer or\\abstention};
+\draw[arr] (q) -- (read);
+\draw[arr] (read) -- (check);
 \draw[arr] (check) -- (exec);
-\draw[arr] (exec) -- (ans);
-\node[det, below=9mm of check.south east, anchor=north, align=center] (oracle)
-  {Oracle agreement\\\footnotesize filters, never authors};
-\node[data, left=10mm of oracle] (pool) {Verified\\training pool};
-\draw[arr, dashed] (exec.south) |- (oracle.east) node[pos=0.3, right, lab] {candidates};
-\draw[arr] (oracle) -- (pool) node[midway, above, lab] {survivors};
-\draw[arr, dashed] (pool.west) -| (plan.south) node[pos=0.85, left, lab] {retrain};
+\draw[arr] (exec) -- (out);
+
+\node[data, below=10mm of read] (cand) {Sampled candidate\\programs};
+\node[det, right=8mm of cand] (match) {Execute and compare\\with benchmark oracle};
+\node[data, right=8mm of match] (pool) {Accepted\\training traces};
+\draw[arr] (cand) -- (match);
+\draw[arr] (match) -- (pool);
+\draw[arr, dashed] (pool.north) |- (read.south) node[pos=0.2, right, lab] {train};
+\node[lab, below=2mm of match] {training-data construction only};
 \end{tikzpicture}
-\caption{The system. A language model translates the question into a typed
-program under constrained decoding, and everything downstream is
-deterministic code. In the bootstrap loop, candidates that compile, ground,
-execute and match the independently computed oracle become training data.
-The oracle filters and never authors.}
+\caption{System overview. The deployment path ends with deterministic
+execution. Oracle comparison is used only when constructing training data.}
 \label{fig:architecture}
 \end{figure}
 
-\subsection{Data and Knowledge Graph}\label{sec:kg}
+\subsection{Data conventions and canonical representation}
+\label{sec:data}
 
-The raw corpus is five years of UK contract award notices in the Open
-Contracting Data Standard, 166{,}277 compiled releases from 2022 to 2026. A
-field survey conducted before any modelling exposed two properties that shaped
-everything downstream. First, award-level value fields are empty throughout
-the corpus while signed values live in contract sub-records, so a naive reader
-of the documented schema aggregates nothing. Second, 89 percent of buyer
-references and 86 percent of supplier references use platform account
-identifiers rather than entity identifiers, and one real organisation can hold
-dozens of accounts. The Ministry of Defence alone appears under 77 distinct
-platform identifiers in a single year of data.
+The source corpus contains 166{,}277 compiled OCDS releases from 2022 to 2026.
+A field audit identified two issues that determine many downstream answers.
+First, signed values are often stored in contract sub-records rather than the
+nominal award-value field. Second, most buyer and supplier references are
+platform account identifiers. One real organisation can therefore appear
+under many IDs. The Ministry of Defence appears under 77 platform identifiers
+in one year of the source data.
 
-The knowledge graph therefore makes conventions explicit rather than
-implicit. Monetary value is resolved through a fixed fallback order from award
-to contract to tender value, and every resolved value carries a provenance
-column and a boolean additivity flag, because tender-level fallback repeats
-one framework value across several awards and must be excluded from sums. The
-alternative, treating whichever value field is populated as the value, is what
-a schema-faithful implementation would do, and it silently double-counts
-framework agreements whose recorded ceilings reach 51 billion pounds. The
-additivity flag turns a folklore rule into a guard the executor can check.
+We convert the releases into a canonical representation with 215{,}221 award
+records and 131{,}502 organisations. Entity resolution is precision-first.
+Registry identifiers and safe deterministic variants are merged before
+normalised name and regional evidence are considered. Fuzzy matching produces
+review candidates but never writes a merge directly. Monetary values follow a
+fixed fallback rule and retain their source field and an additivity flag. The
+flag prevents repeated framework ceilings from being summed once for every
+linked award. The representation is materialised as typed columnar tables.
+This supports vectorised joins, unit tests, and a second evaluator that does not
+share execution code with the main system.
 
-Entity resolution runs precision-first through ordered tiers, registry
-identifier merges first, then safe deterministic variants, then normalised
-name with region, then name-only merges, with 255 borderline cases adjudicated
-by a language model into a human-reviewable file and 82{,}013 singletons left
-deliberately unmerged. Fuzzy matching is only permitted to produce candidate
-files for review, never merges. The aggressive alternative, similarity-based
-merging, was rejected on an asymmetry argument. A false split costs one
-under-counted organisation and is repairable at query time, which the system
-does through variant equivalence classes. A false merge silently corrupts
-every count and sum that touches the merged entity and is not detectable
-downstream. The result is 204{,}711 raw aliases resolved to 131{,}502
-canonical organisations, alongside 215{,}221 contract award nodes.
+\subsection{Program language and deterministic execution}
+\label{sec:algebra}
 
-The graph is stored as typed columnar tables rather than in a graph database.
-At this scale vectorised joins outperform query-engine round trips, and the
-choice keeps the executor a deterministic, unit-testable library, which is
-what later allows a second, independently written implementation to replay
-every benchmark answer for the oracle audit in
-Section~\ref{sec:benchmarks}. A graph store would add operational surface
-without adding expressiveness the workload uses.
+Questions are represented as trees in a closed typed algebra. Seven value
+types and seventeen procurement operators cover filtering, projection,
+counting, guarded summation, grouping, ranking, scalar comparison, and set
+operations. Each node has an explicit input and output type. The complete
+inventory appears in Appendix~\ref{app:algebra}.
 
-\subsection{The Operator Algebra}\label{sec:algebra}
+The algebra is narrower than SQL or Python, but it provides three useful
+properties. Membership is decidable by a recursive type checker. The grammar
+can be compiled into a JSON schema for token-level constrained decoding
+\citep{kwon2023vllm}. The operator set is small enough for a second evaluator
+to implement independently. After a program is produced, the grounding layer
+resolves entities, fields, dates, and values to the canonical representation.
+The executor applies contract-level deduplication, exact decimal arithmetic,
+the additivity guard, empty-key exclusion, and deterministic tie breaking. It
+returns both the answer and the records used to compute it.
 
-The system answers questions by compiling them into programs of a small typed
-algebra. Programs are trees over seven value types, and seventeen node types
-cover filtering with negation, disjunction and computed-set membership,
-projection, counting, guarded money summation, unique lookup, extremum
-records, grouping with count or sum metrics, group reduction by extremum or
-top-$k$, scalar arithmetic and comparison, set union, intersection and
-difference, and groupwise combination. The transfer experiment of
-Section~\ref{sec:wtq} adds one generic node, a row-preserving arg-extremum,
-and nothing else. Appendix~\ref{app:algebra} lists the full inventory with
-type signatures.
+\subsection{Planning, training, and abstention}
+\label{sec:planning}
 
-The obvious alternative is to let the model generate SQL or Python, which is
-what the strongest table question answering systems do and what gives them
-their coverage. The algebra was chosen anyway, for three properties that
-open-ended generation does not provide and that this task cannot do without.
-The grammar is closed, so membership is decidable by a recursive type checker
-whose failures are typed diagnostics rather than stack traces. The grammar is
-small, so a second evaluator can implement it independently for the oracle
-audit. And the grammar compiles to a JSON schema, so decoding itself can be
-constrained to the language. The price is expressiveness, and
-Section~\ref{sec:wtq} measures that price on an external benchmark, at 53 to
-55 percent coverage of gold programs before compiler repair, rather than
-asserting it is small.
+The procurement system uses two learned stages. A reader extracts the requested
+answer type, question literals, and dependency structure. A planner compiles
+the question and brief into a program. This split was retained because it
+outperformed direct generation on procurement. The margin is quantified by a
+cross-base comparison. The fully local system on the weaker base outperforms
+the hybrid system on the stronger base by 5.30 points with a 95\% interval of
+3.62 to 6.97, which indicates that trained question reading contributes more
+than base capability on this task. The WikiTableQuestions transfer
+uses a fused reader-planner because fixed handoffs were weaker during table
+development. All local systems, including untrained baselines, use the same
+constrained decoder. This prevents output-format errors from dominating the
+comparison.
 
-\subsection{One Stage or Two}\label{sec:stages}
+Training candidates are sampled from a cloud teacher or from the local student.
+A candidate is retained when it has a valid type structure, grounds to the
+question and data, executes successfully, and produces the oracle answer. The
+oracle does not author the candidate and is not included in the model input.
+The training ladder includes supervised fine-tuning, self-harvest with
+rejection sampling, and preference optimisation. Preference optimisation is
+not used in the primary systems because its near-miss negatives were unstable
+across the two bases.
 
-The planner is deployed in two configurations, and the choice between them
-was made by experiment rather than by preference. In the two-stage
-configuration a reading model first produces a compact understanding brief,
-eight budgeted sections covering answer type, a closed set of query templates,
-verbatim question atoms, the answer's dependency chain, and named intermediate
-entity sets, and a planning model then compiles brief and question into a
-program. In the one-stage configuration a single model reads the question and
-emits the program directly.
+Abstention is part of the output space. The system can return ambiguous,
+unsupported, or no-result when the question or evidence does not justify an
+answer. A repair step is available only after a typed failure. Refusals and
+meaningful empty results are final, since an earlier ungated repair design
+changed six correct refusals into incorrect answers.
 
-Both configurations were built because the evidence favoured each in a
-different regime. On the procurement benchmark the two-stage system is
-strictly stronger, and the cross-base comparison quantifies why. A fully
-local system on the weaker base model outperforms the hybrid system on the
-stronger base by 5.30 points with interval 3.62 to 6.97, meaning briefing
-quality dominates base capability on this task. Within the second stage, two
-prompt variants were also measured rather than assumed. A capability-card
-variant that constrains planning with template shells helps the smaller cloud
-planner, while the leaner briefing-only variant is better for the stronger
-planner, whose bridge planning the shells anchor. On the web-table transfer
-the same comparison reverses. There, a sequence of nine handoff protocols
-between a reading stage and a planning stage plateaued well below a single
-fused model that reads and plans in one pass, because the hardest questions
-require recasting the reading while planning, and any frozen handoff kills
-the recast. The paper therefore reports the two-stage system where it was
-measured to win and the fused planner where that was measured to win, and
-treats the boundary between the regimes as a finding rather than an
-embarrassment.
+\subsection{Benchmark construction and oracle audit}
+\label{sec:benchmark-build}
 
-\subsection{Deterministic Execution and Verification}\label{sec:exec}
+The main benchmark is generated program first. Parameterised programs are
+instantiated and executed before a question surface is written, so every row is
+created with an executable gold program and answer. The benchmark contains
+12{,}828 questions, including answerable, ambiguous, unsupported, and
+empty-result cases. Splits separate program structures rather than surface
+wording. Mechanical gates prevent plan overlap, duplicate identifiers, local
+sampling omissions, and multi-answer ambiguity.
 
-Everything after planning is deterministic code. A recursive type checker
-validates the tree, a grounding layer resolves surface strings to canonical
-entities and slots, and the runtime evaluator executes under the stated
-conventions, deduplication on the contract identifier, exclusion of empty
-group keys, exact decimal money arithmetic under the additivity guard, and
-deterministic tie breaks. A second evaluator, implemented from the raw files
-with no shared code, exists solely to measure whether the first one is right.
+A second evaluator reconstructs answers from the raw releases without shared
+execution code. Across 14{,}770 audited oracle cases, the two implementations
+agree in 99.88\% of cases. All 18 remaining disagreements were inspected, and
+none affects a reported comparison. This audit measures implementation
+agreement under the declared data conventions. It does not remove uncertainty
+from the source records themselves.
 
-The decision to verify with deterministic checks rather than with a model was
-forced by two measurements. During benchmark construction a language model
-was asked to quality-check 9{,}762 paraphrase rewrites and approved every
-single one, including the rewrites a mechanical drift detector later
-rejected, so model checking was demonstrated to be a rubber stamp on this
-distribution. During harvesting, 86.7 percent of generated bridge plans
-passed every structural check while only 52.3 percent matched the independent
-oracle, so structural validity alone admits a large stratum of wrong programs
-and a filter without an answer oracle cannot see it. Section~\ref{sec:design}
-adds a third measurement, a faithful port of a state-of-the-art LLM verifier
-that contributes exactly zero selection signal on this task even when it is
-shown the executed answers.
+% -----------------------------------------------------------------------------
+\section{Evaluation}
+\label{sec:evaluation}
 
-\subsection{Decoding as Format Authority}\label{sec:decoding}
+\paragraph{Benchmarks.}
+The main evaluation uses a sealed test of 2{,}285 procurement questions. PACS
+contains 922 rows from seven procurement-analysis families and tests whether
+the system depends on the surface generator used for the main benchmark. Its
+specification, question grammar, and logical-shape labels were frozen before
+the model was evaluated. Five isolation checks cover text, program hash,
+template identity, entity anchors, and logical shape. Each sealed intent is
+rendered through an independently written surface grammar, and naturalised
+rewrites pass deterministic checks of operation, negation, comparison
+direction, quantifier, and scope against the gold program's logical
+signature. WikiTableQuestions
+contains 22{,}033 crowd-written questions over 2{,}108 web tables
+\citep{pasupat2015compositional}. Development uses table-disjoint folds, and
+the official 4{,}344-row test is evaluated once under a recorded manifest.
 
-At inference the algebra's grammar is compiled to a JSON schema and enforced
-token by token through constrained decoding \citep{kwon2023vllm}. Every
-evaluated system, including untrained bases, is format-locked. This is a
-fairness device, and one diagnostic justifies it. Decoded freely, the
-untrained base emits question-grounded plans in a fluent self-invented schema
-on 98 of 100 sampled questions and matches the executable contract on 3. The
-fine-tuned models match the contract on 98 and 99. Fine-tuning therefore
-teaches conformance to the specific contract, not the ability to plan, and
-granting the contract to every system through decoding is what makes
-accuracy differences interpretable as planning quality. Without this control
-the scoreboard would conflate two skills, and the cheaper one would dominate
-the measurement.
-
-\subsection{Abstention and Gated Repair}\label{sec:abstention}
-
-Refusal is an output, not a failure. A question may be ambiguous, may name a
-concept the schema does not carry, or may match no records, and the system
-abstains through the same typed channel it answers through. An empty result
-whose literals all trace to the question is treated as the data's answer. A
-repair loop exists and is gated. It consumes typed diagnostics from failed
-checks, proposes one revision, and re-enters the same checks, but abstentions
-and semantically meaningful empty results are final. The gate is not a
-stylistic preference. An earlier ungated loop converted six correct refusals
-into confident wrong answers on a development slice, which is the worst
-possible exchange for a system whose stated purpose is that wrong answers are
-worse than none.
-
-\subsection{The Verified Bootstrap}\label{sec:bootstrap}
-
-Training data is manufactured, never annotated. A generator authors a
-program, executes it under both evaluators, and only then renders a question
-surface, so every question is born with an executable gold program. A harvest
-then samples candidate programs from a teacher model or from the student
-itself at positive temperature, and keeps a candidate only when it compiles,
-grounds, executes, and matches the oracle answer. Greedy decoding is
-deliberately avoided during harvest because it can only re-collect what the
-model already does, and the point of the bootstrap is exploration. The oracle
-filters and never authors. No gold program or answer is copied into any
-training text. What fails is retained with its diagnosis for the failure
-analyses of Section~\ref{sec:design}.
-
-The training ladder runs zero-shot, supervised fine-tuning, rejection
-sampling fine-tuning on the student's own verified survivors with the teacher
-absent, and preference optimisation, on two 8B bases under identical
-configurations. Preference optimisation was evaluated and then abandoned for
-the primary systems on measured grounds. The verifier's rejects are near-miss
-negatives one edit from correct plans, which is precisely the regime where
-likelihood displacement is most destructive, and suppressing them dragged
-down adjacent correct modes on one base while cleaner preference pools made
-the effect worse. The deployed fully local systems use the best measured arm
-per base and additive distillation in place of preference training.
-
-% ---------------------------------------------------------------
-\section{Benchmarks and Evaluation Protocol}\label{sec:benchmarks}
-
-\paragraph{Plan-first generation.} The main benchmark contains 12{,}828
-questions over the knowledge graph, built by instantiating parameterised
-programs, executing them for oracles, and only then writing question
-surfaces. The natural alternative, collecting questions and annotating them
-with programs afterwards, produces more natural language but cannot guarantee
-that annotations exist, are executable, or cover the composition space, and
-its verification cost grows with every question. Plan-first generation makes
-the gold program a birthright of every question, which matters doubly here
-because programs are also the training target. Two gates police generation.
-Gate A re-runs every specification against the full graph and rejects local
-sampling omissions and multi-answer ambiguity. Gate B has an independent
-model answer the rendered question from the evidence alone and rejects the
-question when that answer misses the oracle. Splits separate plans, not
-surfaces, and three build invariants are enforced mechanically, no plan
-straddles train and evaluation, identifiers are globally unique, and row
-counts are conserved across every rebuild.
-
-\paragraph{Quality audit.} A comparison against professional benchmark
-practice exposed six defects in the first build, and each fix is itself
-testable. Boolean questions answered true 330 times out of 330, so mutated
-false twins were generated and their oracles recomputed independently. A
-paraphrase quality check by a language model approved all 9{,}762 rewrites,
-so it was replaced by a position-aware mechanical drift detector whose final
-precision on review was one true defect and zero false positives. Refusal
-questions were lexically detectable more than half the time, so answerable
-contrast twins with the cue attribute swapped were added. Gold programs
-under-specified thresholds and comparison sides that existed only in surface
-text, so 991 additivity guards, 690 comparison parameters, 316 answer fields
-and 15 top-$k$ parameters were backfilled. The remaining defect, oracle
-circularity, is addressed by construction below.
-
-\paragraph{The dual oracle.} A second evaluator, implemented from the raw
-files with no shared code, replays every benchmark answer. Agreement is
-99.88 percent over 14{,}770 audited answers, and all 18 residual
-disagreements were opened by hand and characterised, none affecting a
-reported comparison. This is the property the columnar architecture of
-Section~\ref{sec:kg} was chosen to enable. Correctness of the oracles is a
-measured quantity in this paper, not an assumption, and every number
-downstream inherits that property.
-
-\paragraph{PACS.} The procurement analytics challenge set exists because a
-self-built benchmark, however audited, leaves one question open, whether the
-system merely learned its own generator. PACS answers it with independence
-that is structural rather than rhetorical. Its specification was frozen
-before generation, and the evaluated model was frozen before the
-specification. Seven task families are derived from procurement oversight
-demands, spending and volume, temporal change, supplier concentration,
-cross-buyer comparison, overlap and exclusion, relational composition, and
-disclosure compliance. Program depth and structural exposure are separated
-into orthogonal labels so that deeper and never-shown are separately
-attributable, replacing an earlier design that conflated them. Every intent
-is rendered through three paired surface channels sharing one oracle, an
-independently authored grammar with no shared stems or connectors as the
-primary channel, a naturalised rewrite behind deterministic fidelity gates
-that check operation, negation, comparison direction, quantifier and scope
-against the gold tree's logical signature, and the training renderer as a
-diagnostic column only. Isolation is enforced by five zero-overlap gates
-computed all-pairs before sealing, over question text, gold tree hash,
-intent and template identity, unseen shape signatures, and near-duplicate
-surfaces. The sealed test contains 922 rows over 694 intent clusters, the
-statistical unit is the intent cluster, and confidence intervals use
-cluster bootstrap. A 93-row human audit preceded unsealing and found one
-systematic defect, a boolean handling error in the empty-result class that
-had mislabelled 46 rows, corrected by offline re-execution before any number
-was read. The frozen system was evaluated on the sealed test exactly once.
-
-\paragraph{WikiTableQuestions.} The transfer target is the standard
-benchmark of 22{,}033 crowd-written questions over 2{,}108 web tables
-\citep{pasupat2015compositional}, evaluated with the official evaluator on
-the official test split of 4{,}344 questions. The test set was touched
-exactly once, under a frozen configuration whose commit hash and file
-checksums were recorded before launch, and it is treated as consumed
-thereafter. All development ran on folds of the training split that share no
-tables with any training pool.
-
-\paragraph{Protocol.} Every evaluation is a single model call at temperature
-zero under constrained decoding, with no repair unless a variant is named
-explicitly. Answerable questions score by type-aware match against the
-dual-verified oracle, or by the official evaluator on WikiTableQuestions.
-Refusal questions score under two declared metrics, an exact status match
-and a faithfulness-gated variant in which an empty or multi-valued outcome
-counts only if every literal of the emitted program traces to the question.
-Paired systems are compared by exact McNemar tests on discordant pairs
-\citep{mcnemar1947note}. Because the teacher is served by a provider whose
-decoding cannot be seeded, its variability was measured directly with three
-identical development runs, giving 72.6 plus or minus 1.1 points, and no
-single-run teacher delta below three points is claimed anywhere in this
-paper. Each student configuration is a single frozen training run, so paired
-significance quantifies test-set disagreement between systems rather than
-optimisation variance across seeds, and this scoping is stated wherever it
-applies.
-
-% ---------------------------------------------------------------
-\section{Experiments}\label{sec:experiments}
-
-\subsection{Verified Bootstrap on the Home Benchmark}\label{sec:home}
-
-Figure~\ref{fig:gainladder} decomposes where the performance comes from,
-because a single headline number would conflate three different causes.
-Retrieval-augmented baselines answer 31.5 and 28.8 percent of the
-development set, and the gap to everything above them is the cost of
-exhaustive computation that does not fit a context window. An untrained 8B
-model forced through the executable scaffolding reaches 70.4 percent under
-the revised pipeline, already within the teacher's measured noise band, so
-the scaffolding rather than any training sets the floor. Supervised
-fine-tuning on verified survivors adds 10.8 points, and the fully local
-system with a trained reading stage reaches 86.2 on development. The format
-diagnostic of Section~\ref{sec:decoding} separates the two remaining
-explanations for the training gain, contract conformance from planning
-quality, and attributes the ladder above the floor to planning.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.9\linewidth]{figs/gain_ladder.pdf}
-\caption{Gain decomposition on the development set. The executable scaffold,
-not retrieval, sets the floor, and an untrained scaffolded base already
-touches the teacher's replicate band. Training gains then stack on top of
-the floor. The shaded band is the cloud teacher's measured variability over
-three identical runs.}
-\label{fig:gainladder}
-\end{figure}
-
-On the held-out test of 2{,}285 questions the five-system comparison of
-Figure~\ref{fig:scoreboard}(a) holds with every pairing significant at
-McNemar $p < 10^{-14}$. The fully local Qwen system reaches 85.65 percent
-against 69.76 for the cloud teacher that generated its training data, a
-margin of 15.89 points with 95 percent confidence interval 14.07 to 17.70
-and discordant counts of 406 against 43. The result replicates on the second
-base at 13.57 points, which matters because a single-base result of this
-kind could be an artefact of one model family's pretraining. The student
-beats each of the three teacher replicates separately, so the comparison
-does not rest on provider noise.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figs/scoreboard.pdf}
-\caption{The two scoreboards. (a) On the held-out procurement test both
-hybrid and fully local students pass the cloud teacher that generated their
-training data, and the fully local systems pass the hybrids. (b) On the
-sealed PACS test, evaluated once, the ordering survives with a larger
-margin. Dashed lines mark the teacher.}
-\label{fig:scoreboard}
-\end{figure}
-
-Three further analyses report what the headline hides
-(Figure~\ref{fig:slices}). Moving from development to the 2{,}285-row test
-costs the hybrid systems 5.5 and 7.1 points but the fully local systems only
-0.5 and 0.9, and the pattern holds on both bases. The interpretation offered
-is that training on verified survivors removes exactly the brittleness that
-surfaces as development-to-test decay, and the cross-base replication is
-what elevates this from anecdote to evidence. On a composite hard slice of
-the development set the teacher loses 6 to 12 points and a preference-tuned
-hybrid loses 7.7 while the fully local student moves up by 0.8, so the
-student's advantage is largest precisely where questions are hardest, which
-is the opposite of what a memorisation account would predict. Finally, the
-bootstrap converges. A second self-harvest round lifts harvest yield from
-76.6 to 86.3 percent while the evaluation gain is 0.4 points and not
-significant, so the verifier-gated loop has a natural ceiling on this task,
-and the paper reports the ceiling rather than iterating past it.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figs/slices.pdf}
-\caption{What the headline hides. (a) Development-to-test movement per
-system. Hybrid systems decay steeply on both bases while fully local systems
-barely move. (b) On the composite hard slice the teacher and the
-preference-tuned hybrid fall while the fully local student is flat.}
-\label{fig:slices}
-\end{figure}
-
-\subsection{A Sealed Benchmark the System Did Not Author}\label{sec:pacs}
-
-The compositional planner was frozen and evaluated once on the 922 sealed
-PACS rows. It scores 78.31 percent strict overall and 80.00 on the
-answerable subset with cluster bootstrap interval 77.06 to 82.92. On the
-same rows the untrained base scores 36.01, a retrieval baseline 21.90, and
-the cloud teacher 50.33, so the verified-bootstrap student exceeds its
-teacher by 27.98 points on questions neither system authored. The comparison
-is a system-level one between deployable configurations rather than a model
-comparison under equal decoding, because the teacher's API offers no
-constrained decoding and 23.1 percent of its rows fail on format alone, and
-the paper says so rather than presenting the margin as decoding-neutral.
-
-Two audits attack the headline from opposite directions
-(Figure~\ref{fig:pacsaudit}). Deleting each oracle-program predicate in turn
-and re-executing shows that 42.7 percent of answerable rows are irreducible,
-every predicate load-bearing, and the planner scores 78.7 on that
-shortcut-resistant subset, within 1.3 points of its answerable headline, so
-the score is not inflated by questions a partial program could answer by
-accident. In the other direction a typed-feedback repair loop that acts only
-on hard failures adds 1.7 points on development rows while leaving every
-refusal untouched, and the single-call number remains primary. The
-unseen-exposure axis bounds generalisation honestly. Intent shapes absent
-from training cost 11.5 points with interval 5.6 to 17.2, composition over
-demonstrated constructs transfers, constructions never demonstrated remain
-measurably harder, and the two weakest families, scope binding and universal
-quantification, are named rather than averaged away.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.86\linewidth]{figs/pacs_audits.pdf}
-\caption{PACS integrity audits around the answerable headline (dashed line,
-cluster bootstrap interval shown). The planner loses only 1.3 points on the
-shortcut-resistant irreducible subset, gains 1.7 from a typed-feedback
-repair variant that is reported but not primary, and pays 11.5 points on
-intent shapes never demonstrated in training.}
-\label{fig:pacsaudit}
-\end{figure}
-
-\subsection{Transfer to WikiTableQuestions}\label{sec:wtq}
-
-The transfer is a controlled experiment on portability, and its control is
-strict. The algebra, the type checker, and both evaluators moved unchanged.
-What was rebuilt is exactly the data representation layer, a loader that
-exposes typed views over dirty cells, numeric twins, year and date
-extractions, composite-part splits, and row order as data, a column-aware
-value linker that grounds question tokens to real cells, and the one new
-operator. Each addition was admitted by measurement rather than by need.
-The linker faced a four-arm ablation in which real cell candidates gain 4.0
-points over a schema-only baseline while random cells lose 1.7, so its value
-is grounding rather than added context, and the row-preserving arg-extremum
-was added only after a construct census of development failures showed
-row-order questions were a leading class.
-
-On the official test set, evaluated once under the recorded manifest, the
-four rungs of Figure~\ref{fig:wtqladder}(a) are each significant at
-$p < 5 \times 10^{-18}$. The untrained base scores 22.51, the procurement
-checkpoint 27.33, answer-only bootstrapping 44.43, and gold-program training
-51.80. The checkpoint therefore carries a 4.8-point zero-shot prior across
-domains, and verified training carries 17 to 24.5 points beyond it. The
-answer-only figure matches classical weakly supervised parsers, the
-gold-program figure exceeds early table-pretrained baselines such as TaPas
-\citep{herzig2020tapas}, and neither approaches recent specialised systems
-\citep{cheng2023binder,ye2023dater,wang2024chainoftable}. The remainder of
-this subsection decomposes that gap instead of excusing it.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figs/wtq_ladder.pdf}
-\caption{WikiTableQuestions transfer. (a) The four rungs on the official
-sealed test, touched once. (b) Retraining after
-representation-and-compilation closure lifts the development fold in both
-supervision regimes.}
-\label{fig:wtqladder}
-\end{figure}
-
-A differential audit against 11{,}276 gold SQL programs \citep{shi2020squall}
-separates where the gap lives, stage by conditional stage
-(Table~\ref{tab:audit}). The algebra expresses 53 to 55 percent of gold
-programs. Translated programs match the reference denotation 92 to 93
-percent of the time, and executed in-coverage programs recover the target
-answer in 94.1 percent of cases, so performance is coverage-limited rather
-than execution-limited. The gold SQL annotations themselves reproduce the
-benchmark answer in only 88.9 percent of cases, so the annotation layer is
-treated as a noisy reference rather than an absolute oracle. A closure pass
-that lowers SQL constructs onto existing nodes and adds typed loader views
-raises coverage to 61.0 percent with zero regressions, and its attribution
-matrix is exact, 562 questions recovered by the translator alone, 154 by
-loader views alone, 14 jointly, and 4{,}466 remaining outside the language
-(Figure~\ref{fig:attribution}). One seventh of the apparent expressiveness
-gap was therefore compiler and representation debt rather than a limit of
-the language design.
+\paragraph{Systems.}
+Table~\ref{tab:systems} shows the five main procurement systems. The local
+models are Qwen3-8B and Llama-3.1-8B, trained with rank-64 LoRA under 4-bit
+QLoRA \citep{hu2022lora,dettmers2023qlora}. All local systems use the same
+executor and constrained decoder. The cloud teacher uses its provider API and
+cannot use the same token-level grammar constraint, so teacher comparisons are
+reported as deployable-system comparisons rather than equal-decoding model
+comparisons.
 
 \begin{table}[t]
 \centering
-\caption{Where the WikiTableQuestions gap lives. Stage-by-stage
-decomposition against 11{,}276 gold SQL programs. Each rate conditions on
-the stage above it.}
-\label{tab:audit}
+\caption{Main procurement systems. All systems use the same data layer and
+executor.}
+\label{tab:systems}
 \small
-\begin{tabular}{lc}
+\begin{tabular}{llll}
 \toprule
-Stage & Rate \\
+System & Question reading & Program planning & Training \\
 \midrule
-Gold programs expressible in the algebra (before closure) & 53--55\% \\
-\;\; after translator and loader closure, zero regressions & 61.0\% \\
-Translated programs matching the reference denotation & 92--93\% \\
-Executed in-coverage programs recovering the target answer & 94.1\% \\
-\midrule
-Gold SQL annotations reproducing the benchmark answer & 88.9\% \\
+Cloud teacher & Cloud & Cloud & None \\
+Llama hybrid & Cloud & Llama-3.1-8B & In-domain \\
+Qwen hybrid & Cloud & Qwen3-8B & In-domain \\
+Llama fully local & Llama-3.1-8B & Llama-3.1-8B & In-domain \\
+Qwen fully local & Qwen3-8B & Qwen3-8B & In-domain \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figs/attribution.pdf}
-\caption{Attribution over the 11{,}276 gold SQL programs. The closure pass
-recovers 562 questions through the translator alone, 154 through typed
-loader views alone and 14 jointly, moving coverage from 53.9 to 61.0
-percent. The remaining 4{,}466 sit outside the language, and the two
-largest remaining families are specified as typed extensions and
-deliberately not built mid-evaluation.}
-\label{fig:attribution}
-\end{figure}
+\paragraph{Protocol.}
+Each primary evaluation uses one temperature-zero model call and no repair.
+Answerable questions use type-aware exact match against the audited oracle.
+Refusal questions use strict status match and a faithfulness-gated metric that
+checks whether every literal in the emitted program is supported by the
+question. Paired systems are compared with exact McNemar tests
+\citep{mcnemar1947note}. PACS intervals use cluster bootstrap over intent
+clusters. The cloud teacher cannot be seeded, so its variability was measured
+with three identical development runs at $72.6\pm1.1$ points, and no teacher
+comparison below three points rests on a single run. Each student is a
+single frozen training run. Paired significance therefore measures test-set
+disagreement and not training-seed variance.
 
-The decisive test of the coverage account is interventional rather than
-correlational. If capability is bounded by coverage, then widening coverage
-and retraining should move accuracy in both supervision regimes, and it
-does. Retraining after closure lifts the gold-program model from 40.0 to
-51.0 on the development fold and the answer-only model from 31.7 to 40.0
-(Figure~\ref{fig:coverage}). Both slopes exceed the coverage increment
-itself, consistent with in-coverage questions also becoming easier to learn
-once the representation stops fighting the planner.
+% -----------------------------------------------------------------------------
+\section{Results}
+\label{sec:results}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.55\linewidth]{figs/coverage_capability.pdf}
-\caption{Capability tracks coverage. Widening algebra coverage from 53.9 to
-61.0 percent through compiler and representation closure, then retraining,
-lifts the development fold under both supervision regimes.}
-\label{fig:coverage}
-\end{figure}
+\subsection{Where the procurement performance comes from}
+\label{sec:home}
 
-\subsection{Design Validations}\label{sec:design}
-
-The choices of Section~\ref{sec:system} rest on measurements, and this
-subsection reports the three that carry the most weight. All of them run on
-development data.
-
-\paragraph{What fine-tuning actually teaches.} The schema-validity
-diagnostic decodes the untrained base without constraints on 100 development
-questions. It emits question-grounded plans with real entities on 98, and
-matches the executable contract on 3. The tuned models match the contract on
-98 and 99. Ten randomly selected base transcripts were read by hand to
-confirm the grounded-but-off-schema pattern rather than trusting the gate,
-and the diagnostic itself survived three prior gate bugs of opposite sign
-before its numbers were accepted. The conclusion, that tuning teaches
-contract conformance while constrained decoding grants the contract to
-everyone, is what licenses reading the accuracy ladder as planning quality.
-
-\paragraph{Model verification versus deterministic verification.} A recent
-framework replaces discrete judge scores with expectations over scoring
-token distributions and reports state-of-the-art verification across agentic
-benchmarks \citep{kwok2026llmverifier}. Its applicability here was tested
-directly, as a selector among four sampled candidates per question that all
-pass the deterministic gate, where a perfect selector would gain about five
-points over taking the first survivor. Two ports were evaluated, a minimal
-one that scores immediately and a faithful one with the framework's letter
-scale, pairwise comparisons, free-form analysis before scoring, and the
-executed answers visible in context. The faithful port selects no better
-than position, a net contribution of exactly zero, and the minimal port
-selects slightly worse than position. A deterministic reflector-style scorer
-over execution-derived fault features, zero-row filter probes, empty
-answers, answer-kind mismatches with the question word, question-literal
-echoes, recovers 2.0 of the available 5.0 points with paired discordants of
-seven gains against one loss (Figure~\ref{fig:judges}). Since the faithful
-port saw the same executed answers the reflector saw, the gap is one of
-inductive bias rather than information access. On this task the verification
-signal lives in execution, and judgement adds nothing that rules do not
-already capture. This is the third independent measurement behind the
-paper's deterministic-first design, and it also bounds the practical value
-of best-of-$k$ selection itself, since greedy decoding already sits within
-two points of the sampling oracle.
+Figure~\ref{fig:home-ladder} separates the executable scaffold from model
+training. The retrieval baseline reaches 31.5\% on development. An untrained
+Qwen3-8B model routed through the typed program interface and executor reaches
+70.4\%, already close to the cloud teacher's replicate band. Supervised
+fine-tuning raises accuracy to 81.2\%, and training both the reading and
+planning stages reaches 86.2\%. The large first step shows that exhaustive
+computation and a fixed execution contract provide much of the initial gain.
+The remaining steps measure task-specific planning and question understanding.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.95\linewidth]{figs/judges.pdf}
-\caption{Three selectors among verified candidates on the development fold,
-each shown against its own first-candidate baseline (open marker) and the
-best-of-four oracle (cross). The deterministic reflector over
-execution-derived features is the only selector that beats position, and
-the faithful LLM verifier port contributes exactly zero despite seeing the
-executed answers.}
-\label{fig:judges}
+\includegraphics[width=0.88\linewidth]{gain_ladder.pdf}
+\caption{Development-set capability ladder. The executable scaffold establishes
+most of the gap over retrieval, while task-specific training adds further gains.
+The shaded band shows three cloud-teacher runs.}
+\label{fig:home-ladder}
 \end{figure}
 
-\paragraph{Near-miss negatives and preference training.} The verifier's
-rejects are near-miss negatives, typically one slot from a correct plan.
-Preference optimisation over such pairs helped one base on development and
-hurt the other, and cleaning the preference pool made the damage worse,
-which is the signature of likelihood displacement rather than of noisy data
-\citep{rafailov2023dpo,razin2024unintentional}. The deployed systems
-therefore use additive distillation, and the negative result is reported as
-a boundary of the method rather than buried.
+A format diagnostic supports reading the ladder as planning quality rather
+than output discipline. Decoded without constraints on 100 development
+questions, the untrained base produces question-grounded plans with real
+entities in an invented format on 98 and matches the executable contract on
+3, while the tuned models match the contract on 98 and 99. Fine-tuning
+therefore teaches conformance to the specific contract, and constrained
+decoding grants that contract to every system, so accuracy differences under
+the shared decoder measure planning.
 
-% ---------------------------------------------------------------
-\section{Discussion and Limitations}\label{sec:discussion}
+The sealed test confirms the ordering. Figure~\ref{fig:scoreboards}(a) shows
+69.76\% for the cloud teacher, 75.97\% and 78.03\% for the hybrid systems, and
+83.33\% and 85.65\% for the fully local systems. The strongest local system is
+15.89 points above the teacher, with a 95\% paired interval of 14.07 to 17.70
+and exact McNemar $p<10^{-14}$. The same ordering holds with the second base,
+which reduces the chance that the result is specific to one model family.
+Fully local systems also outperform the hybrids on both bases. This indicates
+that task-specific question reading contributes beyond local program planning.
 
-The primary claim is about a task and the system that solves it, and the
-teacher comparison inside that claim is scoped carefully. The teacher
-operates zero-shot while the students are tuned in domain, so the scoreboard
-shows that a verified bootstrap beats deploying the teacher it was distilled
-from, not that an 8B model outranks its teacher in general ability. PACS,
-where both sides face questions neither authored, shows the gap survives on
-independent surfaces with a larger margin.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{scoreboard.pdf}
+\caption{Main scoreboards. (a) Sealed procurement test. (b) Sealed PACS test.
+Dashed lines mark the cloud teacher in each panel.}
+\label{fig:scoreboards}
+\end{figure}
 
-The scale of the evidence supports deployment-level claims rather than
-prototype-level ones. The system operates over the full five-year national
-corpus, 215{,}221 award records and 131{,}502 organisations, answers a
-12{,}828-question benchmark whose oracles are verified at 99.88 percent by
-an independent implementation, and was evaluated once on each of two sealed
-test sets it could not have seen. The practical impact is a local,
-auditable analyst for public procurement that runs on a single GPU, answers
-exhaustive aggregation questions that retrieval cannot, refuses when the
-data cannot support an answer, and produces programs a reviewer can execute
-rather than prose a reviewer must trust.
+\subsection{Distribution shift and independent procurement questions}
+\label{sec:robustness}
 
-Refusal did not transfer free. On a paired legacy comparison the
-compositional planner wins the answerable subset by 4.4 points yet loses
-explicit abstention badly, because its training mix carried only 37 refusal
-demonstrations. Under the pre-registered bar of no key-bucket regression,
-no retirement claim is made for the older system. Competence follows
-demonstrations, and refusal is a competence.
+Figure~\ref{fig:robustness}(a) compares development and test. The hybrid
+systems lose 5.5 and 7.1 points, while the fully local systems lose 0.5 and
+0.9. On the composite-hard development slice, the Qwen hybrid loses 7.7 points
+and the fully local Qwen gains 0.8. The teacher also declines across its three
+runs. These results are consistent with the fully local system depending less
+on the cloud reader and the development surface distribution. They do not by
+themselves establish a causal robustness mechanism.
 
-The transfer numbers are coverage-limited, and the limitation is measured
-rather than estimated. The algebra expresses roughly half of gold programs,
-the planner reaches 85.3 percent of what the expressible subset can
-express, and the closure audit shows a seventh of the missing half was
-compiler debt rather than language limit. The two largest remaining gaps,
-general expression predicates and ordered-relation navigation, are
-specified as typed extensions and deliberately not built, because widening
-a language mid-evaluation would dissolve the boundary that makes the
-measurements interpretable.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{slices.pdf}
+\caption{Robustness analyses. (a) Development-to-test movement. (b) IID to
+composite-hard movement on development data.}
+\label{fig:robustness}
+\end{figure}
 
-Four further limits bound the claims. The home benchmark is self-built,
-with its integrity measured rather than assumed, and its question surfaces
-are model-generated under style controls, which is not user language. The
-WikiTableQuestions test set is consumed, so future work on that benchmark
-reports development folds or a new holdout. Probe evidence of composition
-beyond demonstrated constructs is bounded at 11.5 points of unseen-exposure
-cost. And the evidence remains confined to executable structured-data
-analytics over one procurement graph and one table benchmark, so claims
-about other domains are conjectures this paper does not make.
+PACS tests new question surfaces and logical exposure. The frozen local planner
+reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on the answerable
+subset, compared with 50.33\% for the cloud teacher. The teacher API lacks the
+local constrained decoder, and 23.1\% of its rows fail on format, so the margin
+is not presented as a decoding-neutral model comparison.
 
-% ---------------------------------------------------------------
-\section{Conclusion}\label{sec:conclusion}
+The PACS audits in Figure~\ref{fig:pacs-audits} separate depth from novelty.
+A row is irreducible when deleting any predicate from its gold program changes
+the answer. This holds for 42.7\% of answerable rows, and the planner scores
+78.7\% on that subset, close to the 80.0\% answerable result. Intent shapes not
+shown during training reduce accuracy to 68.5\%. The system therefore transfers
+new compositions of familiar constructs more reliably than entirely new
+logical forms. The repair result in the same figure is a development variant
+and is not part of the sealed headline.
 
-UK public procurement is public data that the public cannot reliably
-analyse in natural language. This work defined that task end to end, a
-convention-explicit knowledge graph, a program-first benchmark with refusal
-as scored behaviour, a typed compositional program language, and oracles
-whose correctness is measured by an independent second implementation. On
-that foundation a verified bootstrap, deterministic checks deciding what a
-model may learn from, trains an 8B local system to 85.65 percent, past the
-cloud teacher that generated its training data, and to 78.31 on a sealed
-challenge set neither system authored. Rebuilt on web tables at the cost of
-a data layer, the same recipe turns a 22.5 percent floor into 44.4 without
-a single gold program and 51.8 with them. Language coverage is now the
-dominant measured bottleneck, program discovery remains incomplete, and the
-audits in this paper are what make that distinction measurable.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\linewidth]{pacs_audits.pdf}
+\caption{PACS audits. The irreducible subset remains close to the answerable
+headline, while unseen intent shapes produce the largest measured loss. The
+repair arm is a development-only variant.}
+\label{fig:pacs-audits}
+\end{figure}
+
+\subsection{Transfer to WikiTableQuestions}
+\label{sec:wtq}
+
+The transfer retains the typed execution architecture and replaces the
+procurement data adapter with table views, a column-aware value linker, and one
+row-preserving arg-extremum operator. Table~\ref{tab:wtq-results} reports the
+official test results. The procurement checkpoint carries a 4.82-point
+zero-shot gain over the untrained base. Answer-only training reaches 44.43\%,
+and gold-program training reaches 51.80\%. The answer-only result is comparable
+with classical weakly supervised parsers, but both trained systems remain below
+recent specialised table-QA methods \citep{cheng2023binder,ye2023dater,
+wang2024chainoftable}. The experiment is used to study portability and
+bottlenecks, not to claim state of the art.
+
+\begin{table}[t]
+\centering
+\caption{WikiTableQuestions official-test accuracy.}
+\label{tab:wtq-results}
+\small
+\begin{tabular}{lr}
+\toprule
+System & Accuracy \\
+\midrule
+Untrained local base & 22.51 \\
+Procurement checkpoint, zero-shot & 27.33 \\
+Answer-only training & 44.43 \\
+Gold-program training & \textbf{51.80} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A differential audit against 11{,}276 SQUALL SQL programs
+\citep{shi2020squall} locates the remaining gap. The original algebra expresses
+53.9\% of the reference programs. Compiler closure and typed loader views
+recover 730 additional programs and raise coverage to 61.0\%. Of these, 562
+come from translator closure, 154 from loader views, and 14 require both. The
+remaining 39.6\% lie outside the language. Figure~\ref{fig:coverage-attribution}
+shows the resulting attribution. Translated in-coverage programs
+match the reference denotation in 92--93\% of cases, and execution recovers the
+benchmark answer in 94.1\% of those cases. The reference programs are
+themselves imperfect, reproducing the benchmark answer in 88.9\% of cases, so
+the audit treats them as a noisy reference rather than an absolute standard.
+This pattern points to coverage rather than executor correctness as the main
+transfer limit.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{attribution.pdf}
+\caption{Attribution of WikiTableQuestions program coverage. Compiler and
+loader closure raise measured coverage from 53.9\% to 61.0\%, while 39.6\%
+remains outside the language.}
+\label{fig:coverage-attribution}
+\end{figure}
+
+The coverage account is also tested by intervention. After closure, the
+answer-only development model rises from 31.7\% to 40.0\%, and the gold-program
+model rises from 40.0\% to 51.0\%. Figure~\ref{fig:coverage-intervention} shows
+that both supervision regimes improve when the representation and compiler
+cover more of the task. This is the clearest evidence that the transfer gap is
+not solely a planning-model problem.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\linewidth]{coverage_capability.pdf}
+\caption{Development accuracy before and after WikiTableQuestions coverage
+closure. Both answer-only and gold-program training improve after the same
+representation and compiler intervention.}
+\label{fig:coverage-intervention}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+The results support three conclusions. First, a deterministic execution
+contract changes the problem substantially. An untrained local model becomes
+competitive with the cloud teacher once both operate through a typed program
+interface and executor. Second, task-specific training still matters. The two
+fully local systems outperform their hybrid counterparts and degrade less from
+development to test. Third, portability is bounded by what the data adapter,
+compiler, and algebra can represent. The WikiTableQuestions audit measures this
+boundary directly and shows that widening coverage improves both supervision
+regimes.
+
+The teacher comparison is task-specific. The student receives in-domain
+training, while the teacher is evaluated as a zero-shot deployment. The result
+shows that the full local system is more accurate on the defined task, not that
+an 8B model has greater general capability. PACS strengthens the external
+validity claim, but it is still a controlled benchmark rather than a sample of
+real analyst questions.
+
+Five limitations remain. The main benchmark is program-first and its question
+surfaces are generated under style controls. Each student result comes from one
+training run, so training-seed variance is not estimated. The teacher and local
+systems do not share identical decoding constraints. The closed algebra rejects
+questions outside its supported operations, and unseen intent shapes remain a
+clear weakness. Finally, the study does not simulate arbitrary deletion of KG
+facts. Its refusal tests cover missing or unsupported evidence, but not every
+form of data incompleteness.
+
+The candidate-selection experiment in Appendix~\ref{app:selection} provides an
+additional negative result. An LLM selector does not improve over the first
+accepted candidate, while a small deterministic scorer based on execution
+features gains 2.0 points. This finding concerns best-of-$k$ selection only. It
+is not evidence that all model-based verification is ineffective.
+
+% -----------------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented an auditable question-answering framework for UK public
+procurement. The framework combines explicit data conventions, typed program
+generation, deterministic execution, abstention, and independent oracle audit.
+The experiments show that the executable scaffold establishes a strong base,
+local training of both reading and planning improves generalisation, and the
+result transfers to independent procurement questions. The table-domain study
+shows that representation and program-language coverage are the main remaining
+limits.
 
 \bibliography{references}
 \bibliographystyle{tmlr}
 
 \appendix
-\section{Operator Algebra Reference}\label{app:algebra}
 
-Programs are trees over seven value types. \textsc{records} is a subset
-of the flat record universe, \textsc{values} a distinct set of scalars,
-\textsc{groups} a mapping from group key to number, \textsc{ranking} an
-ordered list of key and number pairs, and \textsc{number}, \textsc{value}
-and \textsc{bool} are scalars. Table~\ref{tab:algebra} lists the closed
-node inventory with type signatures. Depth is capped at 16 and node count
-at 64. Every check failure raises a typed diagnostic with a path into the
-tree, which is what the gated repair loop consumes.
+% -----------------------------------------------------------------------------
+\section{Operator Algebra}
+\label{app:algebra}
+
+Programs are trees over seven value types. \textsc{records} is a subset of the
+record universe, \textsc{values} is a distinct set of scalar values,
+\textsc{groups} maps group keys to numbers, and \textsc{ranking} is an ordered
+list of key-value pairs. \textsc{number}, \textsc{value}, and \textsc{bool}
+are scalar types. Program depth is capped at 16 and node count at 64. Each
+checker failure contains a typed diagnostic and a path into the program tree.
 
 \begin{table}[h]
 \centering
-\caption{Node inventory. The seventeen procurement nodes plus the one node
-added for the WikiTableQuestions transfer (marked $\dagger$). Predicates
-inside \texttt{filter} support base constraints (\texttt{eq}, \texttt{in},
-\texttt{contains}, \texttt{exists}, \texttt{gte}, \texttt{lte}), negation,
-disjunction, and computed-set membership (\texttt{in\_expr}, a semijoin or
-antijoin on a subtree).}
+\caption{Closed operator inventory. The WikiTableQuestions transfer adds the
+row-preserving \texttt{extreme\_rows} node.}
 \label{tab:algebra}
 \small
 \begin{tabular}{lll}
 \toprule
-Node & Signature & Meaning \\
+Node & Signature & Function \\
 \midrule
-\texttt{filter} & preds $\to$ \textsc{records} & subset by predicate conjunction \\
-\texttt{values} & \textsc{records} $\to$ \textsc{values} & distinct field values \\
-\texttt{count} & \textsc{records} $\to$ \textsc{number} & record count \\
+\texttt{filter} & predicates $\to$ \textsc{records} & filter records \\
+\texttt{values} & \textsc{records} $\to$ \textsc{values} & project distinct values \\
+\texttt{count} & \textsc{records} $\to$ \textsc{number} & count records \\
 \texttt{size} & \textsc{values} $\to$ \textsc{number} & set cardinality \\
-\texttt{sum} & \textsc{records} $\to$ \textsc{number} & guarded money summation \\
-\texttt{exists} & \textsc{records} $\to$ \textsc{bool} & non-emptiness \\
+\texttt{sum} & \textsc{records} $\to$ \textsc{number} & guarded money sum \\
+\texttt{exists} & \textsc{records} $\to$ \textsc{bool} & test non-emptiness \\
 \texttt{select} & \textsc{records} $\to$ \textsc{value} & unique field lookup \\
-\texttt{extreme} & \textsc{records} $\to$ \textsc{value} & argmax or argmin record \\
+\texttt{extreme} & \textsc{records} $\to$ \textsc{value} & record argmin or argmax \\
 \texttt{groupby} & \textsc{records} $\to$ \textsc{groups} & grouped count or sum \\
 \texttt{argext} & \textsc{groups} $\to$ \textsc{value} & extremum group key \\
 \texttt{top} & \textsc{groups} $\to$ \textsc{ranking} & top-$k$ groups \\
 \texttt{num} & literal $\to$ \textsc{number} & numeric literal \\
-\texttt{combine} & \textsc{number}$^2$ $\to$ \textsc{number}/\textsc{bool} & arithmetic or comparison \\
-\texttt{vcompare} & \textsc{value} $\to$ \textsc{bool} & scalar comparison, date-aware \\
-\texttt{setop} & \textsc{values}$^2$ $\to$ \textsc{values} & union, intersection, difference \\
-\texttt{gcombine} & \textsc{groups}$^2$ $\to$ \textsc{groups} & groupwise combination \\
-\texttt{keys\_where} & \textsc{groups} $\to$ \textsc{values} & keys passing a threshold \\
-\texttt{extreme\_rows}$^\dagger$ & \textsc{records} $\to$ \textsc{records} & row-preserving arg-extremum \\
+\texttt{combine} & \textsc{number}$^2$ $\to$ scalar & arithmetic or comparison \\
+\texttt{vcompare} & \textsc{value} $\to$ \textsc{bool} & scalar comparison \\
+\texttt{setop} & \textsc{values}$^2$ $\to$ \textsc{values} & set operation \\
+\texttt{gcombine} & \textsc{groups}$^2$ $\to$ \textsc{groups} & combine grouped values \\
+\texttt{keys\_where} & \textsc{groups} $\to$ \textsc{values} & thresholded group keys \\
+\texttt{extreme\_rows} & \textsc{records} $\to$ \textsc{records} & row-preserving arg-extremum \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Audit Protocols and Supplementary Results}\label{app:audits}
+% -----------------------------------------------------------------------------
+\section{Audit and Supplementary Results}
+\label{app:audits}
 
-\paragraph{Dual-oracle audit.} The independent evaluator was implemented
-from the raw releases with no shared code and replays every benchmark
-answer. Agreement is 99.88 percent over 14{,}770 audited answers. All 18
-residual disagreements were opened by hand and characterised, and none
-affects a reported comparison.
+\paragraph{Entity resolution.}
+The source contains 204{,}711 raw organisation aliases. Resolution proceeds
+through registry identifiers, safe deterministic variants, normalised name and
+region, and finally name-only evidence. A total of 255 borderline cases were
+placed in a review file, and 82{,}013 singletons were left unmerged. Similarity
+matching never writes a merge directly.
 
-\paragraph{PACS isolation gates.} Five zero-overlap gates hold between
-training and sealed test at the level of question text, logical signature,
-surface template, entity anchors, and program hash. A 93-row human audit
-preceded unsealing and found one systematic defect, a boolean handling
-error in the empty-result class affecting 46 rows, corrected by offline
-re-execution before any number was read.
+\paragraph{Benchmark gates.}
+Every generated program is re-executed against the full graph before its
+question is admitted. The build rejects local sampling omissions, multi-answer
+ambiguity, plan overlap, duplicate identifiers, and row-count changes. A
+position-aware mechanical detector checks whether paraphrases preserve the
+logical signature. Nineteen of the 2{,}285 final-test rows contain phrases also
+seen in refusal traps. Removing them changes every headline by at most 0.21
+points and changes no ranking.
 
-\paragraph{Constraint-necessity audit.} Each predicate of each oracle
-program is deleted in turn and the program re-executed. A row is
-irreducible when every deletion changes the answer. 42.7 percent of
-answerable sealed rows are irreducible, and the planner scores 78.7 on
-that subset against 80.00 on the full answerable set.
+\paragraph{PACS isolation.}
+Five zero-overlap checks hold between training and sealed evaluation at the
+level of question text, logical signature, template identity, entity anchors,
+and program hash. A 93-row human audit took place before unsealing. It found one
+systematic boolean error affecting 46 rows, which was corrected by offline
+re-execution before any model score was read.
 
-\paragraph{Trap-cue disclosure.} Nineteen of 2{,}285 test rows string-match
-cue phrases derived from development refusal traps. Excluding them moves
-every headline by at most 0.21 points and changes no ranking and no
-significance verdict.
-
-\paragraph{Method ladder.} Table~\ref{tab:ladder} reports the
-development-set ladder over training methods and bases under the revised
-pipeline, and the harvest yields that feed them. Preference optimisation
-helps one base and hurts the other, consistent with the near-miss hazard
-of Section~\ref{sec:design}, and the deployed fully local systems use the
-best arm per base. Self-harvest yield exceeds teacher harvest yield on both
-bases, and a second self-harvest round raises yield further, 76.6 to 86.3
-percent on answerable questions, while adding only 0.4 evaluation points,
-not significant, which is where the loop stops.
+\paragraph{Training ladder.}
+Table~\ref{tab:ladder} reports development accuracy and data-engine acceptance
+rates. Acceptance rate is the fraction of sampled answerable candidates that
+pass the data pipeline. It is not system accuracy. Acceptance rises across
+self-harvest rounds while the evaluation gain of the second round is 0.4
+points and not significant, so the loop is reported at its measured ceiling
+rather than iterated further.
 
 \begin{table}[h]
 \centering
-\caption{Development ladder (n=260) and harvest yields. Yields are
-data-engine acceptance rates on answerable questions, a different metric
-from system accuracy, and are never compared against it.}
+\caption{Development ladder and candidate acceptance rates.}
 \label{tab:ladder}
 \small
 \begin{tabular}{lcc}
@@ -1023,35 +677,52 @@ Zero-shot scaffolded & 70.4 & 60.0 \\
 Supervised fine-tuning & 81.2 & 83.1 \\
 Rejection-sampling fine-tuning & 81.5 & 82.7 \\
 Preference optimisation & 83.5 & 77.3 \\
-Fully local (best arm) & 86.2 & 84.2 \\
+Fully local, best arm & 86.2 & 84.2 \\
 \midrule
-Teacher harvest yield & \multicolumn{2}{c}{65.5} \\
-Self-harvest yield, round 1 & 76.6 & 78.1 \\
-Self-harvest yield, round 2 & 86.3 & -- \\
+Teacher candidate acceptance & \multicolumn{2}{c}{65.5} \\
+Self-harvest acceptance, round 1 & 76.6 & 78.1 \\
+Self-harvest acceptance, round 2 & 86.3 & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Reproduction Details}\label{app:config}
+% -----------------------------------------------------------------------------
+\section{Candidate Selection}
+\label{app:selection}
 
-Students are Qwen3-8B \citep{qwen3-2025} and Llama-3.1-8B, adapted with
-rank-64 LoRA \citep{hu2022lora} under 4-bit QLoRA quantisation
-\citep{dettmers2023qlora} in LLaMA-Factory \citep{zheng2024llamafactory},
-with per-base configurations identical apart from base and chat template.
-Serving uses vLLM \citep{kwon2023vllm} with guided JSON decoding compiled
-from the algebra grammar, and every local rung including the untrained
-zero-shot baseline is served through the same guided path. Harvest sampling
-uses positive temperature, since greedy sampling cannot explore beyond what
-the model already solves, and evaluation uses temperature zero with a
-single call per question. Training and evaluation ran on single 80GB A100
-and 96GB H100 devices. The WikiTableQuestions official run was executed
-once under a recorded manifest of commit hash, file checksums, decoding
-parameters and adapter identity, and the test set is treated as consumed.
-The experiment ledger records every experiment behind this paper, including
-the negative results reported in Sections~\ref{sec:design}
-and~\ref{sec:discussion}, under a fixed rule that any rate-type number is
-entered only after ten deterministically sampled raw transcripts, passes
-and failures both, have been read by a human. Full training configurations,
-prompts, manifests and the ledger ship with the code.
+Four candidate programs are sampled per development question after the basic
+program checks. A perfect selector would gain about five points over choosing
+the first accepted candidate. The deterministic scorer uses only execution
+features such as empty results, zero-row filter probes, and answer-kind
+mismatches. It gains 2.0 points (Figure~\ref{fig:candidate-selection}). A
+faithful LLM selector gains 0.0, and an immediate LLM score loses 0.7. This
+experiment evaluates candidate ranking and not the main single-call system.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.82\linewidth]{judges.pdf}
+\caption{Candidate selection on development data. The deterministic scorer is
+the only selector that improves over the first accepted candidate. Crosses
+show the oracle best of four.}
+\label{fig:candidate-selection}
+\end{figure}
+
+% -----------------------------------------------------------------------------
+\section{Reproduction Details}
+\label{app:config}
+
+Students are Qwen3-8B \citep{qwen3-2025} and Llama-3.1-8B. Both are adapted
+with rank-64 LoRA under 4-bit QLoRA quantisation in LLaMA-Factory
+\citep{hu2022lora,dettmers2023qlora,zheng2024llamafactory}. Serving uses vLLM
+with guided JSON decoding compiled from the algebra grammar
+\citep{kwon2023vllm}. Candidate collection uses positive-temperature sampling,
+while evaluation uses one temperature-zero call. Training and evaluation ran
+on single 80GB A100 and 96GB H100 devices. The WikiTableQuestions official run
+used a recorded manifest containing the commit hash, file checksums, decoder
+settings, and adapter identity. An experiment ledger records every run behind
+this paper, and any rate-style number enters the ledger only after ten
+deterministically sampled raw transcripts, passes and failures both, have
+been read by a human. Prompts, manifests, tests, and the experiment
+ledger are released with the code.
 
 \end{document}
