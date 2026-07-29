@@ -385,7 +385,9 @@ clusters. The cloud teacher cannot be seeded, so its variability was measured
 with three identical development runs at $72.6\pm1.1$ points, and no teacher
 comparison below three points rests on a single run. Each student is a
 single frozen training run. Paired significance therefore measures test-set
-disagreement and not training-seed variance.
+disagreement and not training-seed variance. Full training configurations,
+serving settings, compute footprint and the audit rule behind every
+reported rate appear in Appendix~\ref{app:config}.
 
 % -----------------------------------------------------------------------------
 \section{Results}
@@ -422,8 +424,9 @@ with a trained local one on top of the best arm per base.
 \centering
 \includegraphics[width=0.88\linewidth]{gain_ladder.pdf}
 \caption{Home-benchmark results. Colours denote the base model in both
-panels, and hatching marks systems that read questions with the cloud
-model. (a) Development decomposition, from the model-independent retrieval
+panels, and in panel (b) hatching marks the systems that read questions
+with the cloud model; in panel (a) every rung below the top one uses the
+cloud reader. (a) Development decomposition, from the model-independent retrieval
 baseline through the untrained scaffolded base and the three training
 arms that branch from the supervised model, to the top rung that replaces
 the cloud reader with a trained local one on top of the best arm per
@@ -447,6 +450,15 @@ therefore teaches conformance to the specific contract, and constrained
 decoding grants that contract to every system, so accuracy differences under
 the shared decoder measure planning.
 
+In the sealed confirmation of Figure~\ref{fig:home-ladder}(b), the
+strongest local system is
+15.89 points above the teacher, with a 95\% paired interval of 14.07 to 17.70
+and exact McNemar $p<10^{-14}$. The same ordering holds with the second base,
+which reduces the chance that the result is specific to one model family.
+Fully local systems also outperform the hybrids on both bases, by 7.61
+points with interval 6.10 to 9.13 on the stronger base. This indicates
+that task-specific question reading contributes beyond local program planning.
+
 Figure~\ref{fig:heatmap} resolves the sealed result by question type,
 which turns the aggregate ordering into a mechanism. The teacher's
 weakness concentrates exactly where exhaustive computation lives, 48.7\%
@@ -468,15 +480,6 @@ fully local systems close the refusal classes near ceiling.}
 \label{fig:heatmap}
 \end{figure}
 
-In the sealed confirmation of Figure~\ref{fig:home-ladder}(b), the
-strongest local system is
-15.89 points above the teacher, with a 95\% paired interval of 14.07 to 17.70
-and exact McNemar $p<10^{-14}$. The same ordering holds with the second base,
-which reduces the chance that the result is specific to one model family.
-Fully local systems also outperform the hybrids on both bases, by 7.61
-points with interval 6.10 to 9.13 on the stronger base. This indicates
-that task-specific question reading contributes beyond local program planning.
-
 \subsection{Distribution shift and independent procurement questions}
 \label{sec:robustness}
 
@@ -493,8 +496,11 @@ PACS tests new question surfaces and logical exposure. The frozen local planner
 reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on the
 answerable subset. On the same sealed rows the untrained base scores
 36.01\%, a retrieval baseline scores 21.90\%, and the cloud teacher scores
-50.33\%, so every rung of the deployment ladder is present on questions
-none of the systems authored. The teacher API lacks the
+50.33\%, all under the same strict overall metric on the full 922 rows, so
+every rung of the deployment ladder is present on questions none of the
+systems authored. Table~\ref{tab:pacs-family} reports the finer per-family
+numbers on the aligned value-oracle subset, whose denominators differ from
+the strict overall by construction. The teacher API lacks the
 local constrained decoder, and 23.1\% of its rows fail on format, so the margin
 is not presented as a decoding-neutral model comparison.
 
