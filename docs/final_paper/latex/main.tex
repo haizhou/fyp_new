@@ -421,23 +421,15 @@ therefore teaches conformance to the specific contract, and constrained
 decoding grants that contract to every system, so accuracy differences under
 the shared decoder measure planning.
 
-The sealed test confirms the ordering. Figure~\ref{fig:scoreboards}(a) shows
-69.76\% for the cloud teacher, 75.97\% and 78.03\% for the hybrid systems, and
-83.33\% and 85.65\% for the fully local systems. The strongest local system is
+The sealed test confirms the ordering. The cloud teacher scores 69.76\%,
+the hybrid systems 75.97\% and 78.03\%, and the fully local systems
+83.33\% and 85.65\%. The strongest local system is
 15.89 points above the teacher, with a 95\% paired interval of 14.07 to 17.70
 and exact McNemar $p<10^{-14}$. The same ordering holds with the second base,
 which reduces the chance that the result is specific to one model family.
 Fully local systems also outperform the hybrids on both bases, by 7.61
 points with interval 6.10 to 9.13 on the stronger base. This indicates
 that task-specific question reading contributes beyond local program planning.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{scoreboard.pdf}
-\caption{Main scoreboards. (a) Sealed procurement test. (b) Sealed PACS test.
-Dashed lines mark the cloud teacher in each panel.}
-\label{fig:scoreboards}
-\end{figure}
 
 \subsection{Distribution shift and independent procurement questions}
 \label{sec:robustness}
@@ -525,21 +517,11 @@ the audit treats them as a noisy reference rather than an absolute standard.
 This pattern points to coverage rather than executor correctness as the main
 transfer limit.
 
-The coverage account is also tested by intervention. After closure, the
+The coverage account is also tested by intervention. After closure and retraining, the
 answer-only development model rises from 31.7\% to 40.0\%, and the gold-program
-model rises from 40.0\% to 51.0\%. Figure~\ref{fig:coverage-intervention} shows
-that both supervision regimes improve when the representation and compiler
-cover more of the task. This is the clearest evidence that the transfer gap is
-not solely a planning-model problem.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.62\linewidth]{coverage_capability.pdf}
-\caption{Development accuracy before and after WikiTableQuestions coverage
-closure. Both answer-only and gold-program training improve after the same
-representation and compiler intervention.}
-\label{fig:coverage-intervention}
-\end{figure}
+model rises from 40.0\% to 51.0\%, so both supervision regimes improve under
+the same representation and compiler intervention. This is the clearest
+evidence that the transfer gap is not solely a planning-model problem.
 
 % -----------------------------------------------------------------------------
 \section{Discussion and Limitations}
