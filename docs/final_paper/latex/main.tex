@@ -394,25 +394,39 @@ disagreement and not training-seed variance.
 \subsection{Where the procurement performance comes from}
 \label{sec:home}
 
-Figure~\ref{fig:home-ladder} separates the executable scaffold from model
-training. The retrieval baseline reaches 31.5\% on development. An untrained
-Qwen3-8B model routed through the typed program interface and executor reaches
-70.4\%, already close to the cloud teacher's replicate band, and the untrained
-Llama-3.1-8B reaches 60.0\% through the same interface. Supervised
-fine-tuning raises the two bases to 81.2\% and 83.1\%, and training both the
-reading and planning stages reaches 86.2\% and 84.2\%. The large first step shows that exhaustive
-computation and a fixed execution contract provide much of the initial gain.
-The remaining steps measure task-specific planning and question understanding.
+This subsection makes two moves, and their data roles differ by design.
+The decomposition of where performance comes from runs on development data,
+because intermediate training arms are never sent to the sealed test, which
+admits one pass per frozen configuration. The sealed test then confirms the
+frozen champion systems. Figure~\ref{fig:home-ladder} shows both moves side
+by side.
+
+On development, the retrieval baseline reaches 31.5\%. An untrained
+Qwen3-8B routed through the typed program interface and executor reaches
+70.4\%, already close to the cloud teacher's replicate band, and the
+untrained Llama-3.1-8B reaches 60.0\% through the same interface.
+Supervised fine-tuning raises the two bases to 81.2\% and 83.1\%.
+Rejection-sampling fine-tuning on the student's own verified survivors,
+with the teacher absent, holds level at 81.5\% and 82.7\%, which shows the
+verified pool rather than continued teacher access carries the signal.
+Preference optimisation then splits by base, 83.5\% on Qwen against 77.3\%
+on Llama, the instability that removed it from the primary systems, and
+training both the reading and planning stages reaches 86.2\% and 84.2\%.
+The large first step shows that exhaustive computation and a fixed
+execution contract provide much of the initial gain. The remaining rungs
+form the training ablation, and each addition is judged against the rung
+below it.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.88\linewidth]{gain_ladder.pdf}
-\caption{Development-set capability ladder on both base models. The
-executable scaffold establishes most of the gap over the retrieval baseline
-(dotted line), task-specific training adds further gains, and the
-preference-tuned rung shows the base-dependent instability discussed in
-Section~\ref{sec:planning}. The shaded band covers three cloud-teacher
-runs.}
+\caption{Home-benchmark results. (a) Development decomposition on both
+base models. The executable scaffold establishes most of the gap over the
+retrieval baseline (dotted line), and the preference-tuned rung shows the
+base-dependent instability discussed in Section~\ref{sec:planning}. The
+shaded band covers three cloud-teacher runs. (b) Sealed-test confirmation
+of the five frozen systems. Intermediate arms never touch the sealed test,
+which admits one pass per frozen configuration.}
 \label{fig:home-ladder}
 \end{figure}
 
@@ -425,9 +439,8 @@ therefore teaches conformance to the specific contract, and constrained
 decoding grants that contract to every system, so accuracy differences under
 the shared decoder measure planning.
 
-The sealed test confirms the ordering. The cloud teacher scores 69.76\%,
-the hybrid systems 75.97\% and 78.03\%, and the fully local systems
-83.33\% and 85.65\%. The strongest local system is
+In the sealed confirmation of Figure~\ref{fig:home-ladder}(b), the
+strongest local system is
 15.89 points above the teacher, with a 95\% paired interval of 14.07 to 17.70
 and exact McNemar $p<10^{-14}$. The same ordering holds with the second base,
 which reduces the chance that the result is specific to one model family.
@@ -438,17 +451,16 @@ that task-specific question reading contributes beyond local program planning.
 \subsection{Distribution shift and independent procurement questions}
 \label{sec:robustness}
 
-Table~\ref{tab:robustness} compares development and test, and the iid and
-composite-hard development slices. The hybrid systems lose 5.5 and 7.1
-points from development to test, while the fully local systems lose 0.5 and
-0.9. On the composite-hard slice, the Qwen hybrid loses 7.7 points, the
-teacher loses 6 to 12 points across its three runs, and the fully local
-Qwen gains 0.8.
+Table~\ref{tab:robustness} compares development and test. The hybrid
+systems lose 5.5 and 7.1 points, while the fully local systems lose 0.5
+and 0.9, and the pattern holds on both bases. Independent evidence on
+genuinely hard questions comes from the sealed challenge set below rather
+than from any development slice.
 
 \begin{table}[t]
 \centering
-\caption{Distribution-shift behaviour. Left, development-to-test movement
-per system. Right, iid to composite-hard movement on development data.}
+\caption{Development-to-test movement per system. Fully local systems
+barely move while hybrids decay, on both bases.}
 \label{tab:robustness}
 \small
 \begin{tabular}{lccc}
@@ -461,19 +473,9 @@ Llama fully local & 84.2 & 83.33 & $-0.9$ \\
 Qwen fully local & 86.2 & 85.65 & $-0.5$ \\
 \bottomrule
 \end{tabular}
-\hspace{1.2em}
-\begin{tabular}{lccc}
-\toprule
-System & iid & hard & Shift \\
-\midrule
-Teacher (3 runs) & 73.8--78.6 & 65.4--67.6 & $-6$ to $-12$ \\
-Qwen hybrid & 86.4 & 78.7 & $-7.7$ \\
-Qwen fully local & 84.5 & 85.3 & $+0.8$ \\
-\bottomrule
-\end{tabular}
-\end{table} These results are consistent with the fully local system depending less
-on the cloud reader and the development surface distribution. They do not by
-themselves establish a causal robustness mechanism.
+\end{table} The decay asymmetry is consistent with the fully local system depending
+less on the cloud reader and the development surface distribution. It does
+not by itself establish a causal robustness mechanism.
 
 PACS tests new question surfaces and logical exposure. The frozen local planner
 reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on the answerable
@@ -481,7 +483,7 @@ subset, compared with 50.33\% for the cloud teacher. The teacher API lacks the
 local constrained decoder, and 23.1\% of its rows fail on format, so the margin
 is not presented as a decoding-neutral model comparison.
 
-Figure~\ref{fig:pacsradar} breaks the sealed result into the seven task
+Table~\ref{tab:pacs-family} breaks the sealed result into the seven task
 families for all three systems, and the pattern is asymmetric rather than
 uniform. The local planner dominates spending, comparison, relational
 composition, and above all overlap and exclusion, where it scores 97.1\%
@@ -490,17 +492,30 @@ set-operation semantics. The teacher in turn remains stronger on disclosure
 and compliance, 60.6\% against 38.8\%, where universal quantification over
 every notice of a buyer defeats the closed algebra more often than it
 defeats free generation. Training transfers what its pool demonstrates, and
-the radar shows both directions of that dependence honestly.
+the table shows both directions of that dependence.
 
-\begin{figure}[t]
+\begin{table}[t]
 \centering
-\includegraphics[width=0.6\linewidth]{pacs_radar.pdf}
-\caption{Sealed PACS accuracy per task family on value-oracle rows, for the
-local planner, the cloud teacher, and the untrained base. Strengths are
-asymmetric. The planner dominates set-heavy families while the teacher
-retains the lead on universal quantification over disclosure records.}
-\label{fig:pacsradar}
-\end{figure}
+\caption{Sealed PACS accuracy per task family on value-oracle rows
+(n=655). Strengths are asymmetric. The planner dominates set-heavy
+families while the teacher retains the lead on universal quantification
+over disclosure records.}
+\label{tab:pacs-family}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Family & n & Local planner & Cloud teacher & Untrained base \\
+\midrule
+F1 spending and volume & 104 & \textbf{99.0} & 82.8 & 59.6 \\
+F2 temporal change & 107 & 96.3 & \textbf{96.7} & 70.7 \\
+F3 supplier concentration & 97 & 47.4 & \textbf{51.6} & 28.0 \\
+F4 cross-buyer comparison & 107 & \textbf{93.5} & 83.6 & 54.2 \\
+F5 overlap and exclusion & 103 & \textbf{97.1} & 27.2 & 35.6 \\
+F6 relational composition & 88 & \textbf{88.6} & 69.8 & 39.3 \\
+F7 disclosure and compliance & 49 & 38.8 & \textbf{60.6} & 41.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The PACS audits, shown in Figure~\ref{fig:pacs-audits} of the appendix, separate depth from novelty.
 A row is irreducible when deleting any predicate from its gold program changes
@@ -525,8 +540,7 @@ procurement data adapter with table views, a column-aware value linker, and one
 row-preserving arg-extremum operator. Table~\ref{tab:wtq-results} reports the
 official test results. The procurement checkpoint carries a 4.82-point
 zero-shot gain over the untrained base. Answer-only training reaches 44.43\%,
-and gold-program training reaches 51.80\%. Each step of the four-system
-ladder is significant at exact McNemar $p<5\times10^{-18}$. The answer-only result is comparable
+and gold-program training reaches 51.80\%. The answer-only result is comparable
 with classical weakly supervised parsers, but both trained systems remain below
 recent specialised table-QA methods \citep{cheng2023binder,ye2023dater,
 wang2024chainoftable}. The experiment is used to study portability and
@@ -534,17 +548,20 @@ bottlenecks, not to claim state of the art.
 
 \begin{table}[t]
 \centering
-\caption{WikiTableQuestions official-test accuracy.}
+\caption{WikiTableQuestions results. Official sealed test (n=4{,}344,
+one pass under a recorded manifest), each rung significant over the
+previous at exact McNemar $p<5\times10^{-18}$, alongside the development
+fold before and after representation and compiler closure.}
 \label{tab:wtq-results}
 \small
-\begin{tabular}{lr}
+\begin{tabular}{lcccc}
 \toprule
-System & Accuracy \\
+ & Official test & Step gain & Dev fold & after closure \\
 \midrule
-Untrained local base & 22.51 \\
-Procurement checkpoint, zero-shot & 27.33 \\
-Answer-only training & 44.43 \\
-Gold-program training & \textbf{51.80} \\
+Untrained local base & 22.51 & & & \\
+Procurement checkpoint, zero-shot & 27.33 & $+4.82$ & & \\
+Answer-only training & 44.43 & $+17.10$ & 31.7 & 40.0 \\
+Gold-program training & \textbf{51.80} & $+7.37$ & 40.0 & 51.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -735,36 +752,14 @@ remains outside the language.}
 \label{fig:coverage-attribution}
 \end{figure}
 
-\paragraph{PACS per-family results and status axis.}
-Table~\ref{tab:pacs-family} reports the sealed-run accuracy per task family
-over the 655 rows whose oracle is a concrete value. On the 267 status rows
+\paragraph{PACS status axis.}
+Per-family accuracy appears in Table~\ref{tab:pacs-family} of the main
+text. On the 267 status rows
 the planner returns the exact gold status on 138 under raw scoring, and the
 documented offline correction of the empty-result class credits a further
 35 rows, which reconciles exactly with the reported overall of 722 correct
 rows out of 922. Abstention-type golds alone are recognised at 138 of 194
 rows, or 71.1\%.
-
-\begin{table}[h]
-\centering
-\caption{Sealed PACS accuracy per family on value-oracle rows (n=655,
-aggregate 83.8\%). The answerable headline of 80.00\% additionally includes
-the empty-result rows under the corrected scoring.}
-\label{tab:pacs-family}
-\small
-\begin{tabular}{lcc}
-\toprule
-Family & Accuracy & n \\
-\midrule
-F1 spending and volume & 99.0 & 104 \\
-F2 temporal change & 96.3 & 107 \\
-F3 supplier concentration & 47.4 & 97 \\
-F4 cross-buyer comparison & 93.5 & 107 \\
-F5 overlap and exclusion & 97.1 & 103 \\
-F6 relational composition & 88.6 & 88 \\
-F7 disclosure and compliance & 38.8 & 49 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \paragraph{Training ladder.}
 Table~\ref{tab:ladder} reports development accuracy and data-engine acceptance
