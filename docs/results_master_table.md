@@ -468,3 +468,14 @@ plausibility captured none (56.67) — "diagnosis is deterministic first" wins t
 Deployment: k1 stays protocol (+0.33 is noise-level); the scorer's real posts are abstention
 calibration and pool pruning, outside the best-of-k ceiling. Artifacts: reflector_rerank.json,
 scripts/wtq/reflector_rerank.py.
+
+## E14e — faithful LLM-as-a-Verifier steelman: exactly zero net signal (user-directed, 2026-07-23)
+
+Full-fidelity port per official repo (letter A-T single-token scale with logit expectation at the
+tag position, pairwise round-robin A/B template, free analysis BEFORE scoring, observed answers in
+trajectories, strong judge grok-4-1-fast, temp 0): k1 59.00 (3rd exact reproduction) | first 56.33 |
+faithful 56.33 (+-0.00 net) | oracle 63.00. Three-judge final: strawman -0.66, faithful +0.00,
+deterministic reflector +2.00 (paired +7/-1). The steelman upgrade sharpens the claim: the faithful
+judge SAW the executed answers (same information as the reflector) and still extracted nothing —
+the gap is inductive bias (rules over judgment), not information access. E14c conclusion survives
+its strongest form; ~$1 judging cost. Artifacts: faithful_verifier.json, scripts/wtq/faithful_verifier.py.
