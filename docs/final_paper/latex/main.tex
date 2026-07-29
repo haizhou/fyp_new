@@ -397,18 +397,22 @@ disagreement and not training-seed variance.
 Figure~\ref{fig:home-ladder} separates the executable scaffold from model
 training. The retrieval baseline reaches 31.5\% on development. An untrained
 Qwen3-8B model routed through the typed program interface and executor reaches
-70.4\%, already close to the cloud teacher's replicate band. Supervised
-fine-tuning raises accuracy to 81.2\%, and training both the reading and
-planning stages reaches 86.2\%. The large first step shows that exhaustive
+70.4\%, already close to the cloud teacher's replicate band, and the untrained
+Llama-3.1-8B reaches 60.0\% through the same interface. Supervised
+fine-tuning raises the two bases to 81.2\% and 83.1\%, and training both the
+reading and planning stages reaches 86.2\% and 84.2\%. The large first step shows that exhaustive
 computation and a fixed execution contract provide much of the initial gain.
 The remaining steps measure task-specific planning and question understanding.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.88\linewidth]{gain_ladder.pdf}
-\caption{Development-set capability ladder. The executable scaffold establishes
-most of the gap over retrieval, while task-specific training adds further gains.
-The shaded band shows three cloud-teacher runs.}
+\caption{Development-set capability ladder on both base models. The
+executable scaffold establishes most of the gap over the retrieval baseline
+(dotted line), task-specific training adds further gains, and the
+preference-tuned rung shows the base-dependent instability discussed in
+Section~\ref{sec:planning}. The shaded band covers three cloud-teacher
+runs.}
 \label{fig:home-ladder}
 \end{figure}
 
@@ -434,27 +438,69 @@ that task-specific question reading contributes beyond local program planning.
 \subsection{Distribution shift and independent procurement questions}
 \label{sec:robustness}
 
-Figure~\ref{fig:robustness}(a) compares development and test. The hybrid
-systems lose 5.5 and 7.1 points, while the fully local systems lose 0.5 and
-0.9. On the composite-hard development slice, the Qwen hybrid loses 7.7 points
-and the fully local Qwen gains 0.8. The teacher declines by 6 to 12 points on the same slice across its
-three runs. These results are consistent with the fully local system depending less
+Table~\ref{tab:robustness} compares development and test, and the iid and
+composite-hard development slices. The hybrid systems lose 5.5 and 7.1
+points from development to test, while the fully local systems lose 0.5 and
+0.9. On the composite-hard slice, the Qwen hybrid loses 7.7 points, the
+teacher loses 6 to 12 points across its three runs, and the fully local
+Qwen gains 0.8.
+
+\begin{table}[t]
+\centering
+\caption{Distribution-shift behaviour. Left, development-to-test movement
+per system. Right, iid to composite-hard movement on development data.}
+\label{tab:robustness}
+\small
+\begin{tabular}{lccc}
+\toprule
+System & Dev & Test & Shift \\
+\midrule
+Llama hybrid & 83.1 & 75.97 & $-7.1$ \\
+Qwen hybrid & 83.5 & 78.03 & $-5.5$ \\
+Llama fully local & 84.2 & 83.33 & $-0.9$ \\
+Qwen fully local & 86.2 & 85.65 & $-0.5$ \\
+\bottomrule
+\end{tabular}
+\hspace{1.2em}
+\begin{tabular}{lccc}
+\toprule
+System & iid & hard & Shift \\
+\midrule
+Teacher (3 runs) & 73.8--78.6 & 65.4--67.6 & $-6$ to $-12$ \\
+Qwen hybrid & 86.4 & 78.7 & $-7.7$ \\
+Qwen fully local & 84.5 & 85.3 & $+0.8$ \\
+\bottomrule
+\end{tabular}
+\end{table} These results are consistent with the fully local system depending less
 on the cloud reader and the development surface distribution. They do not by
 themselves establish a causal robustness mechanism.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{slices.pdf}
-\caption{Robustness analyses. (a) Development-to-test movement. (b) IID to
-composite-hard movement on development data.}
-\label{fig:robustness}
-\end{figure}
 
 PACS tests new question surfaces and logical exposure. The frozen local planner
 reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on the answerable
 subset, compared with 50.33\% for the cloud teacher. The teacher API lacks the
 local constrained decoder, and 23.1\% of its rows fail on format, so the margin
 is not presented as a decoding-neutral model comparison.
+
+Figure~\ref{fig:pacsradar} breaks the sealed result into the seven task
+families for all three systems, and the pattern is asymmetric rather than
+uniform. The local planner dominates spending, comparison, relational
+composition, and above all overlap and exclusion, where it scores 97.1\%
+against 27.2\% for the teacher, whose free-form programs rarely survive the
+set-operation semantics. The teacher in turn remains stronger on disclosure
+and compliance, 60.6\% against 38.8\%, where universal quantification over
+every notice of a buyer defeats the closed algebra more often than it
+defeats free generation. Training transfers what its pool demonstrates, and
+the radar shows both directions of that dependence honestly.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\linewidth]{pacs_radar.pdf}
+\caption{Sealed PACS accuracy per task family on value-oracle rows, for the
+local planner, the cloud teacher, and the untrained base. Strengths are
+asymmetric. The planner dominates set-heavy families while the teacher
+retains the lead on universal quantification over disclosure records.}
+\label{fig:pacsradar}
+\end{figure}
 
 The PACS audits, shown in Figure~\ref{fig:pacs-audits} of the appendix, separate depth from novelty.
 A row is irreducible when deleting any predicate from its gold program changes
