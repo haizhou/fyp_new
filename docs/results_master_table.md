@@ -456,3 +456,15 @@ plausibility is uncorrelated with executional correctness in this domain. Quanti
 paper's design: where an executable oracle exists, it exhausts the signal; probabilistic verification
 serves domains without one. Line closed; no cloud-judge escalation (ceiling forbids ROI).
 Artifacts: verifier_rerank.json, scripts/wtq/verifier_rerank.py.
+
+## E14d — deterministic reflector reranking beats the LLM judge (user-directed, 2026-07-23)
+
+Same dev-300 k=4 frame as E14c, judge swapped for a deterministic reflector-style scorer (six
+execution-derived fault features: zero-row filter probe, empty answer, question-word/answer-kind
+mismatch, question-literal echo, unused linker anchor, zero-count answers; lowest penalty wins,
+shorter-tree tiebreak): k1 59.00 | first 57.33 | reflector 59.33 | oracle 62.33.
+Mechanism verdict: execution-derived features capture ~40% of the sampling headroom where LLM
+plausibility captured none (56.67) — "diagnosis is deterministic first" wins the reranking task too.
+Deployment: k1 stays protocol (+0.33 is noise-level); the scorer's real posts are abstention
+calibration and pool pruning, outside the best-of-k ceiling. Artifacts: reflector_rerank.json,
+scripts/wtq/reflector_rerank.py.
