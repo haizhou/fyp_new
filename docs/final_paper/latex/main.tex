@@ -347,7 +347,7 @@ executor.}
 \toprule
 System & Question reading & Program planning & Training \\
 \midrule
-Cloud teacher & Cloud & Cloud & None \\
+Cloud teacher & Cloud & Cloud & Zero-shot \\
 Llama hybrid & Cloud & Llama-3.1-8B & In-domain \\
 Qwen hybrid & Cloud & Qwen3-8B & In-domain \\
 Llama fully local & Llama-3.1-8B & Llama-3.1-8B & In-domain \\
@@ -427,8 +427,8 @@ Dashed lines mark the cloud teacher in each panel.}
 Figure~\ref{fig:robustness}(a) compares development and test. The hybrid
 systems lose 5.5 and 7.1 points, while the fully local systems lose 0.5 and
 0.9. On the composite-hard development slice, the Qwen hybrid loses 7.7 points
-and the fully local Qwen gains 0.8. The teacher also declines across its three
-runs. These results are consistent with the fully local system depending less
+and the fully local Qwen gains 0.8. The teacher declines by 6 to 12 points on the same slice across its
+three runs. These results are consistent with the fully local system depending less
 on the cloud reader and the development surface distribution. They do not by
 themselves establish a causal robustness mechanism.
 
@@ -446,7 +446,7 @@ subset, compared with 50.33\% for the cloud teacher. The teacher API lacks the
 local constrained decoder, and 23.1\% of its rows fail on format, so the margin
 is not presented as a decoding-neutral model comparison.
 
-The PACS audits in Figure~\ref{fig:pacs-audits} separate depth from novelty.
+The PACS audits, shown in Figure~\ref{fig:pacs-audits} of the appendix, separate depth from novelty.
 A row is irreducible when deleting any predicate from its gold program changes
 the answer. This holds for 42.7\% of answerable rows, and the planner scores
 78.7\% on that subset, close to the 80.0\% answerable result. Intent shapes not
@@ -455,15 +455,6 @@ a 95\% cluster bootstrap interval of 5.6 to 17.2. The system therefore transfers
 new compositions of familiar constructs more reliably than entirely new
 logical forms. The repair result in the same figure is a development variant
 and is not part of the sealed headline.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.88\linewidth]{pacs_audits.pdf}
-\caption{PACS audits. The irreducible subset remains close to the answerable
-headline, while unseen intent shapes produce the largest measured loss. The
-repair arm is a development-only variant.}
-\label{fig:pacs-audits}
-\end{figure}
 
 \subsection{Transfer to WikiTableQuestions}
 \label{sec:wtq}
@@ -502,7 +493,7 @@ A differential audit against 11{,}276 SQUALL SQL programs
 53.9\% of the reference programs. Compiler closure and typed loader views
 recover 730 additional programs and raise coverage to 61.0\%. Of these, 562
 come from translator closure, 154 from loader views, and 14 require both. The
-remaining 39.6\% lie outside the language. Figure~\ref{fig:coverage-attribution}
+remaining 39.6\% lie outside the language. Figure~\ref{fig:coverage-attribution} in the appendix
 shows the resulting attribution. Translated in-coverage programs
 match the reference denotation in 92--93\% of cases, and execution recovers the
 benchmark answer in 94.1\% of those cases. The reference programs are
@@ -510,15 +501,6 @@ themselves imperfect, reproducing the benchmark answer in 88.9\% of cases, so
 the audit treats them as a noisy reference rather than an absolute standard.
 This pattern points to coverage rather than executor correctness as the main
 transfer limit.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{attribution.pdf}
-\caption{Attribution of WikiTableQuestions program coverage. Compiler and
-loader closure raise measured coverage from 53.9\% to 61.0\%, while 39.6\%
-remains outside the language.}
-\label{fig:coverage-attribution}
-\end{figure}
 
 The coverage account is also tested by intervention. After closure, the
 answer-only development model rises from 31.7\% to 40.0\%, and the gold-program
@@ -670,6 +652,24 @@ level of question text, logical signature, template identity, entity anchors,
 and program hash. A 93-row human audit took place before unsealing. It found one
 systematic boolean error affecting 46 rows, which was corrected by offline
 re-execution before any model score was read.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.88\linewidth]{pacs_audits.pdf}
+\caption{PACS audits. The irreducible subset remains close to the answerable
+headline, while unseen intent shapes produce the largest measured loss. The
+repair arm is a development-only variant.}
+\label{fig:pacs-audits}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{attribution.pdf}
+\caption{Attribution of WikiTableQuestions program coverage. Compiler and
+loader closure raise measured coverage from 53.9\% to 61.0\%, while 39.6\%
+remains outside the language.}
+\label{fig:coverage-attribution}
+\end{figure}
 
 \paragraph{Training ladder.}
 Table~\ref{tab:ladder} reports development accuracy and data-engine acceptance
