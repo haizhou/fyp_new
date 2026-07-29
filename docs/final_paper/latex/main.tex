@@ -165,7 +165,9 @@ search, and risk analysis across public records \citep{soylu2022theybuyforyou}.
 Our focus is a measurable natural-language task rather than a graph resource
 alone. Each answer is tied to an executable program and grounded records.
 Questions that are ambiguous, unsupported by the data model, or matched by no
-records are represented explicitly. This connects provenance to the execution
+records are represented explicitly, in the spirit of unanswerable-question
+benchmarks and selective prediction \citep{rajpurkar2018know,kamath2020selective},
+but scored against executable programs rather than span annotations. This connects provenance to the execution
 trace and makes failure detection part of the benchmark rather than an
 informal property of the interface.
 
@@ -247,7 +249,23 @@ Questions are represented as trees in a closed typed algebra. Seven value
 types and seventeen procurement operators cover filtering, projection,
 counting, guarded summation, grouping, ranking, scalar comparison, and set
 operations. Each node has an explicit input and output type. The complete
-inventory appears in Appendix~\ref{app:algebra}.
+inventory appears in Appendix~\ref{app:algebra}. One sealed PACS question
+illustrates the full path from language to answer.
+
+\begin{quote}\small
+\textit{Compare two slices, works notices during 2025 on one side, services
+notices during 2022 on the other. Does the first side hold more notices?}
+
+\smallskip
+\texttt{combine[gt](count(filter(category=works, year=2025)),}\\
+\texttt{\phantom{combine[gt](}count(filter(category=services, year=2022)))}
+
+\smallskip
+The program type-checks to \textsc{bool}, both branches execute over the
+full record universe, and the executed answer is \texttt{False}, which
+matches the oracle. The answer arrives with the record sets of both
+branches, so a reviewer disputes the program, not a paragraph.
+\end{quote}
 
 The algebra is narrower than SQL or Python, but it provides three useful
 properties. Membership is decidable by a recursive type checker. The grammar
@@ -453,7 +471,12 @@ the answer. This holds for 42.7\% of answerable rows, and the planner scores
 shown during training reduce accuracy to 68.5\%, a cost of 11.5 points with
 a 95\% cluster bootstrap interval of 5.6 to 17.2. The system therefore transfers
 new compositions of familiar constructs more reliably than entirely new
-logical forms. The repair result in the same figure is a development variant
+logical forms. The per-family breakdown in Appendix~\ref{app:audits}
+locates the weakness precisely. Disclosure and compliance questions, which
+require universal quantification over every notice of a buyer, score 38.8\%,
+and the deep cells of supplier concentration, which bind a scope inside each
+group, fall to between 15\% and 30\%, while the five remaining families
+score between 82\% and 97\% on value-oracle rows. The repair result in the same figure is a development variant
 and is not part of the sealed headline.
 
 \subsection{Transfer to WikiTableQuestions}
@@ -555,9 +578,22 @@ surfaces are generated under style controls. Each student result comes from one
 training run, so training-seed variance is not estimated. The teacher and local
 systems do not share identical decoding constraints. The closed algebra rejects
 questions outside its supported operations, and unseen intent shapes remain a
-clear weakness. Finally, the study does not simulate arbitrary deletion of KG
+clear weakness. The transfer study also lacks a
+baseline in which a language model writes SQL that is executed directly,
+and since the official test is consumed, that comparison belongs to future
+work on development folds, with the differential audit as a partial answer,
+since even the gold SQL annotations reproduce the benchmark answer in only
+88.9\% of cases. Finally, the study does not simulate arbitrary deletion of KG
 facts. Its refusal tests cover missing or unsupported evidence, but not every
 form of data incompleteness.
+
+Refusal did not transfer free of charge. On a paired comparison against
+the earlier production system, the compositional planner wins the
+answerable subset by 4.4 points yet loses explicit abstention clearly,
+because its training mix carried only 37 refusal demonstrations. Under the
+pre-registered bar of no key-bucket regression, no retirement claim is made
+for the older system. Competence follows demonstrations, and refusal is a
+competence like any other.
 
 The candidate-selection experiment in Appendix~\ref{app:selection} provides an
 additional negative result. An LLM selector does not improve over the first
@@ -671,6 +707,37 @@ remains outside the language.}
 \label{fig:coverage-attribution}
 \end{figure}
 
+\paragraph{PACS per-family results and status axis.}
+Table~\ref{tab:pacs-family} reports the sealed-run accuracy per task family
+over the 655 rows whose oracle is a concrete value. On the 267 status rows
+the planner returns the exact gold status on 138 under raw scoring, and the
+documented offline correction of the empty-result class credits a further
+35 rows, which reconciles exactly with the reported overall of 722 correct
+rows out of 922. Abstention-type golds alone are recognised at 138 of 194
+rows, or 71.1\%.
+
+\begin{table}[h]
+\centering
+\caption{Sealed PACS accuracy per family on value-oracle rows (n=655,
+aggregate 83.8\%). The answerable headline of 80.00\% additionally includes
+the empty-result rows under the corrected scoring.}
+\label{tab:pacs-family}
+\small
+\begin{tabular}{lcc}
+\toprule
+Family & Accuracy & n \\
+\midrule
+F1 spending and volume & 99.0 & 104 \\
+F2 temporal change & 96.3 & 107 \\
+F3 supplier concentration & 47.4 & 97 \\
+F4 cross-buyer comparison & 93.5 & 107 \\
+F5 overlap and exclusion & 97.1 & 103 \\
+F6 relational composition & 88.6 & 88 \\
+F7 disclosure and compliance & 38.8 & 49 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \paragraph{Training ladder.}
 Table~\ref{tab:ladder} reports development accuracy and data-engine acceptance
 rates. Acceptance rate is the fraction of sampled answerable candidates that
@@ -734,7 +801,11 @@ with rank-64 LoRA under 4-bit QLoRA quantisation in LLaMA-Factory
 with guided JSON decoding compiled from the algebra grammar
 \citep{kwon2023vllm}. Candidate collection uses positive-temperature sampling,
 while evaluation uses one temperature-zero call. Training and evaluation ran
-on single 80GB A100 and 96GB H100 devices. The WikiTableQuestions official run
+on single 80GB A100 and 96GB H100 devices. Each fine-tuning run completes
+within a few hours on one device, every sealed evaluation is a single pass,
+the teacher harvest comprises one pass over the 9{,}267-question training
+pool, and the final-test teacher replicate adds roughly 3{,}000 further
+teacher calls. The WikiTableQuestions official run
 used a recorded manifest containing the commit hash, file checksums, decoder
 settings, and adapter identity. An experiment ledger records every run behind
 this paper, and any rate-style number enters the ledger only after ten
