@@ -223,7 +223,8 @@ execution. Oracle comparison is used only when constructing training data.}
 \subsection{Data conventions and canonical representation}
 \label{sec:data}
 
-The source corpus contains 166{,}277 compiled OCDS releases from 2022 to 2026.
+The source corpus contains 166{,}277 compiled releases in the Open
+Contracting Data Standard \citep{ocds}, from 2022 to 2026.
 A field audit identified two issues that determine many downstream answers.
 First, signed values are often stored in contract sub-records rather than the
 nominal award-value field. Second, most buyer and supplier references are
@@ -238,9 +239,13 @@ normalised name and regional evidence are considered. Fuzzy matching produces
 review candidates but never writes a merge directly. Monetary values follow a
 fixed fallback rule and retain their source field and an additivity flag. The
 flag prevents repeated framework ceilings from being summed once for every
-linked award. The representation is materialised as typed columnar tables.
-This supports vectorised joins, unit tests, and a second evaluator that does not
-share execution code with the main system.
+linked award. Logically, the representation is a typed property graph whose nodes
+represent procurement entities, contracts and classifications, and whose
+edges represent contractual and organisational relations. For execution
+it is materialised as typed columnar tables rather than stored in an RDF
+or property-graph database, since the columnar form supports vectorised
+execution, unit tests, and a second evaluator that shares no execution
+code with the main system.
 
 \subsection{Program language and deterministic execution}
 \label{sec:algebra}
@@ -269,8 +274,9 @@ branches, so a reviewer disputes the program, not a paragraph.
 
 The algebra is narrower than SQL or Python, but it provides three useful
 properties. Membership is decidable by a recursive type checker. The grammar
-can be compiled into a JSON schema for token-level constrained decoding
-\citep{kwon2023vllm}. The operator set is small enough for a second evaluator
+can be compiled into a JSON schema and enforced through structured
+decoding in the serving layer's guided-generation interface
+\citep{dong2024xgrammar}. The operator set is small enough for a second evaluator
 to implement independently. After a program is produced, the grounding layer
 resolves entities, fields, dates, and values to the canonical representation.
 The executor applies contract-level deduplication, exact decimal arithmetic,
@@ -322,7 +328,10 @@ sampling omissions, and multi-answer ambiguity.
 
 A second evaluator reconstructs answers from the raw releases without shared
 execution code. Across 14{,}770 audited oracle cases, the two implementations
-agree in 99.88\% of cases. All 18 remaining disagreements were inspected, and
+agree in 99.88\% of cases. The audited set comprises every answerable
+oracle produced by the benchmark generator at audit time, and the final
+curated benchmark of 12{,}828 rows, which also contains refusal rows
+carrying no value oracle, draws from this audited pool. All 18 remaining disagreements were inspected, and
 none affects a reported comparison. This audit measures implementation
 agreement under the declared data conventions. It does not remove uncertainty
 from the source records themselves.
@@ -423,21 +432,13 @@ with a trained local one on top of the best arm per base.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.88\linewidth]{gain_ladder.pdf}
-\caption{Home-benchmark results. Colours denote the base model in both
-panels, and in panel (b) hatching marks the systems that read questions
-with the cloud model; in panel (a) every rung below the top one uses the
-cloud reader. (a) Development decomposition, from the model-independent retrieval
-baseline through the untrained scaffolded base and the three training
-arms that branch from the supervised model, to the top rung that replaces
-the cloud reader with a trained local one on top of the best arm per
-base. The preference-tuned arm shows
-the base-dependent instability discussed in
-Section~\ref{sec:planning}, and the shaded band covers three cloud-teacher
-runs. (b) Sealed-test confirmation of the five frozen systems. The
-retrieval baseline and the untrained base were not part of the frozen
-sealed run on this benchmark, and their sealed measurements appear on the
-challenge set in Table~\ref{tab:pacs-family}. Intermediate arms never
-touch the sealed test, which admits one pass per frozen configuration.}
+\caption{Procurement results. Colours denote the base model; hatching in
+panel (b) marks cloud-reader systems. (a) Development decomposition across
+the executable scaffold and the training arms, with the shaded band
+covering three teacher runs. (b) Sealed-test results for the five frozen
+systems. Intermediate development arms were not evaluated on the sealed
+test, and the sealed measurements of the retrieval and untrained baselines
+appear on the challenge set in Table~\ref{tab:pacs-family}.}
 \label{fig:home-ladder}
 \end{figure}
 
@@ -472,15 +473,17 @@ empty-result and unsupported questions at 99.2\%, 100.0\% and 100.0\%.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{finaltest_heatmap.pdf}
-\caption{Sealed final-test accuracy by system and question type, twelve
-answerable types and three refusal classes. The teacher collapses on
-exhaustive aggregation, comparison skill follows the base model, and the
-fully local systems close the refusal classes near ceiling.}
+\includegraphics[width=0.9\linewidth]{finaltest_heatmap_main.pdf}
+\caption{Sealed final-test accuracy on the four most diagnostic
+answerable types and the three refusal classes. The teacher performs
+substantially worse on exhaustive aggregation, comparison skill follows
+the base model, and the fully local systems close the refusal classes
+near ceiling. The full fifteen-type breakdown appears in
+Figure~\ref{fig:heatmap-full} of the appendix.}
 \label{fig:heatmap}
 \end{figure}
 
-\subsection{Distribution shift and independent procurement questions}
+\subsection{Distribution shift and a generator-independent procurement benchmark}
 \label{sec:robustness}
 
 Comparing the two panels of Figure~\ref{fig:home-ladder} system by
@@ -511,8 +514,8 @@ and exclusion, 97.1\% against 21.4\% for the teacher, whose free-form
 programs rarely survive the set-operation semantics. The single exception
 is disclosure and compliance, the weakest family for every system, where
 the teacher edges the planner 40.8\% to 38.8\%. Universal quantification
-over every notice of a buyer defeats all systems, and the closed algebra
-does not rescue it. On the refusal axis the planner recognises every one
+over every notice of a buyer defeats all systems, and the current algebra
+and training data do not resolve this task family. On the refusal axis the planner recognises every one
 of the 138 unsupported sealed questions, against 91.3\% for the teacher
 and 29.7\% for the untrained base, so scored abstention is not only a
 design feature but a measured sealed-test behaviour.
@@ -630,16 +633,16 @@ compiler, and algebra can represent. The WikiTableQuestions audit measures this
 boundary directly and shows that widening coverage improves both supervision
 regimes.
 
-The scale of the evidence supports deployment-level claims rather than
-prototype-level ones. The system operates over the full five-year national
+The scale of the evidence supports system-level conclusions beyond a
+small prototype. The system operates over the full five-year national
 corpus of 215{,}221 award records and 131{,}502 organisations, answers a
 12{,}828-question benchmark whose oracles are verified at 99.88\% by an
 independent implementation, and was evaluated once on each of two sealed
-test sets. The practical form is a local analyst for public procurement
-that runs on a single GPU, answers exhaustive aggregation questions that
-retrieval cannot, refuses when the data cannot support an answer, and
-returns programs a reviewer can execute rather than prose a reviewer must
-trust.
+test sets. The resulting system could support a local procurement-analysis
+workflow on a single GPU, answering exhaustive aggregation questions that
+retrieval cannot, refusing when the data cannot support an answer, and
+returning programs a reviewer can execute rather than prose a reviewer
+must trust.
 
 The teacher comparison is task-specific. The student receives in-domain
 training, while the teacher is evaluated as a zero-shot deployment. The result
@@ -782,15 +785,43 @@ remains outside the language.}
 \label{fig:coverage-attribution}
 \end{figure}
 
-\paragraph{PACS status axis.}
-Per-family and status-class results appear in
-Table~\ref{tab:pacs-family} of the main text. On the 267 rows whose
-serialised oracle is empty
-the planner returns the exact gold status on 138 under raw scoring, and the
-documented offline correction of the empty-result class credits a further
-35 rows, which reconciles exactly with the reported overall of 722 correct
-rows out of 922. Abstention-type golds alone are recognised at 138 of 194
-rows, or 71.1\%.
+\paragraph{PACS composition and status axis.}
+Table~\ref{tab:pacs-comp} gives the exact partition of the sealed set.
+The 267 rows whose serialised oracle is empty are the 138 unsupported
+golds, the 90 empty-result golds, and 39 answerable rows whose oracle
+serialisation failed at build time. The planner recognises all 138
+unsupported golds, is credited 35 of the 90 empty-result golds after the
+documented relabelling, and scores zero on the 39 unserialised rows,
+which reconciles exactly with the reported overall, 549 answerable plus
+138 plus 35 equals 722 of 922. Per-family and status-class results appear
+in Table~\ref{tab:pacs-family} of the main text.
+
+\begin{table}[h]
+\centering
+\caption{Composition of the sealed PACS set.}
+\label{tab:pacs-comp}
+\small
+\begin{tabular}{lr}
+\toprule
+Gold status & Rows \\
+\midrule
+Answerable, serialised value oracle & 655 \\
+Answerable, oracle serialisation failed & 39 \\
+Unsupported & 138 \\
+No result & 90 \\
+\midrule
+Total & 922 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{finaltest_heatmap.pdf}
+\caption{Full sealed final-test accuracy by system and question type,
+twelve answerable types and three refusal classes.}
+\label{fig:heatmap-full}
+\end{figure}
 
 \paragraph{Training ladder.}
 Table~\ref{tab:ladder} reports development accuracy and data-engine acceptance
