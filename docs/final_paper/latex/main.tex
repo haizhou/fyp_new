@@ -49,7 +49,7 @@ training raises the strongest fully local system to 85.65\% on a sealed
 2{,}285-question test, compared with 69.76\% for the cloud teacher used to
 propose training candidates. The ordering holds with a second 8B base model
 and on a sealed procurement challenge set, where the local planner reaches
-78.31\%. A transfer to WikiTableQuestions raises an untrained 22.51\%
+78.31\% against 50.33\% for the teacher. A transfer to WikiTableQuestions raises an untrained 22.51\%
 baseline to 44.43\% with answer-only supervision and 51.80\% with gold
 programs. The transfer audit identifies program-language and representation
 coverage as the main remaining bottleneck.
@@ -297,8 +297,9 @@ The main benchmark is generated program first. Parameterised programs are
 instantiated and executed before a question surface is written, so every row is
 created with an executable gold program and answer. The benchmark contains
 12{,}828 questions, including answerable, ambiguous, unsupported, and
-empty-result cases. Splits separate program structures rather than surface
-wording. Mechanical gates prevent plan overlap, duplicate identifiers, local
+empty-result cases, split into 9{,}267 training rows, three development
+slices, and a sealed test of 2{,}285 rows. Splits separate program
+structures rather than surface wording. Mechanical gates prevent plan overlap, duplicate identifiers, local
 sampling omissions, and multi-answer ambiguity.
 
 A second evaluator reconstructs answers from the raw releases without shared
@@ -408,7 +409,8 @@ The sealed test confirms the ordering. Figure~\ref{fig:scoreboards}(a) shows
 15.89 points above the teacher, with a 95\% paired interval of 14.07 to 17.70
 and exact McNemar $p<10^{-14}$. The same ordering holds with the second base,
 which reduces the chance that the result is specific to one model family.
-Fully local systems also outperform the hybrids on both bases. This indicates
+Fully local systems also outperform the hybrids on both bases, by 7.61
+points with interval 6.10 to 9.13 on the stronger base. This indicates
 that task-specific question reading contributes beyond local program planning.
 
 \begin{figure}[t]
@@ -448,7 +450,8 @@ The PACS audits in Figure~\ref{fig:pacs-audits} separate depth from novelty.
 A row is irreducible when deleting any predicate from its gold program changes
 the answer. This holds for 42.7\% of answerable rows, and the planner scores
 78.7\% on that subset, close to the 80.0\% answerable result. Intent shapes not
-shown during training reduce accuracy to 68.5\%. The system therefore transfers
+shown during training reduce accuracy to 68.5\%, a cost of 11.5 points with
+a 95\% cluster bootstrap interval of 5.6 to 17.2. The system therefore transfers
 new compositions of familiar constructs more reliably than entirely new
 logical forms. The repair result in the same figure is a development variant
 and is not part of the sealed headline.
@@ -470,7 +473,8 @@ procurement data adapter with table views, a column-aware value linker, and one
 row-preserving arg-extremum operator. Table~\ref{tab:wtq-results} reports the
 official test results. The procurement checkpoint carries a 4.82-point
 zero-shot gain over the untrained base. Answer-only training reaches 44.43\%,
-and gold-program training reaches 51.80\%. The answer-only result is comparable
+and gold-program training reaches 51.80\%. Each step of the four-system
+ladder is significant at exact McNemar $p<5\times10^{-18}$. The answer-only result is comparable
 with classical weakly supervised parsers, but both trained systems remain below
 recent specialised table-QA methods \citep{cheng2023binder,ye2023dater,
 wang2024chainoftable}. The experiment is used to study portability and
@@ -545,6 +549,17 @@ development to test. Third, portability is bounded by what the data adapter,
 compiler, and algebra can represent. The WikiTableQuestions audit measures this
 boundary directly and shows that widening coverage improves both supervision
 regimes.
+
+The scale of the evidence supports deployment-level claims rather than
+prototype-level ones. The system operates over the full five-year national
+corpus of 215{,}221 award records and 131{,}502 organisations, answers a
+12{,}828-question benchmark whose oracles are verified at 99.88\% by an
+independent implementation, and was evaluated once on each of two sealed
+test sets. The practical form is a local analyst for public procurement
+that runs on a single GPU, answers exhaustive aggregation questions that
+retrieval cannot, refuses when the data cannot support an answer, and
+returns programs a reviewer can execute rather than prose a reviewer must
+trust.
 
 The teacher comparison is task-specific. The student receives in-domain
 training, while the teacher is evaluated as a zero-shot deployment. The result
@@ -659,7 +674,9 @@ re-execution before any model score was read.
 \paragraph{Training ladder.}
 Table~\ref{tab:ladder} reports development accuracy and data-engine acceptance
 rates. Acceptance rate is the fraction of sampled answerable candidates that
-pass the data pipeline. It is not system accuracy. Acceptance rises across
+pass the data pipeline, over the 8{,}555 answerable training questions.
+The teacher pass accepts 5{,}605 traces, and the first self-harvest rounds
+accept 6{,}556 and 6{,}685 on the two bases. It is not system accuracy. Acceptance rises across
 self-harvest rounds while the evaluation gain of the second round is 0.4
 points and not significant, so the loop is reported at its measured ceiling
 rather than iterated further.
