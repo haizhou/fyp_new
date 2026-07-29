@@ -436,3 +436,11 @@ double-failed core: fast 4.5% ($0.91/4,027), reasoning tranche-1 14.0% (42/300, 
 $0.51 fast-tier est). Remaining residue 3,544 gated on the user's dashboard tier reading.
 Pending: rerun the 20-hard set with C-v6 to measure idiom internalization directly.
 Artifacts: eval_wtq_clean_C6.jsonl, harvest_teacher_fast.jsonl, harvest_teacher_reasoning.jsonl.
+
+## E14b — idiom internalization direct test (2026-07-23)
+
+C-v6 bare k=2: original-20 14/20 (C5: 6/20) — but the 7 idiom exemplars ARE from this set: train-recall
+check, mechanism confirmed. Holdout-20 10/20 (C5: 9/20) — clean +1, positive direction, noise-edge
+magnitude. Read: pool seeding LEARNS reliably; GENERALIZES mildly at 7 shapes x10 weight in a 10k pool.
+Scaling path: fold A+ harvest trees (new hard-core shapes) into the next pool, exemplar classes 7 -> dozens.
+Artifact: c6_idiom_test.json.
