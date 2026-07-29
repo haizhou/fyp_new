@@ -413,20 +413,25 @@ Preference optimisation then splits by base, 83.5\% on Qwen against 77.3\%
 on Llama, the instability that removed it from the primary systems, and
 training both the reading and planning stages reaches 86.2\% and 84.2\%.
 The large first step shows that exhaustive computation and a fixed
-execution contract provide much of the initial gain. The remaining rungs
-form the training ablation, and each addition is judged against the rung
-below it.
+execution contract provide much of the initial gain. The three training
+arms branch from the supervised model rather than forming a sequence, and
+the fully local rung changes a different axis, replacing the cloud reader
+with a trained local one on top of the best arm per base.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.88\linewidth]{gain_ladder.pdf}
-\caption{Home-benchmark results. (a) Development decomposition on both
-base models. The executable scaffold establishes most of the gap over the
-retrieval baseline (dotted line), and the preference-tuned rung shows the
-base-dependent instability discussed in Section~\ref{sec:planning}. The
-shaded band covers three cloud-teacher runs. (b) Sealed-test confirmation
-of the five frozen systems. Intermediate arms never touch the sealed test,
-which admits one pass per frozen configuration.}
+\caption{Home-benchmark results. Colours denote the base model in both
+panels, and hatching marks systems that read questions with the cloud
+model. (a) Development decomposition. The scaffolded zero-shot rung is the
+untrained baseline, the three training arms branch from the supervised
+model, and the fully local rung replaces the cloud reader with a trained
+local one on top of the best arm per base. The preference-tuned arm shows
+the base-dependent instability discussed in
+Section~\ref{sec:planning}, and the shaded band covers three cloud-teacher
+runs. (b) Sealed-test confirmation of the five frozen systems.
+Intermediate arms never touch the sealed test, which admits one pass per
+frozen configuration.}
 \label{fig:home-ladder}
 \end{figure}
 
@@ -451,29 +456,12 @@ that task-specific question reading contributes beyond local program planning.
 \subsection{Distribution shift and independent procurement questions}
 \label{sec:robustness}
 
-Table~\ref{tab:robustness} compares development and test. The hybrid
-systems lose 5.5 and 7.1 points, while the fully local systems lose 0.5
-and 0.9, and the pattern holds on both bases. Independent evidence on
-genuinely hard questions comes from the sealed challenge set below rather
-than from any development slice.
-
-\begin{table}[t]
-\centering
-\caption{Development-to-test movement per system. Fully local systems
-barely move while hybrids decay, on both bases.}
-\label{tab:robustness}
-\small
-\begin{tabular}{lccc}
-\toprule
-System & Dev & Test & Shift \\
-\midrule
-Llama hybrid & 83.1 & 75.97 & $-7.1$ \\
-Qwen hybrid & 83.5 & 78.03 & $-5.5$ \\
-Llama fully local & 84.2 & 83.33 & $-0.9$ \\
-Qwen fully local & 86.2 & 85.65 & $-0.5$ \\
-\bottomrule
-\end{tabular}
-\end{table} The decay asymmetry is consistent with the fully local system depending
+Comparing the two panels of Figure~\ref{fig:home-ladder} system by
+system gives the distribution-shift result directly. The hybrid systems
+lose 5.5 and 7.1 points from development to test, while the fully local
+systems lose 0.5 and 0.9, and the pattern holds on both bases. Independent
+evidence on genuinely hard questions comes from the sealed challenge set
+below rather than from any development slice. The decay asymmetry is consistent with the fully local system depending
 less on the cloud reader and the development surface distribution. It does
 not by itself establish a causal robustness mechanism.
 
