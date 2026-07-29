@@ -447,6 +447,27 @@ therefore teaches conformance to the specific contract, and constrained
 decoding grants that contract to every system, so accuracy differences under
 the shared decoder measure planning.
 
+Figure~\ref{fig:heatmap} resolves the sealed result by question type,
+which turns the aggregate ordering into a mechanism. The teacher's
+weakness concentrates exactly where exhaustive computation lives, 48.7\%
+on counts and 61.3\% on sums against 76.2\% and 92.6\% for the strongest
+local system, which is the failure retrieval-style reasoning cannot
+escape. Comparison questions expose a base-dependent skill, with the two
+Qwen systems at 82.1\% and 85.8\% against 40.6\% and 44.3\% for the Llama
+systems. And the refusal columns close the abstention claim on the main
+benchmark, where the strongest local system recognises ambiguous,
+empty-result and unsupported questions at 99.2\%, 100.0\% and 100.0\%.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{finaltest_heatmap.pdf}
+\caption{Sealed final-test accuracy by system and question type, twelve
+answerable types and three refusal classes. The teacher collapses on
+exhaustive aggregation, comparison skill follows the base model, and the
+fully local systems close the refusal classes near ceiling.}
+\label{fig:heatmap}
+\end{figure}
+
 In the sealed confirmation of Figure~\ref{fig:home-ladder}(b), the
 strongest local system is
 15.89 points above the teacher, with a 95\% paired interval of 14.07 to 17.70
