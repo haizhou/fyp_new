@@ -466,8 +466,11 @@ less on the cloud reader and the development surface distribution. It does
 not by itself establish a causal robustness mechanism.
 
 PACS tests new question surfaces and logical exposure. The frozen local planner
-reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on the answerable
-subset, compared with 50.33\% for the cloud teacher. The teacher API lacks the
+reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on the
+answerable subset. On the same sealed rows the untrained base scores
+36.01\%, a retrieval baseline scores 21.90\%, and the cloud teacher scores
+50.33\%, so every rung of the deployment ladder is present on questions
+none of the systems authored. The teacher API lacks the
 local constrained decoder, and 23.1\% of its rows fail on format, so the margin
 is not presented as a decoding-neutral model comparison.
 
