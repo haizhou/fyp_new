@@ -177,14 +177,13 @@ informal property of the interface.
 
 \subsection{Overview}
 
-Figure~\ref{fig:architecture} separates deployment from data construction. At
-deployment time, the model reads a question and emits a program under
-constrained decoding. Deterministic components check, ground, and execute the
-program, then return an answer or abstention. During training-data collection,
-candidate programs are sampled at positive temperature and compared with the
-benchmark oracle after execution. Only matching candidates enter the training
-pool. Oracle access is therefore a property of the data pipeline, not the
-runtime system.
+Figure~\ref{fig:architecture} separates deployment from data construction.
+At deployment time, the model reads a question and emits a program under
+constrained decoding, and deterministic components check, ground, and
+execute it, returning an answer or abstention. During training-data
+collection, candidates sampled at positive temperature enter the training
+pool only when their executed answers match the benchmark oracle, so
+oracle access is a property of the data pipeline, not the runtime system.
 
 \begin{figure}[t]
 \centering
@@ -299,9 +298,9 @@ A candidate is retained when it has a valid type structure, grounds to the
 question and data, executes successfully, and produces the oracle answer. The
 oracle does not author the candidate and is not included in the model input.
 The training ladder includes supervised fine-tuning, self-harvest with
-rejection sampling, and preference optimisation. Preference optimisation is
-not used in the primary systems because its near-miss negatives were unstable
-across the two bases.
+rejection sampling, and preference optimisation, the last excluded from the
+primary systems because its near-miss negatives were unstable across the
+two bases.
 
 Abstention is part of the output space. The system can return ambiguous,
 unsupported, or no-result when the question or evidence does not justify an
@@ -327,8 +326,8 @@ agree in 99.88\% of cases. The audited set comprises every answerable
 oracle produced by the benchmark generator at audit time, and the final
 curated benchmark of 12{,}828 rows, which also contains refusal rows
 carrying no value oracle, draws from this audited pool. All 18 remaining disagreements were inspected, and
-none affects a reported comparison. This audit measures implementation
-agreement under the declared data conventions. It does not remove uncertainty
+none affects a reported comparison. The audit measures implementation
+agreement under the declared conventions rather than removing uncertainty
 from the source records themselves.
 
 % -----------------------------------------------------------------------------
@@ -340,20 +339,22 @@ The main evaluation uses a sealed test of 2{,}285 procurement questions. PACS
 contains 922 rows from seven procurement-analysis families and tests whether
 the system depends on the surface generator used for the main benchmark. Its
 specification, question grammar, and logical-shape labels were frozen before
-the model was evaluated. Five isolation checks cover text, program hash,
-template identity, entity anchors, and logical shape. Each sealed intent is
-rendered through an independently written surface grammar, and naturalised
-rewrites pass deterministic checks of operation, negation, comparison
-direction, quantifier, and scope against the gold program's logical
-signature. WikiTableQuestions
+the model was evaluated. Five isolation checks cover text, program hash, template identity, entity
+anchors, and logical shape, each sealed intent is rendered through an
+independently written surface grammar, and naturalised rewrites pass
+deterministic logical-signature checks against the gold program. WikiTableQuestions
 contains 22{,}033 crowd-written questions over 2{,}108 web tables
 \citep{pasupat2015compositional}. Development uses table-disjoint folds, and
 the official 4{,}344-row test is evaluated once under a recorded manifest.
 
 \paragraph{Systems.}
-Table~\ref{tab:systems} shows the five main procurement systems. The local
-models are Qwen3-8B and Llama-3.1-8B, trained with rank-64 LoRA under 4-bit
-QLoRA \citep{hu2022lora,dettmers2023qlora}. All local systems, including the untrained baselines, use the same executor
+Five main systems differ in where question reading and program planning
+run, over a shared data layer and executor. The cloud teacher reads and
+plans through its provider API zero-shot. The two hybrid systems read with
+the cloud model and plan with a trained local model, and the two fully
+local systems use trained local models for both stages. The local models
+are Qwen3-8B and Llama-3.1-8B, trained with rank-64 LoRA under 4-bit QLoRA
+\citep{hu2022lora,dettmers2023qlora}. All local systems, including the untrained baselines, use the same executor
 and constrained decoder, which prevents output-format errors from dominating
 the comparisons. The cloud teacher uses its provider API and
 cannot use the same token-level grammar constraint, so teacher comparisons are
@@ -364,25 +365,6 @@ parametric knowledge alone, a retrieval reader answers from the top retrieved
 records, and a gold-constraint variant rebuilds the retrieval query from the
 gold program's constraint literals. Each is a frozen configuration evaluated
 in a single sealed pass.
-
-\begin{table}[t]
-\centering
-\caption{Main procurement systems. All systems use the same data layer and
-executor.}
-\label{tab:systems}
-\small
-\begin{tabular}{llll}
-\toprule
-System & Question reading & Program planning & Training \\
-\midrule
-Cloud teacher & Cloud & Cloud & Zero-shot \\
-Llama hybrid & Cloud & Llama-3.1-8B & In-domain \\
-Qwen hybrid & Cloud & Qwen3-8B & In-domain \\
-Llama fully local & Llama-3.1-8B & Llama-3.1-8B & In-domain \\
-Qwen fully local & Qwen3-8B & Qwen3-8B & In-domain \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \paragraph{Protocol.}
 Each primary evaluation uses one temperature-zero model call and no repair.
@@ -406,11 +388,10 @@ reported rate appear in Appendix~\ref{app:config}.
 \subsection{Where the procurement performance comes from}
 \label{sec:home}
 
-This subsection makes two moves. The decomposition of where performance
-comes from runs on development data, since intermediate arms never touch
-the sealed test, and the sealed test then confirms the frozen champion
-systems. Figure~\ref{fig:home-ladder} shows both moves side by side, and
-Table~\ref{tab:ladder} in the appendix lists every rung.
+This subsection makes two moves, a decomposition on development data,
+since intermediate arms never touch the sealed test, and a sealed
+confirmation of the frozen champion systems. Figure~\ref{fig:home-ladder}
+shows both, and Table~\ref{tab:ladder} in the appendix lists every rung.
 
 On development, the retrieval baseline reaches 31.5\%, and an untrained
 Qwen3-8B routed through the typed program interface and executor reaches
@@ -433,11 +414,11 @@ trained local one on top of the best arm per base, and reaches 86.2\% and
 \caption{Procurement results. Colours denote the base model; hatching in
 panel (b) marks cloud-reader systems. (a) Development decomposition across
 the executable scaffold and the training arms, with the shaded band
-covering three teacher runs. (b) Sealed-test results for the five frozen
-systems. Intermediate development arms were not evaluated on the sealed
-test. The sealed data-access baselines appear in Table~\ref{tab:access},
-and the untrained scaffolded base is measured sealed on the challenge set
-in Table~\ref{tab:pacs-family}.}
+covering three teacher runs. (b) Sealed-test results. The five frozen systems sit above the three
+sealed data-access baselines, each a single sealed pass, with the
+answerable and refusal split in Table~\ref{tab:access} of the appendix.
+The untrained scaffolded base is measured sealed on the challenge set in
+Table~\ref{tab:pacs-family}.}
 \label{fig:home-ladder}
 \end{figure}
 
@@ -458,8 +439,9 @@ weaker base outperforms the hybrid on the stronger base by 5.30 points with
 interval 3.62 to 6.97, so trained question reading contributes more than
 base capability on this task.
 
-Figure~\ref{fig:heatmap} resolves the sealed result by question type,
-which turns the aggregate ordering into a mechanism. The teacher's
+Figure~\ref{fig:heatmap-full} in the appendix resolves the sealed result
+by question type across all systems, which turns the aggregate ordering
+into a mechanism. The teacher's
 weakness concentrates exactly where exhaustive computation lives, 48.7\%
 on counts and 61.3\% on sums against 76.2\% and 92.6\% for the strongest
 local system, which is the failure retrieval-style reasoning cannot
@@ -469,59 +451,25 @@ systems. And the refusal columns close the abstention claim on the main
 benchmark, where the strongest local system recognises ambiguous,
 empty-result and unsupported questions at 99.2\%, 100.0\% and 100.0\%.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.9\linewidth]{finaltest_heatmap_main.pdf}
-\caption{Sealed final-test accuracy on the four most diagnostic
-answerable types and the three refusal classes. The teacher performs
-substantially worse on exhaustive aggregation, comparison skill follows
-the base model, and the fully local systems close the refusal classes
-near ceiling. The bottom row shows the sealed retrieval reader from the
-access ablation of Table~\ref{tab:access}. The full fifteen-type
-breakdown appears in Figure~\ref{fig:heatmap-full} of the appendix.}
-\label{fig:heatmap}
-\end{figure}
-
 \paragraph{Data access ablation.}
-Table~\ref{tab:access} isolates what the executable evidence path
-contributes beyond the answering model, using the three sealed baselines
-of Section~\ref{sec:evaluation}. Answerable accuracy is separated from
+The three access baselines in Figure~\ref{fig:home-ladder}(b) isolate
+what the executable evidence path contributes beyond the answering model,
+and Table~\ref{tab:access} in the appendix gives the finer split.
+Answerable accuracy is separated from
 refusal recognition because the weak baselines earn refusal credit
 degenerately, a model that cannot find an answer replies unknown, and
-unknown scores as a refusal. The closed-book run therefore pairs a perfect
-refusal column with 1.0\% on answerable questions, which establishes that
-the corpus is not recoverable from parametric knowledge. The retrieval
-reader is genuinely competent on single-record questions at 66.5\% yet
-collapses to 3.7\% on the six aggregation families. The gold-constraint
-variant removes planning as a failure source and aggregation stays at
-3.3\%, so the aggregation failure is attributable to the enumeration limit
-of top-$k$ evidence rather than to query formulation. It is reported for
-attribution only, since its injected constraint literals disturb lexical
-matching on single-record questions. The fully local system inverts the
-pattern, scoring higher on aggregation than on single-record questions,
-because exhaustive deterministic execution turns the families that defeat
-retrieval into the most reliable ones.
-
-\begin{table}[t]
-\centering
-\caption{Sealed data-access ablation on the final test (n=2{,}285).
-Aggregation pools the six exhaustive families, count, sum, comparison,
-set, top-$k$ and min/max (n=1{,}041); single record pools the remaining
-answerable types (n=884); refusal pools the three refusal classes
-(n=360). All values are accuracy in percent.}
-\label{tab:access}
-\small
-\begin{tabular}{lccccc}
-\toprule
-System & Overall & Answerable & Aggregation & Single record & Refusal \\
-\midrule
-Closed book & 16.6 & 1.0 & 0.0 & 2.3 & 100.0 \\
-Retrieval reader & 39.2 & 32.6 & 3.7 & 66.5 & 74.7 \\
-~~with gold constraints & 25.6 & 11.8 & 3.3 & 21.9 & 98.9 \\
-Qwen fully local & 85.6 & 83.0 & 85.7 & 79.9 & 99.7 \\
-\bottomrule
-\end{tabular}
-\end{table}
+unknown scores as a refusal. The closed-book run pairs a perfect refusal
+column with 1.0\% on answerable questions, so the corpus is not
+recoverable from parametric knowledge. The retrieval reader reaches
+66.5\% on single-record questions yet collapses to 3.7\% on the six
+aggregation families. The gold-constraint variant removes planning as a
+failure source and aggregation stays at 3.3\%, so the failure is the
+enumeration limit of top-$k$ evidence rather than query formulation, and
+it is reported for attribution only since its injected literals disturb
+lexical matching elsewhere. The fully local system inverts the pattern,
+scoring higher on aggregation than on single-record questions, because
+exhaustive execution turns the families that defeat retrieval into the
+most reliable ones.
 
 \subsection{Distribution shift and a generator-independent procurement benchmark}
 \label{sec:robustness}
@@ -533,21 +481,19 @@ systems lose 0.5 and 0.9, and the pattern holds on both bases. The decay asymmet
 less on the cloud reader and the development surface distribution. It does
 not by itself establish a causal robustness mechanism.
 
-PACS tests new question surfaces and logical exposure. The frozen local planner
-reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on the
-answerable subset. On the same sealed rows the untrained base scores
-36.01\%, a retrieval baseline scores 21.90\%, and the cloud teacher scores
-50.33\%, all under the same strict overall metric on the full 922 rows, so
-every rung of the deployment ladder is present on questions none of the
-systems authored. Table~\ref{tab:pacs-family} reports the finer per-family
-numbers on the aligned value-oracle subset, whose denominators differ from
-the strict overall by construction. The teacher API lacks the
-local constrained decoder, and 23.1\% of its rows fail on format, so the margin
-is not presented as a decoding-neutral model comparison.
+PACS tests new question surfaces and logical exposure. The frozen local
+planner reaches 78.31\% strict accuracy on 922 sealed rows and 80.00\% on
+the answerable subset, against 50.33\% for the cloud teacher, 36.01\% for
+the untrained base, and 21.90\% for retrieval under the same strict
+metric, so every rung of the deployment ladder is present on questions
+none of the systems authored. The teacher API lacks the local constrained
+decoder, and 23.1\% of its rows fail on format, so the margin is not
+presented as a decoding-neutral model comparison.
 
 Table~\ref{tab:pacs-family} breaks the sealed result into task families
-and status classes, computed for all systems on identical row sets. The
-local planner leads six of the seven families, most extremely on overlap
+and status classes on identical aligned row sets, whose denominators
+differ from the strict overall by construction. The local planner leads
+six of the seven families, most extremely on overlap
 and exclusion, 97.1\% against 21.4\% for the teacher, whose free-form
 programs rarely survive the set-operation semantics. The single exception
 is disclosure and compliance, the weakest family for every system, where
@@ -654,73 +600,65 @@ planning-model problem.
 \section{Discussion and Limitations}
 \label{sec:discussion}
 
-The results support three conclusions. First, a deterministic execution
-contract changes the problem substantially. An untrained local model becomes
-competitive with the cloud teacher once both operate through a typed program
-interface and executor. Second, task-specific training still matters. The two
-fully local systems outperform their hybrid counterparts and degrade less from
-development to test. Third, portability is bounded by what the data adapter,
-compiler, and algebra can represent. The WikiTableQuestions audit measures this
-boundary directly and shows that widening coverage improves both supervision
-regimes.
+The results support three conclusions. A deterministic execution contract
+changes the problem substantially, since an untrained local model becomes
+competitive with the cloud teacher once both operate through the typed
+interface. Task-specific training still matters, since the fully local
+systems outperform their hybrid counterparts and degrade less from
+development to test. And portability is bounded by what the adapter,
+compiler, and algebra can represent, the boundary the WikiTableQuestions
+audit measures directly.
 
 The scale of the evidence supports system-level conclusions beyond a
-small prototype. The system operates over the full five-year national
-corpus of 215{,}221 award records and 131{,}502 organisations, answers a
-12{,}828-question benchmark whose oracles are verified at 99.88\% by an
-independent implementation, and was evaluated once on each of two sealed
-test sets. The resulting system could support a local procurement-analysis
-workflow on a single GPU, answering exhaustive aggregation questions that
-retrieval cannot, refusing when the data cannot support an answer, and
-returning programs a reviewer can execute rather than prose a reviewer
-must trust.
+small prototype, a full five-year national corpus, an independently
+verified benchmark, and one pass on each of two sealed test sets. The
+resulting system could support a local procurement-analysis workflow on a
+single GPU, answering exhaustive aggregation questions that retrieval
+cannot, refusing when the data cannot support an answer, and returning
+programs a reviewer can execute rather than prose a reviewer must trust.
 
-The teacher comparison is task-specific. The student receives in-domain
-training, while the teacher is evaluated as a zero-shot deployment. The result
-shows that the full local system is more accurate on the defined task, not that
-an 8B model has greater general capability. PACS strengthens the external
-validity claim, but it is still a controlled benchmark rather than a sample of
-real analyst questions.
+The teacher comparison is task-specific, an in-domain student against a
+zero-shot deployment, so it shows that the full local system is more
+accurate on the defined task, not that an 8B model has greater general
+capability. PACS strengthens the external validity claim, but it is still
+a controlled benchmark rather than a sample of real analyst questions.
 
-Five limitations remain. The main benchmark is program-first and its question
-surfaces are generated under style controls. Each student result comes from one
-training run, so training-seed variance is not estimated. The teacher and local
-systems do not share identical decoding constraints. The closed algebra rejects
-questions outside its supported operations, and unseen intent shapes remain a
-clear weakness. The transfer study also lacks a
-baseline in which a language model writes SQL that is executed directly.
-Since the official test is consumed, that comparison belongs to future work
-on development folds, with the differential audit of
-Section~\ref{sec:wtq} as a partial answer. Finally, the study does not simulate arbitrary deletion of KG
-facts. Its refusal tests cover missing or unsupported evidence, but not every
-form of data incompleteness.
+Five limitations remain. The main benchmark is program-first and its
+question surfaces are generated under style controls. Each student result
+comes from one training run, so training-seed variance is not estimated.
+The teacher and local systems do not share identical decoding constraints.
+The closed algebra rejects questions outside its supported operations, and
+unseen intent shapes remain a clear weakness. The transfer study lacks a
+baseline in which a language model writes SQL that is executed directly,
+a comparison that belongs to future work on development folds now that the
+official test is consumed. Finally, the study does not simulate arbitrary
+deletion of KG facts, so the refusal tests cover missing or unsupported
+evidence but not every form of data incompleteness.
 
 Refusal did not transfer free of charge. On a paired comparison against
 the earlier production system, the compositional planner wins the
 answerable subset by 4.4 points yet loses explicit abstention clearly,
-because its training mix carried only 37 refusal demonstrations. Under the
-pre-registered bar of no key-bucket regression, no retirement claim is made
-for the older system. Competence follows demonstrations, and refusal is a
-competence like any other.
+because its training mix carried only 37 refusal demonstrations, so under
+the pre-registered bar of no key-bucket regression, no retirement claim is
+made for the older system. Competence follows demonstrations, and refusal
+is a competence like any other.
 
-The candidate-selection experiment in Appendix~\ref{app:selection} provides an
-additional negative result. An LLM selector does not improve over the first
-accepted candidate, while a small deterministic scorer based on execution
-features gains 2.0 points. This finding concerns best-of-$k$ selection only. It
-is not evidence that all model-based verification is ineffective.
+The candidate-selection experiment in Appendix~\ref{app:selection} adds a
+negative result. An LLM selector does not improve over the first accepted
+candidate, while a small deterministic scorer on execution features gains
+2.0 points, a finding that concerns best-of-$k$ selection only.
 
 % -----------------------------------------------------------------------------
 \section{Conclusion}
 \label{sec:conclusion}
 
 We presented an auditable question-answering framework for UK public
-procurement. The framework combines explicit data conventions, typed program
-generation, deterministic execution, abstention, and independent oracle audit.
-The experiments show that the executable scaffold establishes a strong base,
-local training of both reading and planning improves generalisation, and the
-result transfers to independent procurement questions. The table-domain study
-shows that representation and program-language coverage are the main remaining
-limits.
+procurement, combining explicit data conventions, typed program generation,
+deterministic execution, abstention, and independent oracle audit. The
+experiments show that the executable scaffold establishes a strong base,
+training both reading and planning improves generalisation, the result
+holds on sealed and generator-independent tests, and representation and
+program-language coverage are the main remaining limits.
 
 \bibliography{references}
 \bibliographystyle{tmlr}
@@ -858,6 +796,27 @@ Unsupported & 138 \\
 No result & 90 \\
 \midrule
 Total & 922 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Sealed data-access ablation on the final test (n=2{,}285).
+Aggregation pools the six exhaustive families, count, sum, comparison,
+set, top-$k$ and min/max (n=1{,}041); single record pools the remaining
+answerable types (n=884); refusal pools the three refusal classes
+(n=360). All values are accuracy in percent.}
+\label{tab:access}
+\small
+\begin{tabular}{lccccc}
+\toprule
+System & Overall & Answerable & Aggregation & Single record & Refusal \\
+\midrule
+Closed book & 16.6 & 1.0 & 0.0 & 2.3 & 100.0 \\
+Retrieval reader & 39.2 & 32.6 & 3.7 & 66.5 & 74.7 \\
+~~with gold constraints & 25.6 & 11.8 & 3.3 & 21.9 & 98.9 \\
+Qwen fully local & 85.6 & 83.0 & 85.7 & 79.9 & 99.7 \\
 \bottomrule
 \end{tabular}
 \end{table}
