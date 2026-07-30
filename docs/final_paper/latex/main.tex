@@ -289,15 +289,10 @@ returns both the answer and the records used to compute it.
 The procurement system uses two learned stages. A reader extracts the requested
 answer type, question literals, and dependency structure. A planner compiles
 the question and brief into a program. This split was retained because it
-outperformed direct generation on procurement. The margin is quantified by a
-cross-base comparison. The fully local system on the weaker base outperforms
-the hybrid system on the stronger base by 5.30 points with a 95\% interval of
-3.62 to 6.97, which indicates that trained question reading contributes more
-than base capability on this task. The WikiTableQuestions transfer
+outperformed direct generation on procurement, and the margin is quantified
+in Section~\ref{sec:home}. The WikiTableQuestions transfer
 uses a fused reader-planner because fixed handoffs were weaker during table
-development. All local systems, including untrained baselines, use the same
-constrained decoder. This prevents output-format errors from dominating the
-comparison.
+development.
 
 Training candidates are sampled from a cloud teacher or from the local student.
 A candidate is retained when it has a valid type structure, grounds to the
@@ -358,8 +353,9 @@ the official 4{,}344-row test is evaluated once under a recorded manifest.
 \paragraph{Systems.}
 Table~\ref{tab:systems} shows the five main procurement systems. The local
 models are Qwen3-8B and Llama-3.1-8B, trained with rank-64 LoRA under 4-bit
-QLoRA \citep{hu2022lora,dettmers2023qlora}. All local systems use the same
-executor and constrained decoder. The cloud teacher uses its provider API and
+QLoRA \citep{hu2022lora,dettmers2023qlora}. All local systems, including the untrained baselines, use the same executor
+and constrained decoder, which prevents output-format errors from dominating
+the comparisons. The cloud teacher uses its provider API and
 cannot use the same token-level grammar constraint, so teacher comparisons are
 reported as deployable-system comparisons rather than equal-decoding model
 comparisons. Three further sealed baselines vary data access while holding the
@@ -410,29 +406,26 @@ reported rate appear in Appendix~\ref{app:config}.
 \subsection{Where the procurement performance comes from}
 \label{sec:home}
 
-This subsection makes two moves, and their data roles differ by design.
-The decomposition of where performance comes from runs on development data,
-because intermediate training arms are never sent to the sealed test, which
-admits one pass per frozen configuration. The sealed test then confirms the
-frozen champion systems. Figure~\ref{fig:home-ladder} shows both moves side
-by side.
+This subsection makes two moves. The decomposition of where performance
+comes from runs on development data, since intermediate arms never touch
+the sealed test, and the sealed test then confirms the frozen champion
+systems. Figure~\ref{fig:home-ladder} shows both moves side by side, and
+Table~\ref{tab:ladder} in the appendix lists every rung.
 
-On development, the retrieval baseline reaches 31.5\%. An untrained
+On development, the retrieval baseline reaches 31.5\%, and an untrained
 Qwen3-8B routed through the typed program interface and executor reaches
-70.4\%, already close to the cloud teacher's replicate band, and the
-untrained Llama-3.1-8B reaches 60.0\% through the same interface.
-Supervised fine-tuning raises the two bases to 81.2\% and 83.1\%.
+70.4\%, already close to the cloud teacher's replicate band. This first
+step shows that exhaustive computation and a fixed execution contract
+provide much of the initial gain before any training. Three training arms
+then branch from the supervised model rather than forming a sequence.
 Rejection-sampling fine-tuning on the student's own verified survivors,
-with the teacher absent, holds level at 81.5\% and 82.7\%, which shows the
+with the teacher absent, holds level with supervised fine-tuning, so the
 verified pool rather than continued teacher access carries the signal.
-Preference optimisation then splits by base, 83.5\% on Qwen against 77.3\%
-on Llama, the instability that removed it from the primary systems, and
-training both the reading and planning stages reaches 86.2\% and 84.2\%.
-The large first step shows that exhaustive computation and a fixed
-execution contract provide much of the initial gain. The three training
-arms branch from the supervised model rather than forming a sequence, and
-the fully local rung changes a different axis, replacing the cloud reader
-with a trained local one on top of the best arm per base.
+Preference optimisation splits by base, 83.5\% on Qwen against 77.3\% on
+Llama, the instability that removed it from the primary systems. The fully
+local rung changes a different axis, replacing the cloud reader with a
+trained local one on top of the best arm per base, and reaches 86.2\% and
+84.2\% on the two bases.
 
 \begin{figure}[t]
 \centering
@@ -448,14 +441,10 @@ in Table~\ref{tab:pacs-family}.}
 \label{fig:home-ladder}
 \end{figure}
 
-A format diagnostic supports reading the ladder as planning quality rather
-than output discipline. Decoded without constraints on 100 development
-questions, the untrained base produces question-grounded plans with real
-entities in an invented format on 98 and matches the executable contract on
-3, while the tuned models match the contract on 98 and 99. Fine-tuning
-therefore teaches conformance to the specific contract, and constrained
-decoding grants that contract to every system, so accuracy differences under
-the shared decoder measure planning.
+A 100-question format diagnostic, reported in Appendix~\ref{app:audits},
+confirms that constrained decoding equalises output format across systems,
+so accuracy differences under the shared decoder measure planning rather
+than output discipline.
 
 In the sealed confirmation of Figure~\ref{fig:home-ladder}(b), the
 strongest local system is
@@ -463,8 +452,11 @@ strongest local system is
 and exact McNemar $p<10^{-14}$. The same ordering holds with the second base,
 which reduces the chance that the result is specific to one model family.
 Fully local systems also outperform the hybrids on both bases, by 7.61
-points with interval 6.10 to 9.13 on the stronger base. This indicates
-that task-specific question reading contributes beyond local program planning.
+points with interval 6.10 to 9.13 on the stronger base, and the cross-base
+version of the comparison is sharper still. The fully local system on the
+weaker base outperforms the hybrid on the stronger base by 5.30 points with
+interval 3.62 to 6.97, so trained question reading contributes more than
+base capability on this task.
 
 Figure~\ref{fig:heatmap} resolves the sealed result by question type,
 which turns the aggregate ordering into a mechanism. The teacher's
@@ -493,25 +485,22 @@ breakdown appears in Figure~\ref{fig:heatmap-full} of the appendix.}
 \paragraph{Data access ablation.}
 Table~\ref{tab:access} isolates what the executable evidence path
 contributes beyond the answering model, using the three sealed baselines
-of Section~\ref{sec:evaluation}. The table separates answerable accuracy
-from refusal recognition because the weak baselines earn refusal credit
-degenerately. A model that cannot find an answer replies unknown, and
-unknown scores as a refusal, so the closed-book run pairs a perfect
-refusal column with 1.0\% on answerable questions and its overall score
-of 16.6\% is almost entirely refusal credit. The closed-book result
-establishes that the corpus is not recoverable from parametric knowledge.
-The retrieval reader is genuinely competent on single-record questions at
-66.5\%, and collapses to 3.7\% on the six aggregation families, which is
-the enumeration limit of top-$k$ evidence. The gold-constraint variant
-removes planning as a failure source, and aggregation stays at 3.3\%, so
-the aggregation failure is attributable to retrieval itself rather than to
-query formulation. Its single-record score is lower than the plain
-reader's because injected constraint literals disturb lexical matching, so
-we report it for attribution rather than as a stronger baseline. The fully
-local system inverts the pattern, scoring higher on the aggregation
-families than on single-record questions, because exhaustive deterministic
-execution turns the families that defeat retrieval into the most reliable
-ones.
+of Section~\ref{sec:evaluation}. Answerable accuracy is separated from
+refusal recognition because the weak baselines earn refusal credit
+degenerately, a model that cannot find an answer replies unknown, and
+unknown scores as a refusal. The closed-book run therefore pairs a perfect
+refusal column with 1.0\% on answerable questions, which establishes that
+the corpus is not recoverable from parametric knowledge. The retrieval
+reader is genuinely competent on single-record questions at 66.5\% yet
+collapses to 3.7\% on the six aggregation families. The gold-constraint
+variant removes planning as a failure source and aggregation stays at
+3.3\%, so the aggregation failure is attributable to the enumeration limit
+of top-$k$ evidence rather than to query formulation. It is reported for
+attribution only, since its injected constraint literals disturb lexical
+matching on single-record questions. The fully local system inverts the
+pattern, scoring higher on aggregation than on single-record questions,
+because exhaustive deterministic execution turns the families that defeat
+retrieval into the most reliable ones.
 
 \begin{table}[t]
 \centering
@@ -540,9 +529,7 @@ Qwen fully local & 85.6 & 83.0 & 85.7 & 79.9 & 99.7 \\
 Comparing the two panels of Figure~\ref{fig:home-ladder} system by
 system gives the distribution-shift result directly. The hybrid systems
 lose 5.5 and 7.1 points from development to test, while the fully local
-systems lose 0.5 and 0.9, and the pattern holds on both bases. Independent
-evidence on genuinely hard questions comes from the sealed challenge set
-below rather than from any development slice. The decay asymmetry is consistent with the fully local system depending
+systems lose 0.5 and 0.9, and the pattern holds on both bases. The decay asymmetry is consistent with the fully local system depending
 less on the cloud reader and the development surface distribution. It does
 not by itself establish a causal robustness mechanism.
 
@@ -608,13 +595,8 @@ the answer. This holds for 42.7\% of answerable rows, and the planner scores
 shown during training reduce accuracy to 68.5\%, a cost of 11.5 points with
 a 95\% cluster bootstrap interval of 5.6 to 17.2. The system therefore transfers
 new compositions of familiar constructs more reliably than entirely new
-logical forms. The per-family breakdown in Appendix~\ref{app:audits}
-locates the weakness precisely. Disclosure and compliance questions, which
-require universal quantification over every notice of a buyer, score 38.8\%,
-and the deep cells of supplier concentration, which bind a scope inside each
-group, fall to between 15\% and 30\%, while the five remaining families
-score between 82\% and 97\% on value-oracle rows. The repair result in the same figure is a development variant
-and is not part of the sealed headline.
+logical forms, and Appendix~\ref{app:audits} locates the weak cells
+precisely.
 
 \subsection{Transfer to WikiTableQuestions}
 \label{sec:wtq}
@@ -652,11 +634,10 @@ Gold-program training & \textbf{51.80} & $+7.37$ & 40.0 & 51.0 \\
 
 A differential audit against 11{,}276 SQUALL SQL programs
 \citep{shi2020squall} locates the remaining gap. The original algebra expresses
-53.9\% of the reference programs. Compiler closure and typed loader views
-recover 730 additional programs and raise coverage to 61.0\%. Of these, 562
-come from translator closure, 154 from loader views, and 14 require both. The
-remaining 39.6\% lie outside the language. Figure~\ref{fig:coverage-attribution} in the appendix
-shows the resulting attribution. Translated in-coverage programs
+53.9\% of the reference programs, compiler closure and typed loader views
+raise coverage to 61.0\%, and the remaining 39.6\% lie outside the
+language. Figure~\ref{fig:coverage-attribution} in the appendix attributes
+the recovered programs to each mechanism. Translated in-coverage programs
 match the reference denotation in 92--93\% of cases, and execution recovers the
 benchmark answer in 94.1\% of those cases. The reference programs are
 themselves imperfect, reproducing the benchmark answer in 88.9\% of cases, so
@@ -664,11 +645,10 @@ the audit treats them as a noisy reference rather than an absolute standard.
 This pattern points to coverage rather than executor correctness as the main
 transfer limit.
 
-The coverage account is also tested by intervention. After closure and retraining, the
-answer-only development model rises from 31.7\% to 40.0\%, and the gold-program
-model rises from 40.0\% to 51.0\%, so both supervision regimes improve under
-the same representation and compiler intervention. This is the clearest
-evidence that the transfer gap is not solely a planning-model problem.
+The coverage account is also tested by intervention. After closure and
+retraining, both supervision regimes improve, by 8.3 and 11.0 development
+points in Table~\ref{tab:wtq-results}, so the transfer gap is not solely a
+planning-model problem.
 
 % -----------------------------------------------------------------------------
 \section{Discussion and Limitations}
@@ -708,11 +688,10 @@ training run, so training-seed variance is not estimated. The teacher and local
 systems do not share identical decoding constraints. The closed algebra rejects
 questions outside its supported operations, and unseen intent shapes remain a
 clear weakness. The transfer study also lacks a
-baseline in which a language model writes SQL that is executed directly,
-and since the official test is consumed, that comparison belongs to future
-work on development folds, with the differential audit as a partial answer,
-since even the gold SQL annotations reproduce the benchmark answer in only
-88.9\% of cases. Finally, the study does not simulate arbitrary deletion of KG
+baseline in which a language model writes SQL that is executed directly.
+Since the official test is consumed, that comparison belongs to future work
+on development folds, with the differential audit of
+Section~\ref{sec:wtq} as a partial answer. Finally, the study does not simulate arbitrary deletion of KG
 facts. Its refusal tests cover missing or unsupported evidence, but not every
 form of data incompleteness.
 
@@ -818,6 +797,22 @@ and program hash. A 93-row human audit took place before unsealing. It found one
 systematic boolean error affecting 46 rows, which was corrected by offline
 re-execution before any model score was read.
 
+\paragraph{Format diagnostic.}
+Decoded without constraints on 100 development questions, the untrained
+base produces question-grounded plans with real entities in an invented
+format on 98 and matches the executable contract on 3, while the tuned
+models match the contract on 98 and 99. Fine-tuning therefore teaches
+conformance to the specific contract, and constrained decoding grants that
+contract to every system.
+
+\paragraph{PACS weak cells.}
+Beyond the family rows of Table~\ref{tab:pacs-family}, the deep cells of
+supplier concentration, which bind a scope inside each group, fall to
+between 15\% and 30\%, while the five families outside disclosure and
+concentration score between 82\% and 97\% on value-oracle rows. The
+repair arm in Figure~\ref{fig:pacs-audits} is a development-only variant
+and is not part of the sealed headline.
+
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.88\linewidth]{pacs_audits.pdf}
@@ -832,7 +827,8 @@ repair arm is a development-only variant.}
 \includegraphics[width=\linewidth]{attribution.pdf}
 \caption{Attribution of WikiTableQuestions program coverage. Compiler and
 loader closure raise measured coverage from 53.9\% to 61.0\%, while 39.6\%
-remains outside the language.}
+remains outside the language. Of the 730 recovered programs, 562 come from
+translator closure, 154 from loader views, and 14 require both.}
 \label{fig:coverage-attribution}
 \end{figure}
 
