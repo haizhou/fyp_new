@@ -479,3 +479,23 @@ deterministic reflector +2.00 (paired +7/-1). The steelman upgrade sharpens the 
 judge SAW the executed answers (same information as the reflector) and still extracted nothing —
 the gap is inductive bias (rules over judgment), not information access. E14c conclusion survives
 its strongest form; ~$1 judging cost. Artifacts: faithful_verifier.json, scripts/wtq/faithful_verifier.py.
+
+## E15 — final-test 数据访问消融三基线(单发密封, 2026-07-29/30)
+
+三个新冻结配置各一发密封跑, 同型号 grok-4-1-fast-non-reasoning, 同 final_test 2,285 行, 同类型感知打分器。
+按铁律抽读 10 条原始转写(小 count 对/大 count 崩/ambiguous 判罚正确)后入账:
+
+| 系统 | 总分 | 可答(1925) | 聚合六族(1041) | 单记录(884) | 拒答(360) |
+|---|---|---|---|---|---|
+| 闭卷 grok | 16.63 | 1.0 | 0.0 | 2.3 | 100.0(退化) |
+| RAG-grok(强配置 top-k) | 39.21 | 32.6 | 3.7 | 66.5 | 74.7 |
+| 金约束 plan-guided RAG | 25.56 | 11.8 | 3.3 | 21.9 | 98.9(退化) |
+| (对照)Qwen 全本地 | 85.65 | 83.0 | 85.7 | 79.9 | 99.7 |
+
+结论: (1) 语料不在参数知识里(闭卷可答 1.0%); (2) 检索在单记录题可用(66.5)、聚合族死墙(3.7);
+(3) 金程序约束当查询聚合仍 3.3 → 失败归因于 top-k 枚举极限而非查询表述; 但字面量污染词面匹配
+把 factoid 从 87.6 拖到 41.2, 故金约束版只作归因证据, 不作更强基线卖; (4) 全本地聚合(85.7)反超
+自身单记录(79.9), 穷举执行把检索最怕的族变成最稳的族。退化拒答说明: 弱基线答不出→unknown→拒答
+金标得分, 故论文按可答/拒答拆开报。
+Artifacts: outputs/eval/final_test/{closed_book_grok,rag_grok,plan_guided_rag_grok}/,
+scripts/{closed_book_baseline,plan_guided_rag_baseline}.py; 论文 v7.0 表 tab:access + 热力图第六行。

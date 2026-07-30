@@ -362,7 +362,12 @@ QLoRA \citep{hu2022lora,dettmers2023qlora}. All local systems use the same
 executor and constrained decoder. The cloud teacher uses its provider API and
 cannot use the same token-level grammar constraint, so teacher comparisons are
 reported as deployable-system comparisons rather than equal-decoding model
-comparisons.
+comparisons. Three further sealed baselines vary data access while holding the
+answering model fixed at the teacher class. A closed-book run answers from
+parametric knowledge alone, a retrieval reader answers from the top retrieved
+records, and a gold-constraint variant rebuilds the retrieval query from the
+gold program's constraint literals. Each is a frozen configuration evaluated
+in a single sealed pass.
 
 \begin{table}[t]
 \centering
@@ -437,8 +442,9 @@ panel (b) marks cloud-reader systems. (a) Development decomposition across
 the executable scaffold and the training arms, with the shaded band
 covering three teacher runs. (b) Sealed-test results for the five frozen
 systems. Intermediate development arms were not evaluated on the sealed
-test, and the sealed measurements of the retrieval and untrained baselines
-appear on the challenge set in Table~\ref{tab:pacs-family}.}
+test. The sealed data-access baselines appear in Table~\ref{tab:access},
+and the untrained scaffolded base is measured sealed on the challenge set
+in Table~\ref{tab:pacs-family}.}
 \label{fig:home-ladder}
 \end{figure}
 
@@ -478,10 +484,55 @@ empty-result and unsupported questions at 99.2\%, 100.0\% and 100.0\%.
 answerable types and the three refusal classes. The teacher performs
 substantially worse on exhaustive aggregation, comparison skill follows
 the base model, and the fully local systems close the refusal classes
-near ceiling. The full fifteen-type breakdown appears in
-Figure~\ref{fig:heatmap-full} of the appendix.}
+near ceiling. The bottom row shows the sealed retrieval reader from the
+access ablation of Table~\ref{tab:access}. The full fifteen-type
+breakdown appears in Figure~\ref{fig:heatmap-full} of the appendix.}
 \label{fig:heatmap}
 \end{figure}
+
+\paragraph{Data access ablation.}
+Table~\ref{tab:access} isolates what the executable evidence path
+contributes beyond the answering model, using the three sealed baselines
+of Section~\ref{sec:evaluation}. The table separates answerable accuracy
+from refusal recognition because the weak baselines earn refusal credit
+degenerately. A model that cannot find an answer replies unknown, and
+unknown scores as a refusal, so the closed-book run pairs a perfect
+refusal column with 1.0\% on answerable questions and its overall score
+of 16.6\% is almost entirely refusal credit. The closed-book result
+establishes that the corpus is not recoverable from parametric knowledge.
+The retrieval reader is genuinely competent on single-record questions at
+66.5\%, and collapses to 3.7\% on the six aggregation families, which is
+the enumeration limit of top-$k$ evidence. The gold-constraint variant
+removes planning as a failure source, and aggregation stays at 3.3\%, so
+the aggregation failure is attributable to retrieval itself rather than to
+query formulation. Its single-record score is lower than the plain
+reader's because injected constraint literals disturb lexical matching, so
+we report it for attribution rather than as a stronger baseline. The fully
+local system inverts the pattern, scoring higher on the aggregation
+families than on single-record questions, because exhaustive deterministic
+execution turns the families that defeat retrieval into the most reliable
+ones.
+
+\begin{table}[t]
+\centering
+\caption{Sealed data-access ablation on the final test (n=2{,}285).
+Aggregation pools the six exhaustive families, count, sum, comparison,
+set, top-$k$ and min/max (n=1{,}041); single record pools the remaining
+answerable types (n=884); refusal pools the three refusal classes
+(n=360). All values are accuracy in percent.}
+\label{tab:access}
+\small
+\begin{tabular}{lccccc}
+\toprule
+System & Overall & Answerable & Aggregation & Single record & Refusal \\
+\midrule
+Closed book & 16.6 & 1.0 & 0.0 & 2.3 & 100.0 \\
+Retrieval reader & 39.2 & 32.6 & 3.7 & 66.5 & 74.7 \\
+~~with gold constraints & 25.6 & 11.8 & 3.3 & 21.9 & 98.9 \\
+Qwen fully local & 85.6 & 83.0 & 85.7 & 79.9 & 99.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Distribution shift and a generator-independent procurement benchmark}
 \label{sec:robustness}
@@ -819,7 +870,8 @@ Total & 922 \\
 \centering
 \includegraphics[width=\linewidth]{finaltest_heatmap.pdf}
 \caption{Full sealed final-test accuracy by system and question type,
-twelve answerable types and three refusal classes.}
+twelve answerable types and three refusal classes, with the sealed
+retrieval reader of Table~\ref{tab:access} as the bottom row.}
 \label{fig:heatmap-full}
 \end{figure}
 
