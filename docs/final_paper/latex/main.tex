@@ -16,8 +16,7 @@
 
 \title{Auditable Compositional Question Answering over UK Public Procurement}
 
-% TODO final author block
-\author{\name Anonymous \email anonymous@example.com \\
+\author{\name Hai Zhou \email uceeh01@ucl.ac.uk \\
  \addr University College London}
 
 \def\month{07}
@@ -29,30 +28,31 @@
 \maketitle
 
 \begin{abstract}
-UK public procurement records are public and partly structured, but reliable
-analysis remains difficult. Organisation identifiers are fragmented, monetary
-fields have different accounting meanings, and many useful questions require
-several joins, filters, and aggregations. We build an auditable question
-answering framework from 166{,}277 Open Contracting Data Standard releases.
-The framework normalises the source records, represents questions as programs
-in a closed typed algebra, and executes each program with deterministic data
-conventions. It can also abstain when a question is ambiguous, unsupported, or
-not answered by the available records. The resulting benchmark contains
-12{,}828 questions with executable gold programs. A second evaluator, written
-without shared execution code, reproduces 99.88\% of 14{,}770 audited oracle
-cases.
+UK public procurement records are public and partly structured, yet
+reliable analysis remains difficult. Organisation identifiers are
+fragmented, monetary fields carry different accounting meanings, and useful
+questions require several joins, filters, and aggregations. We build an
+auditable question answering framework over 166{,}277 Open Contracting Data
+Standard releases. Questions become programs in a closed typed algebra,
+executed over a normalised data layer under deterministic conventions, with
+abstention when a question is ambiguous, unsupported, or matched by no
+records. The resulting benchmark contains 12{,}828 questions with
+executable gold programs, and a second evaluator, written without shared
+execution code, reproduces 99.88\% of 14{,}770 audited oracle cases.
 
 Experiments separate the value of the executable scaffold from the value of
-model training. On development data, an untrained 8B model rises from a 31.5\%
-retrieval baseline to 70.4\% when routed through the scaffold. Task-specific
-training raises the strongest fully local system to 85.65\% on a sealed
-2{,}285-question test, compared with 69.76\% for the cloud teacher used to
-propose training candidates. The ordering holds with a second 8B base model
-and on a sealed procurement challenge set, where the local planner reaches
-78.31\% against 50.33\% for the teacher. A transfer to WikiTableQuestions raises an untrained 22.51\%
+model training. On development data, an untrained 8B model rises from a
+31.5\% retrieval baseline to 70.4\% when routed through the scaffold.
+Training raises the strongest fully local system to 85.65\% on a sealed
+2{,}285-question test, above the 69.76\% cloud teacher that proposed its
+training candidates, and the ordering holds with a second base model and on
+a sealed challenge set, 78.31\% against 50.33\%. Sealed access baselines
+locate the mechanism, retrieval answers single-record questions yet
+collapses on exhaustive aggregation even when the gold plan is supplied as
+the query. A transfer to WikiTableQuestions raises an untrained 22.51\%
 baseline to 44.43\% with answer-only supervision and 51.80\% with gold
-programs. The transfer audit identifies program-language and representation
-coverage as the main remaining bottleneck.
+programs, and the transfer audit identifies representation and
+program-language coverage as the main remaining bottleneck.
 \end{abstract}
 
 % -----------------------------------------------------------------------------
