@@ -60,59 +60,78 @@ program-language coverage as the main remaining bottleneck.
 \label{sec:intro}
 
 Large language models can interpret natural-language questions and produce
-fluent answers, but they remain unreliable when a task requires several linked
-operations. A model may retrieve the right records while applying the wrong
-relation, counting the wrong unit, or aggregating values that should remain
-separate. Structured query systems offer a different strength. Their entities,
-relations, and operations can be inspected and executed again. Their weakness
-is coverage, since they depend on a defined schema and a restricted query
-language. Reliable question answering over structured data therefore requires
-both flexible language understanding and a reproducible path from evidence to
-answer.
+fluent answers, but they remain unreliable when a task requires several
+linked operations. A model may retrieve the right records while applying
+the wrong relation, counting the wrong unit, or aggregating values that
+should remain separate. Structured query systems have the opposite
+profile. Their entities, relations, and operations can be inspected and
+executed again, but they depend on a defined schema and a restricted query
+language. Reliable question answering over structured public data
+therefore requires flexible language understanding joined to a
+reproducible path from evidence to answer.
 
-UK public procurement is a demanding setting for this problem. Contract
-notices contain buyers, suppliers, awards, dates, locations, and monetary
-values, which makes them suitable for factual, temporal, and compositional
-analysis. The records are not clean enough to query directly. One organisation
-can appear under many source identifiers and name variants. Values may be
-reported at tender, lot, award, and contract level, where some fields represent
-separate amounts and others repeat the same amount. A program can therefore be
-valid and executable while still computing the wrong quantity. Correctness
-depends on the program, the data conventions, and the link between the two.
+UK public procurement is a demanding instance of this problem. We work
+with 166{,}277 releases in the Open Contracting Data Standard covering
+five years of contract notices, with buyers, suppliers, awards, dates,
+locations, and monetary values. These records cannot be queried directly
+with confidence. One organisation appears under many platform identifiers
+and name variants, the Ministry of Defence under 77 in a single year.
+Values are reported at tender, lot, award, and contract level, where some
+fields represent separate amounts and others repeat the same amount, so a
+program can be valid and executable while computing the wrong quantity.
+Correctness depends jointly on the program, the data conventions, and the
+link between the two. Prior work covers parts of this setting.
+Retrieval-augmented generation supplies relevant records but does not
+guarantee correct joins, counts, or aggregations. Neural-symbolic
+question answering maps language to executable programs, but is usually
+evaluated over curated schemas whose field semantics and entity identities
+are already clean \citep{cheng2023binder,gu2023pangu,luo2024chatkbqa}.
+Bootstrapped training methods such as STaR and rejection-sampling
+fine-tuning learn from selected model outputs
+\citep{zelikman2022star,yuan2023scaling,gulcehre2023rest}, but they do not
+resolve a setting where the source semantics must first be audited,
+refusal is part of the task, and successful execution does not by itself
+establish that the program answers the question.
 
-Prior work addresses parts of this setting. Retrieval-augmented generation can
-supply relevant records, but it does not guarantee correct joins, counts, or
-aggregations. Neural-symbolic question answering maps language to executable
-programs, but is usually evaluated over curated schemas and stable execution
-environments \citep{cheng2023binder,gu2023pangu,luo2024chatkbqa}. Methods such
-as STaR and rejection-sampling fine-tuning learn from selected model outputs
-\citep{zelikman2022star,yuan2023scaling,gulcehre2023rest}. These methods show
-that executable or answer-based feedback can support training. They do not
-resolve the full problem considered here, where the source semantics must first
-be audited, refusal is part of the task, and successful execution does not by
-itself establish that the program answers the question.
+We build the task and system end to end. The releases are normalised into
+a canonical data layer of 215{,}221 award records and 131{,}502 resolved
+organisations, with explicit precision-first rules for entity identity,
+value provenance, and monetary additivity. Questions are answered by a
+two-stage pipeline. A reader turns the question into a structured
+briefing that names the requested answer type, the literal constraints,
+and the intermediate sets the answer depends on. A planner compiles the
+question and briefing into a program in a closed typed algebra of seven
+value types and seventeen operators, emitted under grammar-constrained
+decoding. Deterministic code then grounds the program to the data layer,
+executes it, and returns the answer together with the records that
+produced it, or a scored abstention when the question is ambiguous,
+unsupported, or matched by no records. For training, sampled candidate
+programs are kept only when they compile, ground, execute, and reproduce
+the oracle of a 12{,}828-question benchmark whose answers an
+independently implemented second evaluator reproduces at 99.88\%, and the
+surviving traces drive supervised, rejection-sampling, and preference
+stages on two 8B bases. The final answer always comes from execution, not
+free-form generation.
 
-We build the task and system end to end. Five years of procurement releases
-are converted into a canonical data layer with explicit rules for entity
-identity, value provenance, and monetary additivity. Questions are compiled
-into a small typed algebra. A language model proposes the interpretation and
-program. Deterministic code then checks the program, grounds it to the data,
-and executes it. During training, sampled programs are retained only when their
-executed answers match the benchmark oracle. During deployment, no oracle is
-available or required. The final answer comes from execution, not free-form
-model generation.
-
-The evaluation asks three questions. First, how much of the performance comes
-from the executable scaffold, and how much comes from task-specific model
-training? Second, does the resulting capability survive new program structures
-and question surfaces? Third, when the architecture is moved to another
-structured-data domain, which component limits performance? The experiments
-show that the scaffold establishes a strong floor, training both question
-understanding and planning improves generalisation, and cross-domain transfer
-is limited mainly by representation and program-language coverage.
+The evaluation separates the value of the executable scaffold from the
+value of model training, and asks whether the result survives new
+question distributions and a new domain. On development data an untrained
+8B model rises from a 31.5\% retrieval baseline to 70.4\% when routed
+through the scaffold. Trained end to end, the strongest fully local
+system reaches 85.65\% on a sealed 2{,}285-question test, above the
+69.76\% of the cloud teacher that proposed its training candidates, and
+the ordering holds with a second base model. Sealed access baselines
+locate the mechanism, since retrieval with the same cloud model answers
+single-record questions at 66.5\% yet collapses below 4\% on exhaustive
+aggregation even when the gold plan is supplied as the retrieval query.
+On a sealed challenge set written independently of the benchmark
+generator the planner leads the teacher 78.31\% to 50.33\% and
+recognises every unsupported question. A transfer study on
+WikiTableQuestions raises an untrained 22.51\% baseline to 51.80\% with
+gold programs and traces the remaining limits to representation and
+program-language coverage.
 
 \paragraph{Contributions.}
-This work makes three contributions.
 \begin{enumerate}
     \item We construct an auditable procurement question-answering task with
     explicit data conventions, executable gold programs, scored abstention,
@@ -123,10 +142,10 @@ This work makes three contributions.
     program training from teacher and self-generated candidates without
     making the language model the source of the final answer.
 
-    \item We provide a controlled empirical decomposition across retrieval,
-    executable scaffolding, local planning, sealed external evaluation, and
-    table-domain transfer. The analysis identifies where performance comes
-    from and where the closed language still limits coverage.
+    \item We provide a controlled empirical decomposition across data
+    access, executable scaffolding, local planning, sealed external
+    evaluation, and table-domain transfer, identifying where performance
+    comes from and where the closed language still limits coverage.
 \end{enumerate}
 
 % -----------------------------------------------------------------------------
@@ -231,11 +250,16 @@ platform account identifiers. One real organisation can therefore appear
 under many IDs. The Ministry of Defence appears under 77 platform identifiers
 in one year of the source data.
 
-We convert the releases into a canonical representation with 215{,}221 award
-records and 131{,}502 organisations. Entity resolution is precision-first.
-Registry identifiers and safe deterministic variants are merged before
-normalised name and regional evidence are considered. Fuzzy matching produces
-review candidates but never writes a merge directly. Monetary values follow a
+We convert the releases into a canonical representation with 215{,}221
+award records. Each record links a buyer, one or more suppliers, a value
+with its source field and an additivity flag, award and publication dates,
+and a procurement category. Entity resolution is precision-first and
+proceeds as a waterfall. Registry identifiers merge first, then safe
+deterministic variants, then normalised names supported by regional
+evidence, while fuzzy similarity only nominates candidates for manual
+review and never writes a merge. The 204{,}711 raw organisation aliases
+resolve to 131{,}502 canonical organisations, and 82{,}013 singletons are
+deliberately left unmerged rather than force-clustered. Monetary values follow a
 fixed fallback rule and retain their source field and an additivity flag. The
 flag prevents repeated framework ceilings from being summed once for every
 linked award. Logically, the representation is a typed property graph whose nodes
@@ -282,16 +306,42 @@ The executor applies contract-level deduplication, exact decimal arithmetic,
 the additivity guard, empty-key exclusion, and deterministic tie breaking. It
 returns both the answer and the records used to compute it.
 
-\subsection{Planning, training, and abstention}
+\subsection{Reader, planner, and the deterministic layers}
 \label{sec:planning}
 
-The procurement system uses two learned stages. A reader extracts the requested
-answer type, question literals, and dependency structure. A planner compiles
-the question and brief into a program. This split was retained because it
-outperformed direct generation on procurement, and the margin is quantified
-in Section~\ref{sec:home}. The WikiTableQuestions transfer
-uses a fused reader-planner because fixed handoffs were weaker during table
-development.
+The procurement system uses two learned stages ahead of the deterministic
+layers. The reader receives only the question and emits a structured
+briefing that names the requested answer type, the explicit atoms of the
+question such as entities, dates, categories, and thresholds, the
+intermediate sets the answer depends on, the direction of each relational
+role, and any ambiguity it detects. In the hybrid systems this stage is
+the cloud model, and in the fully local systems it is a trained 8B model.
+The planner receives the question together with the briefing, selects an
+intent template from a closed inventory that covers every answerable
+family and abstention, and fills that template's typed slots, the
+constraint list, the answer field, the grouping key, the ranking size and
+metric, or the comparison specification, emitting the completed program as
+strict JSON under the compiled grammar of Section~\ref{sec:algebra}. This
+split was retained because it outperformed direct generation on
+procurement, and the margin is quantified in Section~\ref{sec:home}. The
+WikiTableQuestions transfer uses a fused reader-planner because fixed
+handoffs were weaker during table development.
+
+Two deterministic layers close the gap between the emitted program and
+the data. Grounding resolves each field mention to a canonical schema
+slot through candidate generation with a type gate, a confidence
+threshold, and a top-two margin, and resolves each entity mention against
+the canonical organisation registry under the same threshold-and-margin
+rule rather than accepting the best hit blindly, with relational
+direction taken from the question phrase, so awarded to a party marks
+that party as the supplier regardless of word order. Execution then
+proceeds as in Section~\ref{sec:algebra}. A verification layer checks
+the grounded program before and after execution, uniqueness where a
+single record is claimed, additivity where money is summed, and coverage
+where a population is enumerated. One repair is available only after a
+typed, diagnosable failure, and refusals and meaningful empty results are
+final, since an earlier ungated repair design changed six correct
+refusals into incorrect answers.
 
 Training candidates are sampled from a cloud teacher or from the local student.
 A candidate is retained when it has a valid type structure, grounds to the
@@ -302,11 +352,10 @@ rejection sampling, and preference optimisation, the last excluded from the
 primary systems because its near-miss negatives were unstable across the
 two bases.
 
-Abstention is part of the output space. The system can return ambiguous,
-unsupported, or no-result when the question or evidence does not justify an
-answer. A repair step is available only after a typed failure. Refusals and
-meaningful empty results are final, since an earlier ungated repair design
-changed six correct refusals into incorrect answers.
+Abstention is part of the output space rather than an error path. The
+reader can classify a question as ambiguous or unsupported, and execution
+can return a meaningful empty result, so refusal competes with answering
+in the same typed output contract and is scored by the same benchmark.
 
 \subsection{Benchmark construction and oracle audit}
 \label{sec:benchmark-build}
@@ -367,7 +416,9 @@ gold program's constraint literals. Each is a frozen configuration evaluated
 in a single sealed pass.
 
 \paragraph{Protocol.}
-Each primary evaluation uses one temperature-zero model call and no repair.
+Each primary evaluation uses temperature-zero decoding, and every system
+is scored under the same fixed budget of at most one verifier-gated
+replan.
 Answerable questions use type-aware exact match against the audited oracle.
 Refusal questions use strict status match and a faithfulness-gated metric that
 checks whether every literal in the emitted program is supported by the
