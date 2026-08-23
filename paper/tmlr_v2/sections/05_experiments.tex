@@ -1,0 +1,200 @@
+\section{Experiments}
+\label{sec:experiments}
+
+Four questions drive the evaluation.  Does typed-program supervision improve strict compositional
+execution accuracy over the same untuned base model and a strong cloud planner (RQ1)?  Does the
+specialised parser hold that accuracy under an independently generated surface form (RQ2)?  Which
+operator families and composition depths stay hard (RQ3)?  And does the complete
+understand--plan--ground--execute--check runtime improve on its untuned counterpart (RQ4)?
+
+\subsection{Datasets and metrics}
+\label{sec:pacs-construction}
+
+Every execution below runs over one Parquet knowledge-graph snapshot and query-record projection,
+whose node counts and edge coverage are in Table \ref{tab:dataset-stats}.  Supervision comes from
+the program-first pipeline of Section \ref{sec:program-supervision}, sampled from the same frozen
+record universe: \TrainN training and \ValN validation instances, each a typed tree or an
+abstention object that has survived static validation, agreement between the two independent
+evaluators, the non-degeneracy rules, and question-level deduplication.  The export also contains
+exact duplicates and two exact train/validation overlaps, so its held-out loss is an optimisation
+diagnostic and not a generalisation estimate.
+
+PACS tests combinations of closed-algebra primitives rather than broad world knowledge.  Its
+seven capability families are the rows of Table \ref{tab:pacs-family}; its levels run from an
+atomic computation (L1) through two or three combined operations (L2) to nested set membership,
+filtered comparisons, set algebra, or group composition (L3).  Gold trees are instantiated from
+family templates over sampled anchors and kept only when they validate, execute identically in
+both implementations, and pass a family-specific non-degeneracy rule, after which whole intent
+clusters are assigned to development or test together (Appendix \ref{app:pacs}).  The frozen test
+holds \PacsN{} items per surface: 694 answerable, 138 unsupported, and 90 no-result; 279 at L1,
+339 at L2, and 304 at L3; 431 seen and 491 declared unseen shapes.  Family sizes range from 67 to
+149, so overall accuracy is a micro average with macro-family accuracy beside it.
+
+Each intent is evaluated on two surfaces sharing one gold program and oracle.  Channel A renders
+the semantics deterministically and independently; Channel B is a separately naturalised question
+that must keep the required literals and pass a logic gate, so A--B is a paired robustness
+measurement over a fixed computation.  Sealing checks exact normalised questions, gold tree
+hashes, and declared unseen shapes against the training export, but its Channel-B near-duplicate
+screen is subsampled and one of the five documented gates has no separate implementation.  PACS
+is therefore a \emph{mechanically screened compositional test}, not a proven zero-leakage split.
+
+The primary metric is strict accuracy from Equation \ref{eq:strict-correctness}; the
+supplementary \emph{safe accuracy}, which also credits literal-faithful empty-result executions,
+is defined in Appendix \ref{app:full-results}.  Tables give exact numerators and denominators,
+and parenthesised intervals are 95\% Wilson score intervals over the fixed test items.
+
+\subsection{Implementation and baselines}
+\label{sec:implementation}
+
+The specialised parser adapts Qwen3-8B with 4-bit QLoRA at rank 64, scaling $\alpha=128$, and
+dropout 0.05, with all target modules adapted.  Training runs for two epochs at per-device batch
+size 2 with gradient accumulation 8, an effective batch of 16, learning rate $10^{-4}$ under
+cosine decay with 3\% warm-up, a 4096-token cutoff, and bfloat16 computation.  Every headline
+evaluation uses one decode per item at temperature zero, with no guided JSON grammar and no
+reflection or repair, which keeps the local and cloud arms comparable; because these are single
+deterministic decodes, no interval reported here estimates sensitivity to checkpoint, prompt,
+provider, or hardware.  The full runtime is evaluated with a repair budget of one replan.
+Endpoints, model revisions, prompt hashes, and the commands that regenerate every artifact are in
+Appendix \ref{app:reproducibility}.
+
+All PACS systems receive the same algebra description and one-question prompt.  \textbf{Untuned
+8B} is Qwen3-8B with no task-specific fine-tuning; the \textbf{cloud planner} is
+\texttt{grok-4-1-fast-non-reasoning} under the same interface and algebra contract;
+\textbf{typed-program 8B} is the QLoRA adapter above.  Only the specialised parser was run on
+Channel B, so Channel A carries the three-system comparison.  Two baselines sit outside the PACS
+tables.  A \textbf{retrieval} baseline indexes the record projection with TF-IDF and passes the
+top-$k$ records to an untuned reader, plain at $k{=}10$ and field-boosted at $k{=}40$, standing
+for the evidence mechanism our method replaces (Section \ref{sec:analysis-body}).  The end-to-end
+comparison uses a balanced \RuntimeN{}-item artifact of 13 categories with 20 cases each,
+comparing the full local runtime, the same stack without specialised adaptation, and a stored
+cloud-teacher run.  No component ablation of routing, verification, and repair was run; Section
+\ref{sec:limitations} states what that costs the attribution.
+
+\subsection{Main results}
+
+Table \ref{tab:pacs-main} answers RQ1.  The typed-program model solves
+\PacsOursCorrectA/\PacsN{} cases, \PacsGainBase{} points above the same untuned base model and
+\PacsGainTeacher{} points above the cloud planner, and its Wilson interval overlaps neither
+baseline.
+
+\begin{table}[t]
+  \caption{PACS strict execution accuracy.  All Channel-A rows use the same \PacsN{} cases and a
+  single temperature-zero free decode.  ``Valid tree'' is reported for diagnosis only: explicit
+  abstentions do not emit a tree, and validity does not imply correctness.}
+  \label{tab:pacs-main}
+  \centering
+  \small
+  \begin{tabular}{llrrrcc}
+    \toprule
+    System & Surface & Correct & $n$ & Strict acc. & 95\% Wilson CI & Valid tree \\
+    \midrule
+    Untuned Qwen3-8B & A & 332 & 922 & 36.01 & [32.97, 39.16] & 77.77 \\
+    Cloud planner & A & 450 & 922 & 48.81 & [45.59, 52.03] & 52.28 \\
+    \textbf{Typed-program Qwen3-8B} & A & \textbf{687} & 922 & \textbf{74.51}
+      & \textbf{[71.60, 77.22]} & 71.58 \\
+    Typed-program Qwen3-8B & B & 675 & 922 & 73.21 & [70.26, 75.97] & 70.50 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The valid-tree column moves against accuracy.  Ranked by static validity alone the untuned base
+model comes first, 6.19 points above the specialised parser, while trailing it by 38.50 points on
+strict accuracy.  A well-typed program can still reverse two roles, project the wrong field, or
+express the wrong scope, and an explicit abstention is a scoreable final action that emits no
+tree at all: the guarantee boundary of Table \ref{tab:guarantee-boundary}, visible as a
+measurement.
+
+For RQ2 the specialised model falls \PacsSurfaceDrop{} points from Channel A to Channel B, with
+macro-family accuracy down from \PacsMacroA\% to \PacsMacroB\%.  The parser is not reproducing one
+fixed wording, then, though this is also not unrestricted linguistic robustness, since both
+channels preserve the same literals under explicit logic gates.  The largest per-family decline is
+3.38 points on relational composition (F6), while supplier concentration (F3) improves by 2.96
+points.  A paired significance test is left out of this draft: the strict Boolean-matching fix has
+to reach every scorer first, and the paired decisions must then be regenerated from the frozen
+outputs.
+
+\subsection{Results by family and depth}
+
+Table \ref{tab:pacs-family} answers RQ3.  Overlap and exclusion (F5) is the strongest family at
+94.49\%, more than 60 points above the base model, with large gains also on cross-buyer
+comparison (F4) and relational composition (F6).  Supplier concentration (F3) and
+disclosure/compliance (F7) stay near 50\% and 42\%, and on both the cloud model matches or
+slightly beats the specialised parser.  The micro average hides this, since F7 contributes only
+67 of \PacsN{} cases.
+
+\begin{table}[t]
+  \caption{Strict accuracy by PACS family.  Exact correct counts are given in parentheses.
+  Surface B is available only for the specialised parser.}
+  \label{tab:pacs-family}
+  \centering
+  \small
+  \begin{tabular}{llrrrr}
+    \toprule
+    & Family ($n$) & Untuned A & Cloud A & Typed A & Typed B \\
+    \midrule
+    F1 & Spending/volume (148) & 41.89 (62) & 62.84 (93) & \textbf{84.46 (125)} & 81.08 (120) \\
+    F2 & Temporal change (149) & 57.72 (86) & 72.48 (108) & \textbf{83.22 (124)} & 81.88 (122) \\
+    F3 & Supplier concentration (135) & 19.26 (26) & 51.85 (70) & 51.11 (69) & \textbf{54.07 (73)} \\
+    F4 & Cross-buyer comparison (147) & 39.46 (58) & 44.22 (65) & \textbf{81.63 (120)} & 79.59 (117) \\
+    F5 & Overlap/exclusion (127) & 32.28 (41) & 33.07 (42) & \textbf{94.49 (120)} & 93.70 (119) \\
+    F6 & Relational composition (149) & 28.19 (42) & 28.86 (43) & \textbf{67.79 (101)} & 65.10 (97) \\
+    F7 & Disclosure/compliance (67) & 25.37 (17) & \textbf{43.28 (29)} & 41.79 (28) & 40.30 (27) \\
+    \midrule
+    & Macro family & 34.88 & 48.09 & \textbf{72.07} & 70.82 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Depth behaves less regularly than family: 92.11\% at L1, 61.06\% at L2, and 73.36\% at L3, where
+the L2 dip follows from how families and status types distribute across levels rather than from
+two-step programs being intrinsically harder than three-step ones.  Declared seen and unseen
+shapes score 74.01\% and 74.95\%.  That near equality is encouraging within its construction:
+with no atom/compound-divergence design and a subsampled near-duplicate screen, it evidences
+generalisation to a declared structural holdout, not CFQ-style compositional generalisation.
+Appendix \ref{app:full-results} holds the full depth and exposure tables.
+
+For RQ4, the full local runtime solves \RuntimeOursCorrect/\RuntimeN{} cases (\RuntimeOurs\%,
+95\% Wilson CI [81.43, 89.83]), against \RuntimeBaseCorrect/\RuntimeN{} (\RuntimeBase\%) untuned
+and \RuntimeTeacherCorrect/\RuntimeN{} (\RuntimeTeacher\%) for the stored cloud-teacher run.
+Category gains concentrate on bridge joins (14/20 versus 2/20), comparisons (17/20 versus 7/20),
+and categorical questions (13/20 versus 8/20), the same profile as the PACS families.  All three
+systems score 20/20 on the sum category, but the underlying data contain unnormalised non-GBP
+additive rows, so that column is not evidence of currency-correct aggregation.  Its run manifest
+is less complete than the PACS one, which is why we treat it as secondary evidence; the
+per-category table is in Appendix \ref{app:full-results}.
+
+\subsection{Analysis}
+\label{sec:analysis-body}
+
+Figure \ref{fig:visual-thesis} follows one bridge question through all three mechanisms:
+\emph{how many contract notices were published by buyers who have awarded a contract to Edmundson
+Electrical Limited?}  Over $U_G$ it denotes 23 records naming that supplier, 16 buyer values
+projected from them, and 4{,}257 notices published by those buyers.  The two failures differ in
+kind.  Retrieval at $k{=}40$ returns all 23 first-hop records, so its answer of 14 is not a recall
+failure: the notices being counted were never retrieved and could only be counted by retrieving
+all 4{,}257.  The untuned model instead emits \texttt{count(filter(supplier\_name = anchor))},
+which passes static validation with root type \numbertype{} and executes without error to 23, the
+size of the first hop.  Both return a plausible number; neither expresses the question.  The 16
+buyer values also carry the entity caveat in miniature, since they include both \emph{LEEDS
+BECKETT UNIVERSITY} and \emph{the Education Authority}: stored strings, not resolved legal
+entities.
+
+The aggregate gain decomposes the same way.  The specialised parser's \PacsOursCorrectA{} strict
+successes are 549 correct executed answers and 138 correct explicit abstentions, against 291 and
+41 for the untuned model, which also answers 114 out-of-grammar cases and emits 104 invalid
+trees.  Typed-program supervision therefore changes both semantic coverage and the willingness to
+use the unsupported action; syntax repair alone would not produce this pattern, since the base
+model already emits type-valid trees at a high rate while encoding the wrong role, projection, or
+composition in many of them.  The cloud planner sits between the two, with 324 correct answers and
+126 correct abstentions against 161 invalid trees, 57 unparseable outputs, and 25 API errors.
+Counting service errors as failures is the right convention for a single-run comparison, but it
+blends model capability with provider availability.
+
+Strict scoring also leaves something on the table: the specialised Channel-A run contains 73
+literal-faithful empty-result executions that receive no credit, because those non-answerable
+controls require an explicit abstention, and crediting them would raise the score to 82.43\%.
+That gap measures whether the model avoided an unsupported factual answer under a broader
+operational policy, which is a different question from exact-answer accuracy, and a production
+interface has to choose between them: a user asking for a count over an empty scope may well
+prefer ``0'', whereas a missing-operator question needs to be told that the operation is
+unsupported.

@@ -1,0 +1,226 @@
+\section{Method}
+\label{sec:method}
+
+Given a question $q$ and schema view $\mathcal{S}$, a learned mapper proposes a typed computation
+$z$.  The online path grounds and executes $z$, then releases a traced value, terminates without an
+answer, or returns a structured failure for one further proposal.  An unsupported result or a clean
+empty result terminates without another proposal.  Offline curation applies the same contract and a
+hidden typed oracle before a candidate may become positive supervision.  The oracle is absent from
+online prompts and student targets.  Figure \ref{fig:online-offline} shows both paths.
+
+\begin{figure}[t]
+  \centering
+  \IfFileExists{figs/fig02_online_offline.pdf}{%
+    \includegraphics[width=\linewidth]{fig02_online_offline}%
+  }{%
+    \fbox{\parbox[c][2.00in][c]{0.94\linewidth}{\centering\small
+      \textbf{Figure placeholder.} The online path is question and schema $\rightarrow$ Step 1 intent
+      $\rightarrow$ deterministic compiler or conditional Step 2 graph planner $\rightarrow$
+      grounding $\rightarrow$ exhaustive execution $\rightarrow$ release or no answer.  Offline,
+      the hidden oracle additionally gates direct SFT, repair targets, preference pairs, hard
+      negatives, and abstention targets.  The oracle is removed before export.}}
+  }
+  \caption{Online inference and offline supervision construction.  The online runtime compiles,
+  grounds, executes, and checks a proposal without access to an oracle.  Offline curation adds
+  expected status, answer shape, and hidden oracle checks when applicable, then stores overlapping
+  supervision views without exporting oracle values.  A repair reruns every deterministic stage.}
+  \label{fig:online-offline}
+\end{figure}
+
+\subsection{Online proposal and checking}
+\label{sec:m-runtime}
+
+\paragraph{Structured understanding.}
+The first model receives the question and a keyword-selected schema slice, but no database rows or
+oracle.  It returns a JSON intent program containing an answer signature, typed steps, literal
+constraints, role-bearing entity mentions, dependencies, and any unsupported or ambiguous reason.
+The validator checks step references, return type, answer signature, and dependency order.
+
+\paragraph{Direct compilation and conditional graph planning.}
+A valid intent is compiled deterministically unless it triggers a fast-path veto.  The two current
+vetoes prevent an unsupported cue from coexisting with an answering plan and prevent a request for
+record count from compiling to an entity-set count.  If direct compilation fails or is vetoed, a
+second model receives the question, the structured briefing, schema context, and the supported
+capabilities.  It returns a typed variable graph.
+
+Each graph variable has a kind, semantic role, constraints, and dependencies.  A relation binds a
+field emitted by one variable into a downstream filter.  The return specification names the input
+variable, operation, answer field, comparator or grouping key, and guards.  For example, a
+buyer--supplier--buyer question is represented as
+\[
+ R_b \longrightarrow S_b=\operatorname{distinctSupplier}(R_b)
+ \longrightarrow R[\operatorname{supplier}\in S_b]
+ \longrightarrow \operatorname{distinctBuyer}(R)\setminus\{b\}.
+\]
+Before compilation, a consistency checker compares the graph with explicit years, CPV codes,
+categories, titles, numeric literals, role cues, comparison direction, and the requested count
+target.  In evaluation, the planner may draw two structural samples, but resampling occurs only
+after a compile or consistency failure that can be detected without an oracle.
+
+The reported implementation has one fidelity boundary after this check.  A late check may add a
+missing year, CPV code, or category to a flat query specification after a graph plan already exists,
+while execution still gives priority to that graph plan.  This path can detect a discrepancy but
+does not guarantee that the added condition reaches execution.  We therefore audit retention of
+question constraints separately and do not treat the late check as a semantic guarantee.
+
+\paragraph{Hard grounding and preflight.}
+Grounding maps aliases to allowed backend fields, checks value shapes, resolves buyer and supplier
+mentions, verifies emitted and bound fields, forces exhaustive reduction, and inserts the additive
+guard required by monetary sums.  Field grounding uses declared aliases and local character
+$n$-gram candidates with type checks; entity resolution requires a unique acceptable match rather
+than blindly selecting the first candidate.  A cycle, missing variable, incompatible dependency,
+ambiguous entity, illegal field, or unsafe aggregate produces a structured failure.
+
+\paragraph{Deterministic execution.}
+Variables execute in dependency order over the complete contract-record universe.  Source variables
+filter records, entity variables emit distinct values, dependent record variables consume those
+values through set membership, and scalar variables count, sum, compare, rank, or select.  Counts
+deduplicate contract identifiers, sums use decimal arithmetic, and ties use stable ordering.
+Independent variables at the same dependency level may run concurrently without changing their
+denotation.  Each variable trace records its grounded constraints, status, dependencies, output
+size, and emitted field.
+
+\paragraph{Evidence, release, and bounded repair.}
+Preflight checks schema legality, conflicts, and exhaustive execution.  Postflight checks result
+cardinality and population disclosure.  Checks for answer sanity and evidence then decide whether an
+answer card may be returned.  The card contains the answer, exact population statistics, and a
+bounded sample of matching contract identifiers.  The sample supports audit and replay but is not
+the complete contributing population for a large aggregate.  Eligible compile, grounding, or
+execution failures can trigger one replan conditioned on feedback.  Every repaired proposal is
+compiled, grounded, executed, and checked again.  States with a clean empty result, ambiguity, or
+unsupported content terminate without further answer search.  Training data collection permits two repair rounds;
+the controlled runtime evaluation permits one.
+
+\subsection{Offline supervision from checked executions}
+\label{sec:m-training}
+
+The teacher pipeline runs the full runtime on 9,267 training questions drawn from the benchmark
+construction process described in Section \ref{sec:m-benchmark}.  The stored harvest summary names
+\texttt{gpt-5.4-nano} for Step 1 and \texttt{grok-4-1-fast-non-reasoning} for Step 2.  The audited
+runner reconstructs temperature zero and budgets of at most two structural plan samples and two
+feedback repairs.  The historical artifact does not preserve a full command or prompt version, so
+these decoding and budget values are reconstructed settings rather than independently stored call
+metadata.  The exact prompt and call contract and its artifact boundary are given in Appendix
+\ref{app:prompts}.  A
+plan is a positive answerable target only when it passes compilation, grounding, execution, and release
+checks, has the required answer shape, and matches the hidden oracle.  We write the online and
+offline decisions separately.
+\begin{equation}
+\begin{aligned}
+ R(z;q,\mathcal{S},K) &= G(z;q,\mathcal{S},K)\land V(z,K)
+ \land D(\operatorname{Exec}(z,K),\sigma(z)), \\
+ A(z;q,\mathcal{S},K,y,\tau) &= R(z;q,\mathcal{S},K)
+ \land H(\operatorname{Exec}(z,K),\tau)
+ \land M(\operatorname{Exec}(z,K),y).
+\end{aligned}
+\label{eq:acceptance}
+\end{equation}
+Here $G$ covers compilation and grounding, $V$ covers execution and release checks, and $D$ checks
+the result against the signature $\sigma(z)$ declared by the proposal.  These terms define the
+online decision $R$ without access to the answer.  Offline acceptance $A$ additionally compares the
+result with the expected answer shape $\tau$ through $H$ and with the typed oracle $y$ through $M$.
+A candidate that fails either offline check cannot become a positive target.  Wrong answers may be
+retained as hard negatives, while successful repairs and accepted or rejected pairs are stored
+separately.
+
+Each training question contributes one primary trace, with overlapping repair and preference views
+stored separately.  After family and bucket caps, training uses 2,787 plan rows, 1,679 repair rows,
+and 5,091 Step 1 programs.  RSFT continues the SFT adapter on a stochastic Step 2 student harvest
+while cloud Step 1 remains fixed.  Its stored summary records temperature 0.7, four plan samples,
+and at most two feedback repairs.  This collection budget differs from the deterministic checkpoint
+evaluation protocol in Section \ref{sec:experiments}.
+
+The student never receives the oracle answer.  Direct plan supervised fine tuning learns
+$p(z^+\mid q,u,\mathcal{S})$, where $u$ is the Step 1 briefing and $\mathcal{S}$ is the schema
+contract.  Repair training learns $p(z^+\mid q,u,z^-,f,\mathcal{S})$ from a failed plan and
+structured feedback.  Direct preference optimisation ranks accepted plans above rejected plans for
+the same input \citep{rafailov2023dpo}.  These objectives explain how an oracle can select training
+examples without becoming an answer shortcut at inference.
+
+\subsection{Procurement data pipeline}
+\label{sec:m-data}
+
+\paragraph{Ingestion and snapshot selection.}
+The loader streams compressed JSON Lines files and flattens OCDS releases, parties, awards, and
+contracts.  Blank and malformed lines are logged and skipped.  A contracting process can be
+published more than once.  For each OCID we retain the release with the latest parseable date and
+store the set of source years in which that OCID appeared.  Extraction later accepts only this
+selected $(\text{OCID},\text{release-id})$ pair, which prevents an older version from re-entering
+the graph.
+
+\paragraph{Entity resolution.}
+Organisation resolution favours precision.  A recognised official scheme and identifier forms a
+canonical node.  A platform-specific FTS identifier is linked to an official node only when all
+observations with the same OCID, normalised name, and party role identify one candidate.  Unresolved
+observations next pass through a government lookup, exact normalised name plus region, and finally
+exact name when no region is available.  Residual clusters receive stable hashed identifiers, and
+empty normalised names remain singletons.  Jaro--Winkler similarity of at least 0.92 produces a
+review candidate but never an automatic merge.  A later union--find pass applies reviewed edges
+only after checking cluster-level identifier conflicts.  Every raw identifier is retained in an
+alias map.
+
+\paragraph{Extraction, graph construction, and validation.}
+The extractor creates tender, lot, award, bid-statistic, text-evidence, and document-metadata tables.
+Amount selection follows award, linked contract, then tender precedence and preserves value,
+currency, and source.  Organisation, contract, CPV, and evidence nodes are connected by
+\textsc{buyer-of}, \textsc{supplier-of}, \textsc{categorised-by}, and \textsc{evidence-for} edges.
+Exact lot evidence is preferred; an OCID-level link is used when no lot link is available.  Before
+writing the graph, the build checks primary keys, edge endpoints, alias targets, JSON fields,
+additivity policy, and award coverage.  Buyer, supplier, category, and evidence coverage are
+reported separately rather than silently filling missing values.  Figure \ref{fig:data-graph}
+summarises the representation path.
+
+\begin{figure}[t]
+  \centering
+  \IfFileExists{figs/fig03_data_graph.pdf}{%
+    \includegraphics[width=\linewidth]{fig03_data_graph}%
+  }{%
+    \fbox{\parbox[c][1.55in][c]{0.94\linewidth}{\centering\small
+      \textbf{Figure placeholder.} (a) Yearly OCDS releases $\rightarrow$ latest dated
+      $(\text{OCID},\text{release-id})$ snapshot. (b) Official identifiers $\rightarrow$
+      conservative alias rules $\rightarrow$ reviewed safe merges or unresolved singletons.
+      (c) Buyer and supplier organisations linked through contract-award nodes to CPV and evidence
+      nodes, with source metadata retained.}}
+  }
+  \caption{Procurement data and representation pipeline.  Version selection precedes exact rich
+  extraction; precision-first entity resolution preserves an alias audit; and the resulting
+  Parquet-backed property graph retains category and contract-level provenance links.  Fuzzy
+  similarity creates review candidates rather than automatic merges.}
+  \label{fig:data-graph}
+\end{figure}
+
+\subsection{Executable benchmark construction}
+\label{sec:m-benchmark}
+
+Questions begin as deterministic \emph{answer specifications}, not as free-form model outputs.  A
+specification contains literal constraints, an answer operation and field, a deduplication key,
+expected status, and provenance.  Stage 1 executes each candidate on the production record backend
+and a separate reference index.  It rejects conflicting constraints, inconsistent record IDs,
+non-unique factoids, unstable answers, and unsafe sums.  Stage 2 renders an accepted specification
+as a natural question.  A second gate checks identifier leakage, literal preservation, answer type,
+operation, and visible constraints.  The naturaliser never writes the oracle.
+
+The initial process retained 9,044 of 10,000 specifications after naturalisation.  Targeted builders
+then added coverage-fixed, extended-operation, bridge, identity, and explicit non-answer examples.
+The final 12,828 rows are assigned by whole plan group, so a plan identifier cannot occur in both
+training and evaluation.  Curation also balances operation and difficulty buckets and diversifies
+question surfaces.  The current artifact has no train--final plan-ID overlap, although two exact
+question--answer strings and five deduplication groups cross that boundary; we report this in
+Section \ref{sec:discussion}.
+
+\subsection{Single call algebra planner}
+\label{sec:m-compose}
+
+PACS and WTQ use a separate planner that emits one recursive expression or an explicit abstention.
+The algebra has seven types.  They are $\records$, $\values$, $\groups$, $\numbertype$,
+$\valuetype$, $\booltype$, and $\ranking$.  Its operators support filtering, projection, grouping,
+count, sum, extrema, comparison, set operations, and computed set membership.  Validation rejects unknown
+fields, incompatible children, trees deeper than 16, and trees larger than 64 nodes.  The primary
+PACS protocol uses one temperature-zero call, no repair, and no guided decoding.
+
+Compose-v3 training examples are accepted only when a generated tree type-checks, the production
+and secondary executors agree, and the result is non-degenerate.  Its current export has 12,414
+training and 253 validation rows.  The WTQ port replaces the procurement record view with a
+per table adapter.  A typed view is used for predicates and arithmetic, while a raw view preserves
+the displayed answer strings.  Neither protocol invokes the full understander, graph planner,
+evidence verdict, or feedback loop.

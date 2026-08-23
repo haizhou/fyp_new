@@ -1,0 +1,48 @@
+\section{PACS Construction Details}
+\label{app:pacs}
+
+\begin{table}[h]
+  \caption{PACS capability families and intended composition at each level.}
+  \centering
+  \scriptsize
+  \begin{tabular}{lp{0.23\linewidth}p{0.55\linewidth}}
+    \toprule
+    ID & Capability & Typical L1--L3 progression \\
+    \midrule
+    F1 & Spending/volume & Filtered count or additive sum; combined scopes; nested
+    supplier-conditioned scope. \\
+    F2 & Temporal change & Existence/count by year; comparison or difference; grouped temporal
+    extreme. \\
+    F3 & Supplier concentration & Supplier count; grouped top supplier; buyer-conditioned
+    supplier grouping. \\
+    F4 & Cross-buyer comparison & Buyer scope; same-category compare/difference; differently
+    filtered two-sided comparison. \\
+    F5 & Overlap/exclusion & Supplier set; union/intersection/difference; record count conditioned
+    on a derived set. \\
+    F6 & Relational composition & Buyers of supplier; year-filtered buyer set; buyer--supplier--
+    buyer bridge with anchor exclusion. \\
+    F7 & Disclosure/compliance & Missing-field count; buyers with at least one missing field;
+    grouped threshold/perfect-coverage condition. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The \PacsN{}-case test contains 148/149/135/147/127/149/67 examples from F1--F7.  Depth counts are
+279 L1, 339 L2, and 304 L3.  Shape exposure is 431 seen and 491 declared unseen.  Operational
+status counts are 694 answerable, 138 unsupported, and 90 no-result cases.  Because status
+variants travel with their base intent cluster, they do not cross the development/test split.
+
+The sealing implementation uses seed 20260719.  It drops an entire cluster if any of its three
+surface candidates exactly collides with a normalised training instruction, relabels status
+variants from their actual tree shape, and checks the exact question, tree hash, and unseen-shape
+conditions.  For the naturalised channel it computes character-trigram Jaccard similarity
+against \texttt{train\_tris[::7]}; this performance shortcut is disclosed because it weakens an
+otherwise all-pairs interpretation of the gate.  The console message currently says that G3
+passes even though no separate G3 counter is evaluated.  The paper wording follows code, not
+that message.
+
+The audit sample selects up to five naturalised instances per family--depth cell and additional
+status examples with the same seed.  Before release, a human audit should record literal
+preservation, semantic equivalence, answerability, and whether any generated wording is
+unnatural or discloses a template artifact.  The current repository contains the sample but not
+a complete signed human-audit report.

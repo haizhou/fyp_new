@@ -1,0 +1,313 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Overview: two connected execution paths}
+\label{sec:overview}
+
+The system contains a shared deterministic data substrate and two deliberately distinct
+language-model interfaces.
+
+The \textbf{typed-program path} maps a question directly to either an algebra tree or an
+abstention object.  It is used to generate program supervision and to measure compositional
+semantic-parsing capability.  A tree is validated, executed over the query-record universe, and
+scored against an offline oracle.  This path does not create an evidence bundle or call the
+deployment repair loop.
+
+The \textbf{full runtime} first elicits a structured intent.  A router then chooses a
+deterministic compiler whenever the intent can be compiled without either of two implemented
+fast-path vetoes; remaining questions are sent to a typed graph planner.  Both branches converge
+on a graph/low-level specification that is grounded, preflighted, executed, and checked before
+an answer is released.  A bounded feedback path is available only for eligible structured
+defects.  Figure \ref{fig:method-overview} is reserved for this general control flow, whereas
+Figure \ref{fig:visual-thesis} must contain one concrete trace.
+
+\begin{figure}[t]
+  \centering
+  \figureplaceholder{1.65in}{\textbf{Author-drawn Figure 2: full runtime.}\\
+  Question $\rightarrow$ structured understander $\rightarrow$ routing gate
+  $\rightarrow$ deterministic intent compiler \emph{or} typed graph planner
+  $\rightarrow$ consistency/compile $\rightarrow$ grounding and preflight
+  $\rightarrow$ deterministic execution $\rightarrow$ evidence, postflight, and sanity checks
+  $\rightarrow$ answer with evidence / no verified answer.  One dashed bounded-replan edge.}
+  \caption{General full-runtime control flow.  A directly compilable intent bypasses the graph
+  model; a structured failure may trigger bounded replanning, after which the complete
+  ground--execute--check sequence is repeated.  The separate typed-program evaluation omits
+  these deployment stages.}
+  \label{fig:method-overview}
+\end{figure}
+
+\subsection{From OCDS releases to a queryable graph}
+\label{sec:data-method}
+
+\subsubsection{Streaming ingestion and release selection}
+
+The ingestion stage scans yearly gzip-compressed JSON Lines files.  It skips empty and malformed
+lines rather than terminating a multi-year build, unwraps release packages, and flattens the
+fields needed by downstream extraction.  OCDS publishes a new release when information about a
+contracting process changes \citep{ocds-standard}; consequently, multiple rows can share an Open
+Contracting ID (OCID).  For each OCID, the implementation retains the row with the latest
+parseable release date and records all observed source years.  This policy creates a current
+snapshot rather than a complete event history.  It is deterministic for a fixed input ordering
+and explicitly differs from merging all release versions field by field.
+
+The full pipeline entry point accepts an optional year subset.  In the current implementation,
+partial runs must be directed to an explicit non-canonical output path; this prevents a small
+diagnostic run from silently replacing a complete artifact.  The canonical full build preserves
+its original default path.
+
+\subsubsection{Role-aware entity resolution}
+
+Entity resolution is conservative because a false merge affects every downstream join.  Phase 1
+uses official organisation identifiers when an observed identifier belongs to an accepted
+official scheme.  A publication-system identifier (such as a GB-FTS identifier) can become an
+alias only when observations with the same OCID and normalised name share a party role and the
+complete candidate set points to exactly one official canonical identifier.  Candidate
+identifiers are accumulated across observations before the uniqueness decision; a first-row
+match is not sufficient.  This rule avoids merging two same-named parties that occur as buyer
+and supplier or that map to different official organisations.
+
+Phase 2 resolves remaining parties in three deterministic passes: a government lookup table;
+exact normalised name plus region; and, when region is absent, exact normalised name.  A resolved
+cluster receives a stable identifier derived from SHA-256.  An observation whose name
+normalises to an empty string is retained as its own singleton instead of disappearing from the
+output.  Jaro--Winkler similarity at a threshold of 0.92 is used only to emit review candidates;
+it never performs an automatic fuzzy merge.  Thus the resolver favours false negatives over
+irreversible false positives.
+
+\subsubsection{Fact extraction and provenance}
+
+The extraction stage produces normalised tables for tenders, lots, award criteria, awards, bid
+statistics, text evidence, and documents.  For an award-level monetary value, the implementation
+uses the award value when present, otherwise a linked contract value, and finally a tender value
+as a fallback.  Only award- and contract-sourced values are labelled
+\texttt{value\_is\_additive}; tender fallbacks are not.  A numeric zero is a valid value and is
+not replaced by a later fallback.  Currency is stored but not normalised.
+
+Every extracted fact retains identifiers that link it to the OCID, release, award or contract,
+and source evidence where available.  These links permit the runtime to return record-level
+provenance, but they do not prove that a publisher supplied every real-world fact.
+
+\subsubsection{Graph construction and validation}
+
+The graph contains organisation, contract/notice, CPV, and evidence nodes.  Buyer and supplier
+edges connect canonical organisations to contract nodes; category edges connect contracts to
+CPV nodes; and evidence edges connect source artifacts to contracts.  Contract-node identifiers
+are deterministically formed from the OCID and award identifier.  Before publication, the build
+checks primary-key uniqueness, referential integrity, JSON serialisability, additivity labels,
+and coverage thresholds.  The frozen experimental graph contains \KGContracts contract nodes,
+\KGOrgs organisation nodes, \KGCPV CPV nodes, and \KGEvidence evidence nodes.  Exact edge and
+coverage counts appear in Table \ref{tab:dataset-stats}.
+
+The query backend materialises a flat record universe $U_G$ from these Parquet nodes and edges.
+This representation intentionally makes the unit of \texttt{count} explicit: duplicate rows are
+deduplicated by \texttt{contract\_node\_id}.  Buyer/supplier fields use the corresponding stored
+name projection.  Grouping drops null and empty keys.  This record view is the contract between
+the algebra and the graph; changing it changes benchmark semantics and therefore requires a new
+snapshot hash.
+
+\subsection{Closed typed algebra}
+\label{sec:algebra}
+
+The algebra is \emph{closed} in its operator inventory but permits open composition of those
+operators.  Static validation limits a tree to depth 16 and 64 nodes and returns one of seven
+root types.  Table \ref{tab:operators} summarises the principal signatures; Appendix
+\ref{app:algebra} provides the complete inventory and failure semantics.
+
+\begin{table}[t]
+  \caption{Core algebra operators.  $P$ is a predicate, $f$ a field, $m$ an aggregate metric,
+  and $\bowtie_s$ an expression-valued membership predicate.}
+  \label{tab:operators}
+  \centering
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    Family & Signature & Semantics \\
+    \midrule
+    Filter & $\operatorname{filter}_{P}:\records\!\to\!\records$ & Select records \\
+    Project & $\operatorname{values}_{f}:\records\!\to\!\values$ & Distinct non-empty values \\
+    Cardinality & $\operatorname{count}:\records\!\to\!\numbertype$ & Distinct contract count \\
+                & $\operatorname{size}:\values\!\to\!\numbertype$ & Set cardinality \\
+    Aggregate & $\operatorname{sum}_{f}:\records\!\to\!\numbertype$ & Decimal accumulation \\
+    Group & $\operatorname{groupby}_{f,m}:\records\!\to\!\groups$ & Keyed count or sum \\
+    Set & $\operatorname{union/intersect/diff}:\values^2\!\to\!\values$ & Set algebra \\
+    Bridge & $\operatorname{filter}_{f\bowtie_s e}$ & Semi-/anti-join with $e:\values$ \\
+    Rank & $\operatorname{argext}:\groups\!\to\!\valuetype$ & Extreme group key \\
+         & $\operatorname{top}_k:\groups\!\to\!\ranking$ & Ordered key--value pairs \\
+    Scalar & $\operatorname{combine}:\numbertype^2\!\to\!\numbertype/\booltype$ & Arithmetic/comparison \\
+    Boolean & $\operatorname{exists}:\records\!\to\!\booltype$ & Non-empty test \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Predicates support equality, membership, containment, existence, bounded numeric comparison,
+negation, disjunction, and expression-valued membership.  The last form is the key to a bridge
+query.  For example, if $k$ is an anchor buyer name,
+\begin{align}
+ S &= \operatorname{values}_{\texttt{supplier\_name}}
+      (\operatorname{filter}_{\texttt{buyer\_name}=k}(U_G)),\\
+ B &= \operatorname{values}_{\texttt{buyer\_name}}
+      (\operatorname{filter}_{\texttt{supplier\_name}\in S}(U_G)),\\
+ A &= B\setminus
+      \operatorname{values}_{\texttt{buyer\_name}}
+      (\operatorname{filter}_{\texttt{buyer\_name}=k}(U_G)).
+ \label{eq:bridge-example}
+\end{align}
+The types make two common errors visible before execution: filtering
+\texttt{supplier\_name} by a buyer anchor is a role error detectable only from semantics, but
+returning contract identifiers where a set of buyer values is expected also violates the
+declared answer signature.
+
+Static validation checks tree shape and type composition, not the truth of the program or every
+domain guard.  Field existence is checked during evaluation.  Monetary training templates add
+an explicit \texttt{value\_is\_additive=true} predicate, but the generic \texttt{sum} operator
+does not itself prove that this predicate is present, and neither evaluator currently enforces a
+single currency.  We therefore treat monetary results as subject to the limitation in Section
+\ref{sec:limitations}.
+
+\subsection{Deterministic execution}
+\label{sec:execution}
+
+The runtime algebra evaluator first calls the static validator, then evaluates the tree
+recursively over $U_G$.  A record filter constructs a Boolean mask.  An
+\texttt{in\_expr} predicate first evaluates its child to a distinct value set and then applies
+membership to the parent field.  Counts deduplicate contract identifiers.  Distinct projection
+removes null and empty strings.  Numeric sums deduplicate records and accumulate with
+\texttt{Decimal}; non-finite or non-numeric values fail the execution.  Grouped counts
+deduplicate $(\text{group key},\text{contract id})$ pairs.  Rankings use a deterministic
+value-and-key ordering, and select operations fail rather than guess when more than one distinct
+answer remains.
+
+A second evaluator is implemented separately for dataset generation and audit.  A candidate
+training instance is retained only when the system evaluator and this independent implementation
+both return successful envelopes and their answers agree under the generator comparator.  This
+reduces circularity between template generation and execution, although it is not formal
+verification: the two implementations can share assumptions, and the historical comparator had
+an overly permissive Boolean coercion rule (Section \ref{sec:limitations}).
+
+\subsection{Program-first supervision}
+\label{sec:program-supervision}
+
+Training examples are sampled from the actual record distribution rather than generated as
+unanchored text.  A sampler selects concrete buyers, suppliers, years, CPV codes, categories, and
+other field values; instantiates a typed program; renders a natural-language instruction; and
+executes the program.  We reject a sample if (i) the tree fails static validation, (ii) either
+evaluator fails, (iii) the evaluators disagree, (iv) the answer is degenerate for its declared
+type, or (v) the question string has already been accepted.  Degeneracy rules exclude zero-valued
+numeric examples, empty value sets, singleton rankings, and missing scalar answers.  These rules
+are a data-construction heuristic, not a statement that zero is intrinsically invalid at
+inference time.
+
+The resulting LLaMA-Factory export contains \TrainN training and \ValN validation examples.
+Each target is JSON containing either a typed tree or, for unsupported evaluation controls, an
+abstention object.  The specialised parser uses Qwen3-8B \citep{yang2025qwen3} with 4-bit QLoRA
+\citep{dettmers2023qlora}.  LoRA rank is 64, scaling $\alpha=128$, dropout is 0.05, and all
+target modules are adapted.  Training runs for two epochs with per-device batch size 2,
+gradient accumulation 8 (effective batch 16), learning rate $10^{-4}$, cosine decay, 3\%
+warm-up, a 4096-token cutoff, and bfloat16 computation.  The held-out synthetic loss is reported
+only as an optimisation diagnostic because the export contains duplicates and two exact
+train/validation overlaps.
+
+\subsection{Schema-grounded understanding and conditional planning}
+\label{sec:understanding-planning}
+
+The full runtime begins by retrieving a compact schema context and requesting a structured intent
+program.  The intent records the question shape, answer signature, source record constraints,
+intermediate entity-set roles, target constraints, and return operation.  Provider-enforced JSON
+schema output is used when available, with a text/JSON fallback for older clients.  A malformed
+briefing receives one cheap structural retry; an unparseable result becomes a typed planning
+failure rather than a factual answer.
+
+If the object is a recognised intent program, a deterministic compiler maps it to a graph plan.
+The compiled fast path is accepted unless compilation fails or one of two narrow semantic vetoes
+fires: an unsupported cue that could be converted into an invented answer, or a mismatch between
+an entity-set count and a record-count question.  The implementation intentionally does not run
+the raw-planner consistency checker over every compiled graph, because checks calibrated for raw
+model payloads produced false positives on deterministic compiler output.
+
+Questions that do not pass this gate invoke the Step-2 graph planner.  The planner emits typed
+variables, dependencies, operation units, and a return specification.  A consistency checker
+tests the payload against the question, and the compiler normalises and attaches low-level query
+specifications.  Structural compile/consistency failures may trigger a small number of fresh
+plan samples.  An executable but semantically wrong plan is not detectable from structure alone
+and is not resampled using an oracle at inference time.
+
+This conditional design is related to high-precision grammar plus neural fallback systems
+\citep{shaw-etal-2021-compositional}.  A complete routing ablation would compare compiler-only,
+always-planner, and conditional modes under the same model and budget.  The present artifact set
+does not contain that complete three-way experiment, so the paper describes the implemented
+mechanism but does not attribute the entire end-to-end gain to routing.
+
+\subsection{Grounding and graph execution}
+\label{sec:grounding}
+
+Grounding maps aliases to canonical backend fields, normalises values, resolves confident
+organisation mentions, and rejects fields outside the allowed backend profile.  It also attaches
+operation-specific guards such as the additivity predicate used for monetary operations.  A
+preflight phase checks schema support and query preconditions before any answer is produced.
+
+For a graph plan, variables are executed in dependency order.  A source record-set variable
+applies its grounded constraints.  An entity-set variable emits distinct values from its source.
+The emitted set is then bound to the appropriate field of a dependent target variable---for
+example, supplier values are bound to \texttt{supplier\_name}, whereas a record-set
+intersection binds contract identifiers.  Variables at the same dependency level may execute in
+parallel; a terminal operation computes the requested count, set, comparison, or other supported
+answer.  Each variable trace stores its status, grounded constraints, emitted field, output size,
+and answer summary.  The executor is the sole factual authority: the planner is never asked to
+invent the terminal value.
+
+\subsection{Evidence, release checks, and answer cards}
+\label{sec:verification}
+
+Execution returns record and evidence identifiers in an \texttt{EvidenceBundle}.  Postflight
+checks inspect operation-specific properties of the returned rows, while answer-sanity checks
+detect incompatible shapes, non-finite numbers, and other release defects.  An evidence verdict
+summarises whether the implemented support requirement is satisfied.  A released
+\texttt{AnswerCard} contains the denotation or its verbalisation, confidence label, evidence
+identifiers, and limitations.  If a required check fails, the runtime produces no verified
+answer.
+
+These checks provide operational guarantees, not an oracle.  They can establish that a program
+uses allowed fields, executes over the declared scope, and returns linked records.  They cannot
+establish that the plan captures the user's intended semantics or that the publisher's data are
+complete.  We therefore reserve \emph{correct} for the offline oracle metric and use
+\emph{runtime verified} only in the sense defined by Table \ref{tab:guarantee-boundary}.
+
+\subsection{Bounded replanning and abstention}
+\label{sec:repair}
+
+Algorithm \ref{alg:runtime} summarises the implemented control logic.  Repair is eligible when a
+structured defect supplies actionable feedback: compilation or consistency rejection, failed
+preflight/postflight checks, an execution/verifier failure, or a no-result plan containing a
+literal not traceable to the question.  The feedback object records the failure stage, failed
+checks, grounding information, and invented literals.  A new plan is then grounded, executed,
+and checked from the beginning.  No repaired answer is accepted merely because its surface form
+looks better.
+
+Conversely, if a fully grounded query executes to no results and every literal is traceable to
+the question, the empty result is terminal.  Replanning in this case would amount to
+answer-shopping.  Unsupported operations, unresolved ambiguity, exhausted repair budgets, and
+insufficient evidence all terminate with a controlled non-answer.
+
+\begin{figure}[t]
+  \centering
+  \fbox{\begin{minipage}{0.93\linewidth}
+  \small
+  \textbf{Algorithm 1: Full question-answering runtime}\par
+  \begin{enumerate}
+    \item Obtain structured intent $i\leftarrow\textsc{Understand}(q,\mathrm{schema})$.
+    \item If $i$ compiles and no fast-path veto fires, set $H\leftarrow\textsc{Compile}(i)$;
+          otherwise obtain and consistency-check $H\leftarrow\textsc{Plan}(q,i)$.
+    \item For each attempt up to the fixed budget: ground all variables and literals; run
+          preflight; execute variables in dependency order; construct evidence; run postflight,
+          sanity, and evidence checks.
+    \item If all release conditions pass, return an answer card whose factual value is the
+          executor denotation.
+    \item If the defect is repair-eligible, send structured feedback to the planner and return
+          to Step 3.  Otherwise return the corresponding unsupported, ambiguous, no-result, or
+          insufficient-evidence non-answer.
+  \end{enumerate}
+  \end{minipage}}
+  \caption{Runtime control procedure.  Repair changes the plan, never the factual answer
+  directly, and repeats the complete deterministic path.}
+  \label{alg:runtime}
+\end{figure}

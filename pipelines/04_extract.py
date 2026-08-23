@@ -14,8 +14,8 @@ Writes: data/extracted/tender_core.parquet
 
 Usage:
     python pipelines/04_extract.py                  # full run
-    python pipelines/04_extract.py --years 2025     # one year only (quick test)
-    python pipelines/04_extract.py --years 2024 2025
+    python pipelines/04_extract.py --years 2025 --output-dir data/smoke/extracted
+    python pipelines/04_extract.py --years 2024 2025 --output-dir data/smoke/extracted
 
 IMPORTANT: Run 01_ingest.py first (data/interim/releases.parquet must exist).
 
@@ -30,8 +30,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import yaml
-from ingest import load_interim
-from extract import extract_all, write_extracted
+from procurement_graph.common.pipeline_paths import resolve_output_target
+from procurement_graph.extract.tables import extract_all, write_extracted
+from procurement_graph.ingest.loader import load_interim
 
 ROOT = Path(__file__).parent.parent
 
@@ -89,11 +90,21 @@ def print_report(tables: dict) -> None:
     print("─" * 60)
 
 
-def main(years: list[int] | None = None) -> None:
+def main(
+    years: list[int] | None = None,
+    output_dir: Path | None = None,
+) -> None:
     cfg = load_settings()
     raw_dir = ROOT / cfg["data"]["raw_dir"]
     interim_path = ROOT / cfg["data"]["interim_dir"] / "releases.parquet"
-    extracted_dir = ROOT / "data" / "extracted"
+    canonical_extracted_dir = ROOT / "data" / "extracted"
+    extracted_dir = resolve_output_target(
+        canonical_extracted_dir,
+        output_dir,
+        project_root=ROOT,
+        partial=bool(years),
+        option_name="--output-dir",
+    )
 
     year_label = f"years={years}" if years else "all years"
     print("=" * 60)
@@ -141,11 +152,15 @@ if __name__ == "__main__":
         epilog="""
 Examples:
   python pipelines/04_extract.py                   # all years (~166K records)
-  python pipelines/04_extract.py --years 2025      # 2025 only (~52K, quick test)
-  python pipelines/04_extract.py --years 2024 2025 # two years
+  python pipelines/04_extract.py --years 2025 --output-dir data/smoke/extracted
+  python pipelines/04_extract.py --years 2024 2025 --output-dir data/smoke/extracted
         """,
     )
-    parser.add_argument("--years", nargs="*", type=int, default=None,
+    parser.add_argument("--years", nargs="+", type=int, default=None,
                         help="Limit to specific year files (e.g. --years 2025)")
+    parser.add_argument(
+        "--output-dir", type=Path, default=None,
+        help="Output directory (required and non-canonical with --years)",
+    )
     args = parser.parse_args()
-    main(years=args.years)
+    main(years=args.years, output_dir=args.output_dir)

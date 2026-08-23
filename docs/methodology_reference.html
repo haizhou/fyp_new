@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="zh-Hans" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方法学参考 — 每一步做了什么、怎么实现的、得到什么</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  :root{
+    --ground:#f7f8fa;--surface:#fff;--raised:#eef1f5;--line:#d6dae2;--line-soft:#e7eaf0;
+    --ink:#111721;--ink-2:#3b4453;--ink-3:#6c7585;
+    --code:#1c5c8f;--code-bg:#e8f0f7;
+    --ok:#0d6b4f;--ok-bg:#e5f2ed;
+    --warn:#8f5410;--warn-bg:#faf0e1;
+    --gap:#9e2b28;--gap-bg:#fbebea;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --ground:#0b0e13;--surface:#141920;--raised:#1a212a;--line:#28303b;--line-soft:#1e252e;
+    --ink:#e6eaf1;--ink-2:#b2bccb;--ink-3:#7b8595;
+    --code:#6fb4e8;--code-bg:#12222f;--ok:#54c9a4;--ok-bg:#0d2a22;
+    --warn:#dfa662;--warn-bg:#2b2114;--gap:#ef8781;--gap-bg:#321718;}}
+  html[data-theme="dark"]{
+    --ground:#0b0e13;--surface:#141920;--raised:#1a212a;--line:#28303b;--line-soft:#1e252e;
+    --ink:#e6eaf1;--ink-2:#b2bccb;--ink-3:#7b8595;
+    --code:#6fb4e8;--code-bg:#12222f;--ok:#54c9a4;--ok-bg:#0d2a22;
+    --warn:#dfa662;--warn-bg:#2b2114;--gap:#ef8781;--gap-bg:#321718;}
+  html[data-theme="light"]{
+    --ground:#f7f8fa;--surface:#fff;--raised:#eef1f5;--line:#d6dae2;--line-soft:#e7eaf0;
+    --ink:#111721;--ink-2:#3b4453;--ink-3:#6c7585;
+    --code:#1c5c8f;--code-bg:#e8f0f7;--ok:#0d6b4f;--ok-bg:#e5f2ed;
+    --warn:#8f5410;--warn-bg:#faf0e1;--gap:#9e2b28;--gap-bg:#fbebea;}
+
+  body{margin:0;padding:0 1.4rem 6rem;background:var(--ground);color:var(--ink);
+       font-family:var(--sans);font-size:17px;line-height:1.7}
+  .wrap{max-width:64rem;margin:0 auto}
+  nav{position:sticky;top:0;z-index:30;background:var(--ground);border-bottom:1px solid var(--line);
+      display:flex;flex-wrap:wrap;align-items:center;gap:.1rem 1rem;padding:.6rem 0;margin-bottom:2rem;
+      font-family:var(--mono);font-size:.7rem}
+  nav a{color:var(--ink-3);text-decoration:none;border-bottom:2px solid transparent;padding-bottom:2px;white-space:nowrap}
+  nav a:hover,nav a:focus-visible{color:var(--code);border-bottom-color:var(--code)}
+  nav button{margin-left:auto;font-family:var(--mono);font-size:.7rem;background:var(--surface);
+             color:var(--ink-2);border:1px solid var(--line);border-radius:3px;padding:.25rem .55rem;cursor:pointer}
+
+  header.t{padding:3rem 0 2rem;border-bottom:3px solid var(--ink)}
+  header.t h1{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.15;margin:0 0 .8rem;font-weight:700;letter-spacing:-.02em}
+  header.t p{margin:0;color:var(--ink-2);max-width:52ch}
+
+  section{padding:2.6rem 0;border-bottom:1px solid var(--line);scroll-margin-top:3rem}
+  section:last-of-type{border-bottom:0}
+  h2{font-size:clamp(1.35rem,2.8vw,1.85rem);margin:0 0 .4rem;font-weight:700;letter-spacing:-.015em}
+  .eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--code);margin:0 0 .4rem}
+  h3{font-size:1.05rem;font-weight:700;margin:2rem 0 .6rem;padding-bottom:.3rem;border-bottom:1px solid var(--line-soft)}
+  h4{font-size:.95rem;font-weight:700;margin:1.3rem 0 .4rem}
+  p{margin:0 0 .8rem;max-width:64ch}
+  ul,ol{margin:0 0 .9rem;padding-left:1.3rem}
+  li{margin-bottom:.35rem;max-width:62ch}
+
+  code{font-family:var(--mono);font-size:.85em;background:var(--code-bg);color:var(--code);padding:.1em .34em;border-radius:3px}
+  pre{font-family:var(--mono);font-size:.79rem;line-height:1.55;background:var(--raised);
+      border:1px solid var(--line-soft);border-radius:4px;padding:.85rem 1rem;overflow-x:auto;margin:0 0 .9rem}
+  pre code{background:none;color:inherit;padding:0;font-size:1em}
+
+  .src{display:inline-block;font-family:var(--mono);font-size:.65rem;letter-spacing:.03em;
+       padding:.1rem .4rem;border-radius:2px;vertical-align:.1em;margin-left:.4rem;white-space:nowrap}
+  .s-code{background:var(--ok-bg);color:var(--ok)}
+  .s-paper{background:var(--code-bg);color:var(--code)}
+  .s-none{background:var(--gap-bg);color:var(--gap)}
+
+  .box{border-radius:0 4px 4px 0;padding:.9rem 1.2rem;margin:1rem 0}
+  .must{border-left:4px solid var(--warn);background:var(--warn-bg)}
+  .must h4{color:var(--warn);margin-top:0;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+  .must p:last-child,.must ul:last-child{margin-bottom:0}
+  .risk{border-left:4px solid var(--gap);background:var(--gap-bg)}
+  .risk h4{color:var(--gap);margin-top:0;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}
+  .risk p:last-child{margin-bottom:0}
+
+  .scroll{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;margin-bottom:1rem}
+  th,td{padding:.45rem .7rem;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  thead th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);
+           border-bottom:1px solid var(--line);font-weight:700;white-space:nowrap}
+  td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  @media print{nav{position:static}nav button{display:none}section{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="t">
+  <h1>方法学参考:每一步做了什么、<br>怎么实现的、得到什么</h1>
+  <p>为撰写 Methodology 章节准备的逐阶段底稿。每一条都标注核实来源,凡是我没有在代码里亲眼看到的,一律标红,不要直接写进论文。</p>
+</header>
+
+<nav>
+  <a href="#legend">图例</a><a href="#a">A 数据层</a><a href="#b">B 基准构建</a><a href="#c">C 双验证</a>
+  <a href="#d">D 推理系统</a><a href="#e">E 训练数据</a><a href="#f">F 待补清单</a>
+  <button type="button" id="theme">Dark</button>
+</nav>
+
+<section id="legend">
+  <p class="eyebrow">图例</p>
+  <p><span class="src s-code">代码核实</span> 我打开源文件读过,可以直接引用,并可在论文里给出文件名。</p>
+  <p><span class="src s-paper">论文/草稿</span> 来自 <code>main.tex</code> 或 <code>thesis_draft/</code>,数字可信但我未逐一回到代码复核。</p>
+  <p><span class="src s-none">未核实</span> 我没有验证过,写之前必须自己确认。</p>
+</section>
+
+<!-- ============================== A ============================== -->
+<section id="a">
+  <p class="eyebrow">A — 数据层</p>
+  <h2>从 OCDS 原始公告到 typed KG</h2>
+
+  <h3>A1 · 摄入与规范化 <span class="src s-paper">论文/草稿</span></h3>
+  <p>输入是 <strong>166,277 份 OCDS release</strong>(2022–2026),规范化后得到 <strong>215,221 条 award 记录</strong>。
+  论文正文用「releases」,毕设摘要用「contract awards」—— <strong>这两个口径不一致,必须统一后再写。</strong></p>
+
+  <h3>A2 · 实体消解:两阶段瀑布 <span class="src s-code">代码核实</span></h3>
+  <p>实现在 <code>src/procurement_graph/er/phase1.py</code> 与 <code>phase2.py</code>。核心原则是<strong>精确度优先</strong>:上层判不了才交给下层,而模糊匹配<strong>永远不写入合并</strong>。</p>
+
+  <h4>Phase 1(确定性)</h4>
+  <ol>
+    <li><code>collect_parties(releases_df)</code> —— 从 releases 抽出全部 party 观测,统计 raw_id 数与覆盖的 OCID 数。</li>
+    <li><strong>官方编号解析</strong> —— 按 <code>raw_id</code> 分组,<code>_best_canonical_for_raw_id(grp)</code> 从官方注册方案(scheme)里选出最佳 canonical_id。</li>
+    <li><strong>同 OCID 内的 GB-FTS 交叉引用</strong> —— <code>_cross_ref_fts_aliases()</code>:同一份公告内出现的 GB-FTS 编号,可借该公告内已解析的官方编号链接过去。</li>
+    <li><strong>输出</strong> —— <code>canonical_orgs_df</code>(每个规范实体一行)与 <code>alias_map_df</code>(raw_id → canonical_id 的多对一映射)。
+    关键细节:<strong>alias_map 覆盖全部 raw_id</strong>,未解析的 GB-FTS 单例也在里面,带 <code>er_status='unresolved'</code> 标记 —— 也就是说<strong>没有记录被悄悄丢弃</strong>。</li>
+  </ol>
+
+  <h4>Phase 2(受控合并)</h4>
+  <ul>
+    <li><code>apply_gov_lookup()</code> —— 用政府机构对照表匹配。</li>
+    <li><code>merge_by_name_region()</code> —— 规范化名称 + 地区证据联合判断,<code>_make_merged_id(norm_name, region)</code> 生成合并 ID。</li>
+    <li><code>consolidate_merged_groups()</code> / <code>consolidate_duplicate_canonical_orgs()</code> —— 合并组归并,<code>_modal()</code> 取众数、<code>_aggregate_org_type()</code> 聚合机构类型。</li>
+    <li><code>build_audit_log()</code> —— <strong>每一次合并都写审计日志</strong>。这一条在论文里很值钱:合并是可回溯的。</li>
+  </ul>
+
+  <p><span class="src s-paper">论文/草稿</span> 结果:<strong>204,711</strong> 个原始别名 → <strong>131,502</strong> 个规范机构,其中 <strong>82,013</strong> 个单例保持未合并。国防部单年出现 <strong>77</strong> 个平台身份。</p>
+
+  <div class="box must">
+    <h4>写论文时必须说明</h4>
+    <p>要讲清楚<strong>为什么模糊匹配只提名不合并</strong>:错误合并两个议会,会在下游每个答案里造成无声且永久的错误;不合并则错误可见。这是一个可以写成设计原则的取舍,不要只描述流程。</p>
+  </div>
+
+  <h3>A3 · KG 构建与校验 <span class="src s-code">代码核实</span></h3>
+  <p><code>src/procurement_graph/kg/build.py :: build_kg_tables()</code> 的输入是五张表(<code>releases</code>、<code>awards</code>、<code>canonical_orgs</code>、<code>alias_map</code>、<code>text_evidence</code>),输出四类节点 + 四类边:</p>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>产物</th><th>构造函数</th><th>输入</th><th class="n">规模</th></tr></thead>
+    <tbody>
+      <tr><td>org_nodes</td><td><code>build_org_nodes</code></td><td>canonical_orgs + alias_map + releases</td><td class="n">131,502</td></tr>
+      <tr><td>contract_nodes</td><td><code>build_contract_nodes</code></td><td>awards + releases</td><td class="n">215,221</td></tr>
+      <tr><td>cpv_nodes</td><td><code>build_cpv_nodes</code></td><td>releases</td><td class="n">3,870</td></tr>
+      <tr><td>evidence_nodes</td><td><code>build_evidence_nodes</code></td><td>text_evidence</td><td class="n">535,731</td></tr>
+      <tr><td><code>buyer_of</code></td><td><code>build_buyer_edges</code></td><td>awards + releases + alias_map</td><td class="n">215,218</td></tr>
+      <tr><td><code>supplier_of</code></td><td><code>build_supplier_edges</code></td><td>awards + alias_map</td><td class="n">334,063</td></tr>
+      <tr><td><code>categorized_by</code></td><td><code>build_categorized_by_edges</code></td><td>awards + releases</td><td class="n">164,691</td></tr>
+      <tr><td><code>evidence_for</code></td><td><code>build_evidence_for_edges</code></td><td>evidence_nodes + contract_nodes</td><td class="n">1,326,240</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>建完之后 <code>enrich_org_nodes()</code> 和 <code>enrich_cpv_nodes()</code> 回填派生统计,再由 <code>run_validation()</code> → <code>validate_kg()</code> 跑一批断言,结果写成校验报告。已核实的检查项包括:</p>
+  <ul>
+    <li>org / contract / cpv / evidence 四类节点的<strong>主键唯一性</strong></li>
+    <li><code>(ocid, award_id)</code> 组合唯一 —— 防止同一笔授标被重复建节点</li>
+    <li>org 的 <code>address_regions</code> JSON 合法性,且<strong>主地区必须包含在地区集合内</strong></li>
+  </ul>
+
+  <div class="box must">
+    <h4>写论文时必须说明</h4>
+    <p>两百万条边里 <strong>1,326,240 条是 <code>evidence_for</code></strong>,占三分之二。核心关系边只有约 71.4 万。审稿人一定会拆这个数,你自己先拆,并说明溯源边正是答案自带审计轨迹的来源。</p>
+  </div>
+</section>
+
+<!-- ============================== B ============================== -->
+<section id="b">
+  <p class="eyebrow">B — 基准构建</p>
+  <h2>12,828 道题是怎么造出来的</h2>
+
+  <h3>B1 · 「子图」其实不是遍历采样的 <span class="src s-code">代码核实</span></h3>
+  <p>这是你问的核心问题,答案和直觉不同,<strong>必须在论文里说准</strong>。实现在
+  <code>src/procurement_graph/qa/benchmark/samplers.py</code>。</p>
+
+  <p>系统<strong>没有做图遍历式的子图采样</strong>。它的做法是在<strong>扁平记录全域</strong>上采「约束组」:</p>
+
+<pre><code>def _moderate_groups(records, columns, config, *, min_rows=None):
+    grouped = records.groupby(columns, dropna=False).size().rename("n").reset_index()
+    lower = config.min_evidence_rows if min_rows is None else min_rows
+    grouped = grouped[grouped["n"].between(lower, config.max_evidence_rows)]   # 基数带
+    for column in columns:
+        text = grouped[column].astype(str).str.strip()
+        grouped = grouped[grouped[column].notna() & text.ne("")
+                          & text.ne("nan") & text.ne("None")]                  # 剔除空键
+    return grouped.sort_values(["n", *columns]).reset_index(drop=True)         # 确定性排序</code></pre>
+
+  <p>四个步骤,每一步都有方法学含义:</p>
+  <ol>
+    <li><strong>按列组合分组</strong> —— 例如 <code>["release_year","tender_category"]</code> 或 <code>["release_year","tender_cpv_id"]</code>。组键就是未来的约束集。</li>
+    <li><strong>基数带过滤</strong> —— 只保留 <code>n</code> 落在 <code>[min, max]</code> 内的组。这一步同时排除了「记录太少所以答案退化」和「记录太多所以不可控」两类题。</li>
+    <li><strong>空键剔除</strong> —— 任何一个分组列取值为空 / <code>nan</code> / <code>None</code> 的组直接丢弃。</li>
+    <li><strong>确定性排序</strong> —— 按 <code>(n, *columns)</code> 排序后再采样,保证可复现。</li>
+  </ol>
+
+  <p><code>_combined_groups()</code> 在多个列组合上分别跑上面的流程,给每组打上 <code>group_columns</code> 标签后拼接;
+  <code>_sample_frame(grouped, n, rng)</code> 用固定种子采样;<code>_constraints_from_group(row)</code> 把组键翻译成约束。</p>
+
+  <h4><code>SamplerConfig</code> 的真实阈值 <span class="src s-code">代码核实</span></h4>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>参数</th><th class="n">值</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>seed</code></td><td class="n">42</td><td>采样种子</td></tr>
+      <tr><td><code>target_specs</code></td><td class="n">10,000</td><td>目标规格数上限</td></tr>
+      <tr><td><code>min_evidence_rows</code></td><td class="n">1</td><td>通用证据下限</td></tr>
+      <tr><td><code>min_aggregation_evidence_rows</code></td><td class="n">3</td><td><strong>聚合题证据下限</strong></td></tr>
+      <tr><td><code>min_sum_evidence_rows</code></td><td class="n">3</td><td>求和题证据下限</td></tr>
+      <tr><td><code>min_conjunction_evidence_rows</code></td><td class="n">3</td><td>合取题证据下限</td></tr>
+      <tr><td><code>min_temporal_evidence_rows</code></td><td class="n">3</td><td>时序题证据下限</td></tr>
+      <tr><td><code>min_cpv_evidence_rows</code></td><td class="n">3</td><td>CPV 题证据下限</td></tr>
+      <tr><td><code>max_evidence_rows</code></td><td class="n">20,000</td><td>证据上限</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>六个采样器分别产出:<code>_sample_factoid_specs</code>、<code>_sample_count_specs</code>、<code>_sample_sum_specs</code>、
+  <code>_sample_conjunction_specs</code>、<code>_sample_temporal_specs</code>、<code>_sample_cpv_specs</code>。
+  预算由 <code>_rebalance_budgets()</code> 按各类别的实际容量再平衡,最后按 <code>spec_id</code> 去重。</p>
+
+  <div class="box risk">
+    <h4>如果写错会被抓</h4>
+    <p>不要写成「我们从知识图谱中采样子图」。真实做法是<strong>在扁平记录视图上按列组合做基数受限的分组采样</strong>。
+    审稿人一看 <code>samplers.py</code> 就知道,而且这个做法本身完全站得住 —— 用不着美化成图采样。</p>
+  </div>
+
+  <h3>B2 · 真正的两跳来自 bridge 家族 <span class="src s-code">代码核实</span></h3>
+  <p>多跳构造在 <code>src/procurement_graph/qa/targeted_v2/builder.py</code>,共 <strong>7 个 bridge 家族</strong>:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>家族</th><th>构造函数</th><th>逻辑</th><th>操作</th></tr></thead>
+    <tbody>
+      <tr><td><code>buyer_suppliers_sum</code></td><td><code>bridge_suppliers_of_buyer</code></td><td>先解出某买方的全部供应商,再对这些供应商的合约求和</td><td>sum</td></tr>
+      <tr><td><code>supplier_buyers_count</code></td><td><code>bridge_buyers_of_supplier</code></td><td>先解出某供应商的全部买方,再数这些买方的公告</td><td>count</td></tr>
+      <tr><td><code>cpv_suppliers_other_cpv</code></td><td><code>bridge_cpv_suppliers_other_cpv</code></td><td>某 CPV 下的供应商,在另一 CPV 下的记录</td><td>count</td></tr>
+      <tr><td><code>buyer_cpv_set_count</code></td><td><code>bridge_buyer_cpv_set</code></td><td>某买方用过的全部 CPV,再数这些 CPV 下的公告</td><td>count</td></tr>
+      <tr><td><code>year_suppliers_next_year</code></td><td><code>bridge_year_suppliers_next_year</code></td><td>某年的供应商,在次年的记录</td><td>count</td></tr>
+      <tr><td><code>category_buyers_count</code></td><td><code>bridge_category_buyers</code></td><td>某类别下的买方,及其公告数</td><td>count</td></tr>
+      <tr><td><code>supplier_set_compare</code></td><td><code>bridge_supplier_set_compare</code></td><td>两个供应商集合的比较</td><td>compare</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>真实案例(可直接放进论文当 running example)</h4>
+<pre><code># builder.py :: bridge_suppliers_of_buyer
+suppliers = {r["supplier_name"] for r in query(backend,
+              [{"field":"buyer_name","op":"eq","value":buyer}]) if r["supplier_name"]}
+matches   = d[d["supplier_name"].isin(suppliers) & d["_val"].notna()]
+if len(suppliers) < 2 or matches.empty:      # 守卫:少于两个供应商就丢弃
+    continue
+constraints = [{"field":"supplier_name","op":"in_subquery",
+                "value":{"resolve":"suppliers_of_buyer","buyer":buyer}}]
+canonical   = f"What is the total value of contracts awarded to suppliers who also worked with {buyer}?"
+oracle      = round(float(matches["_val"].sum()), 2)</code></pre>
+
+  <p>注意三点:约束用 <code>in_subquery</code> 显式表达「先解子查询再过滤」;
+  <code>len(suppliers) &lt; 2</code> 的守卫排除了退化的单供应商情形;
+  证据 ID 通过 <code>record_ids(...matches.head(50))</code> 留存。</p>
+
+  <p><strong>一条已验证的真实题目</strong>(来自 <code>final_test.jsonl</code>):</p>
+<pre><code>Q: "Record check: how many notices are under CPV codes that
+    Liverpool University Hospitals NHS Foundation Trust has used before?"
+gold_plan.constraints = [{"field":"tender_cpv_id","op":"in_subquery",
+    "value":{"resolve":"cpvs_of_buyer","buyer":"Liverpool University Hospitals NHS Foundation Trust"}}]
+gold_plan.answer_operation = "count"
+gold_plan.dedupe_key       = "contract_node_id"
+oracle_answer              = 1176</code></pre>
+
+  <h3>B3 · 四层题面 <span class="src s-code">代码核实</span></h3>
+  <p><code>scripts/build_multilevel_qa.py</code> 是<strong>计划优先</strong>的:每一条已通过执行器验证的 targeted-v2 行就是一个 PLAN(约束 + 操作 + oracle)。在此之上生成四层:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>层</th><th>产物</th><th>生成方式</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td>L0</td><td><code>plan_bank.jsonl</code></td><td>无语言的纯计划</td><td>执行器验证集</td></tr>
+      <tr><td>L1</td><td><code>surfaces.L1.jsonl</code></td><td>模板生成的源问题</td><td>规则规划器对照组</td></tr>
+      <tr><td>L2</td><td><code>surfaces.L2.jsonl</code></td><td>LLM 改写</td><td>语言到计划的泛化</td></tr>
+      <tr><td>L3</td><td><code>surfaces.L3.jsonl</code></td><td>LLM 对抗形式</td><td>更强的表面扰动</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p><strong>关键设计:同一个计划的所有层级共享同一个 oracle</strong>,所以层间准确率差异<strong>只反映语言到计划的泛化</strong>,不掺杂答案难度差异。这句话值得原样写进论文。</p>
+
+  <h4>L2/L3 的确定性门控 <span class="src s-code">代码核实</span></h4>
+  <p>LLM 改写不是直接采纳,要过 <code>procurement_graph.qa.multilevel.check_surface</code>,失败则拒绝重采(<code>--retries</code> 轮)。门控条件:</p>
+  <ul>
+    <li><strong>原子保留</strong> —— 原问题里的实体、年份、类别必须仍在</li>
+    <li><strong>不得引入新数字</strong></li>
+    <li><strong>不得引入新的 KG 机构名</strong></li>
+    <li><strong>不可答触发词必须保留</strong></li>
+    <li><strong>必须真的被改写过</strong>(防止 LLM 原样返回)</li>
+  </ul>
+  <p>另有 <code>PERSONAS</code> 机制(<code>assign_balanced_personas</code> / <code>persona_for_attempt</code>)做措辞多样化,以及 <code>checker_accepts</code> 的二次 LLM 检查。</p>
+
+  <h3>B4 · 入库门控 <span class="src s-paper">论文/草稿</span></h3>
+  <p>每支程序在题目入库前对完整图谱重新执行一次,排除:多重答案歧义、计划重叠、识别码重复、局部采样遗漏。
+  <span class="src s-none">未核实</span> 这四个门控的具体实现位置我没有逐一定位,写之前建议自己在 <code>gates.py</code> / <code>gate_b.py</code> 里确认。</p>
+</section>
+
+<!-- ============================== C ============================== -->
+<section id="c">
+  <p class="eyebrow">C — 双验证</p>
+  <h2>独立求值器到底怎么实现的</h2>
+
+  <h3>C1 · 设计意图,以及它的独立性边界 <span class="src s-code">代码核实</span></h3>
+  <p><code>scripts/qa_independent_eval.py</code> 的文档字符串把动机写得很清楚,建议在论文里转述:</p>
+  <blockquote style="border-left:3px solid var(--line);margin:0 0 1rem;padding-left:1rem;color:var(--ink-2)">
+    纯 pandas 跑原始 node/edge parquet 表 —— <strong>刻意不与 <code>kg_interface</code> / <code>executor</code> 共用代码</strong>。
+    目的是双验证:基准 oracle 由生成器/执行器家族产出,所以在一个独立实现从原始表重算出同样答案之前,「正确」是循环论证的。
+  </blockquote>
+  <p>它还记录了触发这件事的真实事故:<code>worklog 2026-07-04</code> 的 <strong>notice-vs-contract 计数单位漂移</strong>,正是从这个缺口溜过去的。这个细节非常适合写进论文,因为它说明双验证不是形式主义。</p>
+
+  <div class="box risk">
+    <h4>必须主动交代的独立性边界</h4>
+    <p>脚本有两种 org 匹配约定,<strong>独立程度不同</strong>:</p>
+    <ul>
+      <li><code>--convention edge</code>(<strong>默认</strong>)—— <code>load_frames()</code> 直接读 <code>contract_nodes</code>、<code>org_nodes</code>、
+      <code>buyer_of</code>、<code>supplier_of</code> 四张原始表并自行 merge。<strong>完全独立。</strong></li>
+      <li><code>--convention flat</code> —— <code>load_frames_flat()</code> 会 <code>import ParquetKGQueryBackend</code> 来构造扁平视图。
+      此时<strong>独立的只是算子实现,记录全域的构造是共享的</strong>。源码注释自己写明了:<em>"op implementations remain this module's own"</em>。</li>
+    </ul>
+    <p>论文里要说明 99.88% 是在哪个约定下取得的。默认是 edge,但请回到运行记录确认头条数字用的是哪一个。</p>
+  </div>
+
+  <h3>C2 · 算子实现 <span class="src s-code">代码核实</span></h3>
+  <p><code>IndependentEvaluator.evaluate(row)</code> 返回 <code>(answer, note)</code>,<strong><code>note</code> 非空即表示这是部分/启发式评估</strong>,会单独进 <code>partial_eval_notes</code>。逐算子:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>操作</th><th>独立实现</th><th>note</th></tr></thead>
+    <tbody>
+      <tr><td><code>count</code></td><td><code>matched["contract_node_id"].nunique()</code> —— 合约级去重,不是行数</td><td>—</td></tr>
+      <tr><td><code>sum</code></td><td><code>to_numeric(value_amount).dropna().sum()</code>,四舍五入 2 位</td><td>—</td></tr>
+      <tr><td><code>exists</code></td><td><code>len(matched) &gt; 0</code></td><td>—</td></tr>
+      <tr><td><code>select_unique</code></td><td>买方/供应商走边表取名;唯一才返回</td><td><code>not_unique</code></td></tr>
+      <tr><td><code>distinct_set</code></td><td>依次试 supplier / buyer / cpv 字段,<strong>用 oracle 反推是哪个字段</strong></td><td><code>field_inferred:*</code></td></tr>
+      <tr><td><code>argmin/argmax</code></td><td>优先在非零值中取极值</td><td><code>nonzero_preferred</code></td></tr>
+      <tr><td><code>rank_top_k</code></td><td><strong>硬编码 top-3 buyers by count</strong></td><td><code>top3_buyers_by_count</code></td></tr>
+      <tr><td><code>compare</code></td><td>转 <code>_evaluate_compare()</code>,含<strong>题面正则解析</strong></td><td><code>surface_threshold</code> 等</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>C3 · 18 个残余分歧的代码级解释 <span class="src s-code">代码核实</span></h3>
+  <p>这是全文最能体现严谨的一段。<strong>那 18 个分歧不是随机噪声,而是求值器两处已知的启发式所致</strong>,并且代码里预先声明了它们:</p>
+
+<pre><code># 文件顶部的显式声明
+UNDERSPECIFIED_FAMILIES = {"date_relation", "boolean_field_equality", "comparison",
+                           "numeric_threshold", "supplier_set_compare"}
+# 注释:这些家族的 gold_plan 没有序列化全部参数
+#      (阈值和比较方向只存在于题面)—— 借助题面解析评估,并单独报告。</code></pre>
+
+  <ul>
+    <li><strong>15 个 top_k 参数推断</strong> —— <code>rank_top_k</code> 分支硬编码了「按计数取前三个买方」。
+    当黄金计划的 <code>k</code> 或分组字段不同时,两边就会不一致。</li>
+    <li><strong>3 个 boolean 表面解析</strong> —— <code>numeric_threshold</code> 用
+    <code>re.search(r"(?:gbp|£)\s*([\d,.]+)\s*(million|billion|m|bn)?", question)</code> 从题面抠阈值;
+    抠不到就返回 <code>threshold_unparsed</code>。</li>
+  </ul>
+
+  <div class="box must">
+    <h4>写论文时的正确表述</h4>
+    <p>不要写成「18 个无法解释的分歧」。要写成:<strong>求值器对五个参数未完全序列化的家族采用题面解析,这部分被显式标注并单独报告;
+    残余 18 例全部落在这两类已知启发式内,逐一人工检视,无一影响已报告的比较。</strong>
+    这样写,弱点反而变成方法学上的强项。</p>
+  </div>
+</section>
+
+<!-- ============================== D ============================== -->
+<section id="d">
+  <p class="eyebrow">D — 推理系统</p>
+  <h2>模型提出,确定性代码裁决</h2>
+
+  <h3>D1 · Reader / Step-1:briefing 的真实契约 <span class="src s-code">代码核实</span></h3>
+  <p>代码里存在<strong>两种 briefing 表示</strong>,写论文时要说清用的是哪一种。</p>
+
+  <h4>形式一:带标签的文本(<code>typed_planning.py :: _normalise_understanding_keys</code>)</h4>
+  <p>八个字段,大写标签映射到小写键:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>标签</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td><code>QUESTION_TYPE</code></td><td>问题类型</td></tr>
+      <tr><td><code>QUERY_TEMPLATE</code></td><td>意图模板</td></tr>
+      <tr><td><code>NEEDS_TO_RETURN</code></td><td>要返回什么</td></tr>
+      <tr><td><code>KNOWN_INFORMATION</code></td><td><strong>从问题本身抽出的前置信息</strong></td></tr>
+      <tr><td><code>ROLE_DIRECTION</code></td><td>关系角色方向</td></tr>
+      <tr><td><code>REASONING_CHAIN</code></td><td><strong>预测的大致逻辑链</strong></td></tr>
+      <tr><td><code>MISSING_OR_UNSUPPORTED_INFORMATION</code></td><td><strong>规划之前就标记不可答</strong></td></tr>
+      <tr><td><code>NOTES_FOR_PLANNER</code></td><td>给规划器的提示</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>形式二:程序骨架 JSON —— 这才是训练数据里实际用的</h4>
+  <p>取自 <code>data/qa/teacher_full_v1/verified_sft.jsonl</code> 的<strong>真实样本,未经修饰</strong>:</p>
+<pre><code>Q: "...for Powys County Council, under CPV 85000000, which supplier is
+    listed on the contract notice awarded to ABICARE SERVICES LIMITED?"
+
+answer_signature: {operation:"select", value_type:"entity", answer_field_text:"supplier"}
+program: [
+  {id:"A", op:"filter_records", inputs:[],    args:{filters:[
+      {field_text:"release_year",       operator:"eq", value:"2025",              value_type:"year"},
+      {field_text:"buyer organisation", operator:"eq", value:"Powys County Council", value_type:"entity"},
+      {field_text:"CPV code",           operator:"eq", value:"85000000",          value_type:"cpv"}]}},
+  {id:"B", op:"filter_records", inputs:["A"], args:{filters:[
+      {field_text:"supplier_name", operator:"eq", value:"ABICARE SERVICES LIMITED", value_type:"entity"}]}}
+]</code></pre>
+
+  <p><strong>论文里最该点出的一件事:<code>field_text</code> 仍是自然语言</strong>(<code>"buyer organisation"</code>、<code>"CPV code"</code>)。
+  briefing 是一棵<strong>带依赖(<code>inputs</code>)的程序骨架,但字段尚未接地</strong> —— 它承诺逻辑链的形状,不承诺 schema 细节。
+  这正是把它称为「语义前缀」的依据。</p>
+
+  <p><strong>可报告的统计</strong> <span class="src s-code">代码核实</span>:<code>verified_sft.jsonl</code> 共 <strong>5,598</strong> 条,
+  其中 <strong>3,855</strong> 条带完整 briefing,<strong>403</strong> 条含真实中间依赖(<code>inputs</code> 非空)。</p>
+
+  <h3>D2 · Planner / Step-2 <span class="src s-code">代码核实</span></h3>
+  <p><code>typed_plan_messages()</code> 构造提示,输入 payload 是三件套:<code>question</code>、
+  <code>step1_understanding_briefing</code>、<code>retrieved_schema_context</code>。</p>
+  <p>两个提示变体(保留做 A/B):<code>variant="card"</code> 附带执行器能力卡与模板骨架(为 nano 级 Stage-2 引入);
+  <code>variant="lean"</code> 是仅 briefing 的版本 —— <strong>实测对 grok 更好</strong>,因为骨架机制反而干扰了它的桥接规划。</p>
+  <p>系统提示里有一句关键约束:<em>"fill the fields faithfully and <strong>never answer the question</strong>"</em>。
+  输出形状由严格的 <code>graph_plan_schema</code> 强制,所以提示本身只需给任务指引,不必再塞 schema。</p>
+
+  <p>九个意图模板 + <code>bridge_join</code> + <code>unanswerable</code>,每个模板声明允许的 <code>operations</code> 与 <code>slots</code>:</p>
+<pre><code>"factoid":     {operations:("select_unique",),          slots:("answer_field","constraints")}
+"count":       {operations:("count",),                  slots:("constraints",)}
+"sum":         {operations:("sum",),                    slots:("constraints",)}
+"boolean":     {operations:("exists","predicate"),      slots:("constraints","comparison")}
+"comparison":  {operations:("predicate",),              slots:("constraints","comparison")}
+"min_max":     {operations:("argmax","argmin"),         slots:("constraints",)}
+"top_k":       {operations:("top_k",),                  slots:("constraints","group_by","k","metric")}
+"set":         {operations:("distinct_set",),           slots:("answer_field","constraints")}
+"compare_two": {operations:("compare",),                slots:("left","right","constraints")}</code></pre>
+
+  <p><code>bridge_join</code> 模板显式声明两个 step,<strong>中间依赖写在结构里</strong>:</p>
+<pre><code>"bridge_join": {steps:[
+   {step:"anchor_set", action:"find intermediate entities",
+    constraints:[...], bind_slot:"buyer|supplier"},
+   {step:"answer",     action:"aggregate over contracts for bound entities",
+    from_step:"anchor_set", constraints:[...]}]}</code></pre>
+
+  <h3>D3 · 编译 <span class="src s-code">代码核实</span></h3>
+  <p><code>graph_planning.py :: compile_graph_plan()</code> 的早期拒绝理由(可以直接列进论文的失败分类):</p>
+  <ul>
+    <li><code>missing_graph_plan</code> —— payload 里没有 graph_plan</li>
+    <li><code>missing_graph_variables</code> —— 变量表为空</li>
+    <li><code>missing_graph_return</code> —— 缺 operation 或 input</li>
+    <li><code>runtime_rejected</code> —— 运行期拒绝</li>
+  </ul>
+  <p>依赖推导是这里最有技术含量的一段,值得在论文里单独写一小段。<code>derive_depends_on()</code> 从变量命名约定推出依赖,
+  但规划器经常用同一后缀表达<strong>相反</strong>的含义(<code>b1a1</code> 既可能是「喂给 a1」也可能是「派生自 a1」)。
+  处理办法:<strong>当命名推导与显式 <code>depends_on</code> 冲突时,以显式声明为准,丢弃命名推出的反向边,避免编译出二元环。</strong>
+  另外「关系 from S to T」被当作真实的数据流边,否则关系式桥接会静默地不绑定而全量执行。</p>
+
+  <p><span class="src s-paper">论文/草稿</span> 论文称有「十二个规范化变换 + 三道闸门(全程序可接地 / DAG 合法 / 无未受约束的绑定源)」。
+  <span class="src s-none">未核实</span> 我没有逐一数出这 12 个变换和 3 道闸门的代码位置,引用前请自行核对。</p>
+
+  <h3>D4 · 执行 <span class="src s-code">代码核实</span></h3>
+  <p><code>executor.py :: execute_query_spec()</code> 的流程:</p>
+  <ol>
+    <li>跑 <code>preflight_checks()</code>;任一失败即返回,并<strong>按失败类型映射状态</strong>:
+    缺字段 → <code>schema_error</code>;需穷举未满足 → <code>incomplete_evidence</code>;其余 → <code>constraint_conflict</code>。</li>
+    <li>检查操作是否在支持集内。<strong>已核实的 <code>_SUPPORTED</code> 共 10 个</strong>:
+    <code>select_unique, count, sum, exists, argmax, argmin, distinct_set, set, top_k, predicate</code>;
+    不在集合内 → <code>unsupported_operation</code>。</li>
+    <li><strong>快路径</strong>:<code>count</code> / <code>exists</code> 只需计数,走 <code>backend.count()</code> 加一个封顶采样
+    (<code>_EVIDENCE_ID_CAP</code>)取证据,<strong>使得 bridge 第二跳的巨大匹配集永远不会被完整物化</strong>。这是个真实的工程决策,值得写。</li>
+  </ol>
+
+  <div class="box risk">
+    <h4>口径冲突预警</h4>
+    <p>执行器的 <code>_SUPPORTED</code> 是 <strong>10 个操作</strong>,<code>models.py</code> 的 <code>RuntimeAnswerOperation</code> 是
+    <strong>12 个</strong>,而论文声称的算子代数是 <strong>17 个节点类型 + 7 种值类型</strong>。
+    这三者<strong>属于不同层</strong>:17 个是第 9 章递归代数的节点类型,12/10 个是 v1 运行期规格的答案操作。
+    论文里必须讲清是哪一层,否则会被认为数字对不上。</p>
+  </div>
+
+  <h3>D5 · 验证 <span class="src s-code">代码核实</span></h3>
+  <p><code>verifier.py</code> 里<strong>已核实的具名检查共五项</strong>,分前后两段:</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>阶段</th><th>检查</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td>preflight</td><td><code>schema_fields</code></td><td>引用字段是否存在于后端(后端未暴露字段时记为跳过)</td></tr>
+      <tr><td>preflight</td><td><code>constraint_conflicts</code></td><td>约束间是否互相矛盾</td></tr>
+      <tr><td>postflight</td><td><code>answer_uniqueness</code></td><td>声称唯一答案时,匹配合约数须 ≤ 1</td></tr>
+      <tr><td>postflight</td><td><code>sum_additive_safety</code></td><td>检查 <code>value_is_additive</code>,返回 <code>unsafe_evidence_ids</code></td></tr>
+      <tr><td>postflight</td><td><code>population_coverage</code></td><td>集合枚举的总体覆盖;走采样时标记 <code>coverage_sampled</code> 与样本量</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><code>sum_additive_safety</code> 有两个诚实的短路:无行时返回通过并注明 <code>reason="no rows"</code>;
+  后端未提供 <code>value_is_additive</code> 时同样通过并注明 —— <strong>不假装检查过</strong>。这个细节可以写。</p>
+
+  <h3>D6 · 反思 <span class="src s-code">代码核实</span></h3>
+  <p><code>reflector.py :: reflect(result, plan, *, rounds_used=0, max_rounds=3)</code>。
+  <strong><code>max_rounds=3</code> 已核实</strong>,<code>pipeline.py</code> 同样默认 3,循环体是 <code>for round_index in range(self.max_rounds)</code>。</p>
+  <p>已核实的动作类型:</p>
+  <ul>
+    <li><code>no_repair_needed</code> —— 执行通过验证,或计划本身可执行</li>
+    <li><code>mark_unsupported</code> —— 问题在当前 KG 下不可答</li>
+    <li><code>ask_clarifying_question</code> —— 规划器无候选,或问题歧义</li>
+    <li><code>report_insufficient_evidence</code> —— KG 中无匹配合约</li>
+  </ul>
+  <p>预算判断是 <code>budget_left = rounds_used &lt; max_rounds - 1</code>。</p>
+</section>
+
+<!-- ============================== E ============================== -->
+<section id="e">
+  <p class="eyebrow">E — 训练数据</p>
+  <h2>候选自动生成,训练集只装验证通过的</h2>
+
+  <h3>E1 · 验收漏斗 <span class="src s-paper">论文/草稿</span></h3>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>阶段</th><th class="n">数量</th><th class="n">验收率</th><th>来源</th></tr></thead>
+    <tbody>
+      <tr><td>可答训练题</td><td class="n">8,555</td><td class="n">—</td><td>论文 ladder 表</td></tr>
+      <tr><td>教师通过</td><td class="n">5,605</td><td class="n">65.5%</td><td>论文</td></tr>
+      <tr><td>自采集首轮 · Qwen</td><td class="n">6,556</td><td class="n">76.6%</td><td>论文</td></tr>
+      <tr><td>自采集首轮 · Llama</td><td class="n">6,685</td><td class="n">78.1%</td><td>论文</td></tr>
+      <tr><td>自采集第二轮</td><td class="n">—</td><td class="n">86.3%</td><td>论文</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>论文里最该强调的一句:验收率持续上升,但第二轮的评测增益只有 0.4 分且不显著</strong>,
+  所以循环停在实测天花板而非继续迭代。<strong>验收率不是能力增益的代理指标</strong> —— 这是个可独立成立的方法学发现。</p>
+
+  <h4>磁盘上的实际文件 <span class="src s-code">代码核实</span></h4>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>文件</th><th class="n">行数</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td><code>teacher_full_v1/traces.jsonl</code></td><td class="n">9,267</td><td>全部候选轨迹</td></tr>
+      <tr><td><code>teacher_full_v1/verified_sft.jsonl</code></td><td class="n">5,598</td><td>验证通过(≈ 论文 5,605)</td></tr>
+      <tr><td><code>teacher_full_v1/failures.jsonl</code></td><td class="n">1,789</td><td>失败轨迹</td></tr>
+      <tr><td><code>teacher_full_v1/repair_sft.jsonl</code></td><td class="n">1,725</td><td>修复轨迹</td></tr>
+      <tr><td><code>teacher_full_v1/hard_negatives.jsonl</code></td><td class="n">1,262</td><td>难负例</td></tr>
+      <tr><td><code>teacher_full_v1/abstain_sft.jsonl</code></td><td class="n">590</td><td>弃答示范</td></tr>
+      <tr><td><code>teacher_full_v1/dpo_pairs.jsonl</code></td><td class="n">390</td><td>偏好对</td></tr>
+      <tr><td><code>rsft_qwen_r1/verified_sft.jsonl</code></td><td class="n">6,550</td><td>自采集首轮(≈ 论文 6,556)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>文件行数与论文数字有个位数差异</strong>(5,598 vs 5,605;6,550 vs 6,556)。写论文前要么解释(去重/后处理),要么统一口径。</p>
+
+  <h3>E2 · 验收规则 <span class="src s-code">代码核实</span></h3>
+  <p><code>scripts/export_step1_sft.py</code> 的文档字符串把 briefing 的验收逻辑讲得很清楚,建议在论文里转述这个论证:</p>
+  <blockquote style="border-left:3px solid var(--line);margin:0 0 1rem;padding-left:1rem;color:var(--ink-2)">
+    只保留 <code>oracle_match=True</code> 的轨迹(答对,<strong>或正确地弃答</strong>)。
+    briefing 位于每个结果的上游,所以<strong>验收 = 在这份 briefing 之下整条流水线跑通了</strong>。
+  </blockquote>
+  <p>去重逻辑:同一 <code>qid</code> 保留最佳轨迹,<code>oracle_match</code> 者优先。</p>
+  <p><code>scripts/export_llamafactory.py</code>:plan SFT = 验证通过 + 弃答,<strong>按家族封顶</strong>,
+  弃答样本占验证池的比例设上限;排序用 <code>sha1(id)</code> 保证确定性。</p>
+
+  <div class="box must">
+    <h4>措辞纪律</h4>
+    <p>不要写「使用部分可验证的数据训练」。要写:<strong>候选轨迹由模型自动生成,但学生模型的最终训练集只包含通过执行验证的子集。</strong></p>
+    <p>同样地,不要写「验证使学生从 69.76 提升到 85.65」—— 你没有「未筛选 vs 已验证」的直接消融,
+    只能说验证过的自生成监督<strong>足以</strong>训出超过教师的学生。</p>
+  </div>
+</section>
+
+<!-- ============================== F ============================== -->
+<section id="f">
+  <p class="eyebrow">F — 收尾</p>
+  <h2>动笔前必须自己确认的六件事</h2>
+
+  <ol>
+    <li><strong>规模口径统一。</strong> 166,277 releases 与 215,221 award records 是两个不同的东西,
+    毕设摘要目前把后者写成了「releases」的角色。全文选一个主口径。</li>
+    <li><strong>算子数量分层说明。</strong> 17(第 9 章递归代数节点)/ 12(<code>RuntimeAnswerOperation</code>)/ 10(执行器 <code>_SUPPORTED</code>)
+    分属不同层,必须讲清楚,否则看起来自相矛盾。</li>
+    <li><strong>双验证的约定。</strong> 99.88% 是 edge 还是 flat 约定下取得的?回到运行记录确认,并在论文里写明独立性边界。</li>
+    <li><strong>12 个变换 / 3 道闸门。</strong> <span class="src s-none">未核实</span> 论文已经这样写了,但我没能在代码里逐一对上。引用前请自行数一遍。</li>
+    <li><strong>入库四门控的实现位置。</strong> <span class="src s-none">未核实</span> 建议在 <code>qa/benchmark/gates.py</code> 与 <code>gate_b.py</code> 里定位后再写。</li>
+    <li><strong>训练文件行数与论文数字的个位数差异。</strong> 5,598/5,605、6,550/6,556 —— 找出原因或统一。</li>
+  </ol>
+
+  <div class="box must">
+    <h4>Methodology 的建议骨架(对标 ACL/EMNLP)</h4>
+    <ol>
+      <li><strong>Problem Definition</strong> —— 形式化:给定问题 q 与数据 D,学一个映射,使得答案由执行产生而非生成产生。<strong>你现在完全缺这一节。</strong></li>
+      <li><strong>Framework Overview</strong> —— Interpreter / Planner / 确定性栈的分解,以及「模型提出、执行裁决」的边界。</li>
+      <li><strong>Program Language</strong> —— 值类型与算子清单、类型检查、文法编译成 JSON schema。</li>
+      <li><strong>Program Generation</strong> —— Reader 的 briefing 契约、Planner 的模板与受约束解码。</li>
+      <li><strong>Grounding &amp; Execution</strong> —— 接地纪律、编译闸门、执行器快路径。</li>
+      <li><strong>Verification &amp; Repair</strong> —— 五项检查、三轮修复上限、拒绝规则。</li>
+      <li><strong>Training Data Construction</strong> —— 候选采样、验收规则、自采集。<strong>这一节现在散在 Evaluation 里,要搬进 Method。</strong></li>
+    </ol>
+  </div>
+</section>
+
+</div>
+<script>
+(function(){var r=document.documentElement,b=document.getElementById('theme');
+function s(t){r.setAttribute('data-theme',t);b.textContent=t==='dark'?'Light':'Dark';}
+s(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+b.addEventListener('click',function(){s(r.getAttribute('data-theme')==='dark'?'light':'dark');});})();
+</script>
+</body>
+</html>

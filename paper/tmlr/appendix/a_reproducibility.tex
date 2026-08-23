@@ -1,0 +1,93 @@
+\section{Reproducibility Snapshot}
+\label{app:reproducibility}
+
+\subsection{Code and artifact state}
+
+The repository base commit inspected for this draft is
+\texttt{d15ec0a3bd5b5f295f9828e44067094b73ab2cd7}.  The working tree also contains uncommitted
+correctness patches and staged data artifacts; the commit alone is therefore not an exact
+reproduction capsule.  Before submission, the authors must create a clean tagged revision and
+record the patch, Python environment lock, CUDA/driver versions, model revisions, and command
+lines.  No new model training or batch inference was run to prepare this draft.
+
+\begin{table}[h]
+  \caption{Content hashes for the primary frozen inputs.}
+  \label{tab:artifact-hashes}
+  \centering
+  \scriptsize
+  \begin{tabular}{p{0.44\linewidth}p{0.48\linewidth}}
+    \toprule
+    Repository path & SHA-256 \\
+    \midrule
+    \path{data/qa/pacs_v1/test_channel_a.jsonl}
+      & \texttt{1869558ad2764b92888df47b093dfc2f}\newline
+        \texttt{f693d2fdfdd6544f1fa3734d017cf2bb} \\
+    \path{data/qa/pacs_v1/test_channel_b.jsonl}
+      & \texttt{36100c4bfb7b34ef6fe1d72c62d33a62}\newline
+        \texttt{d069501aad97c0e28a172345a901339b} \\
+    \path{data/training/llamafactory_compose_v3/compose_sft_train.json}
+      & \texttt{a80945184aeb9531321b26ef57286656}\newline
+        \texttt{8707eeba10b7dc56ec34f8e35f00a20d} \\
+    \path{data/training/llamafactory_compose_v3/compose_sft_val.json}
+      & \texttt{7cba3d43610a90216e5d7655319178df}\newline
+        \texttt{3a66f1728d1133b704808b0a8ba2a899} \\
+    \path{data/kg/nodes/contract_nodes.parquet}
+      & \texttt{246caad93e1c8b184d3714a280190efb}\newline
+        \texttt{3c238f4cab73cd3bf1f36b38de307bf1} \\
+    \path{data/kg/nodes/org_nodes.parquet}
+      & \texttt{42f9542833275ea7a57feb2cc4f4e64}\newline
+        \texttt{a507513f35b2e420a449d938b68b867af} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Per-item PACS predictions and summaries are stored under
+\texttt{data/qa/compose\_probe\_v1/}.  The primary summaries are
+\texttt{summary\_pacstest\_base\_a.json},
+\texttt{summary\_pacstest\_teacher\_a.json},
+\texttt{summary\_pacstest\_v3\_a.json}, and
+\texttt{summary\_pacstest\_v3\_b.json}.  The corresponding JSON Lines files retain the raw
+model response, parsed tree, execution answer, oracle, outcome, and correctness flag.
+
+The 260-item runtime summaries are under
+\texttt{outputs/eval/matrix\_v2/fully-local-qwen/},
+\texttt{.../cicada-qwen3-zeroshot/}, and \texttt{.../teacher\_r3/}.  These paths contain an
+internal historical label and currently resolve through a machine-specific absolute symlink;
+that label is not used as the method's paper name.
+
+\subsection{Pipeline entry points}
+
+A full deterministic data build follows this order:
+\begin{verbatim}
+.venv/bin/python -B pipelines/01_ingest.py
+.venv/bin/python -B pipelines/02_er_phase1.py
+.venv/bin/python -B pipelines/03_er_phase2.py
+.venv/bin/python -B pipelines/04_extract.py
+.venv/bin/python -B pipelines/40_build_kg.py
+.venv/bin/python -B pipelines/41_validate_kg.py
+\end{verbatim}
+Partial year/sample runs require explicit alternate outputs in the current code and must never
+be used to overwrite the canonical artifact.  Exact raw-data acquisition commands and licences
+remain to be added to the release manifest.
+
+Program supervision is built with \texttt{scripts/build\_compose\_train.py}, exported with the
+compose export script, and trained with
+\texttt{configs/training/qwen3\_8b\_compose\_sft\_v3\_qlora.yaml}.  The stored training summary
+reports train loss 0.0171394, evaluation loss 0.0096943, and runtime 8270.93 seconds.  These losses
+are diagnostics only because the exported split is not fully deduplicated.
+
+PACS generation uses, in order,
+\texttt{scripts/pacs/generate.py}, \texttt{render\_channels.py},
+\texttt{surface\_independent.py}, \texttt{naturalize.py}, and \texttt{seal.py}.  Evaluation uses
+\texttt{scripts/run\_compose\_probe\_eval.py}.  A release command must record the serving
+endpoint, exact model revision, API date/version, prompt hash, maximum tokens, concurrency,
+temperature, guided-decoding flag, reflection budget, and scorer revision.
+
+\subsection{Checklist before final submission}
+
+The final artifact should contain: (i) a clean source tag and dirty-tree check; (ii) raw-data and
+KG manifests; (iii) model/adapter hashes or durable release links; (iv) exact prompts and JSON
+schemas; (v) strict scorer unit tests covering Boolean versus numeric values; (vi) route,
+repair, and failure counts; (vii) random seeds and repeated-run policy; (viii) hardware and
+software versions; and (ix) a one-command script that regenerates every table from JSON/Parquet
+without copying numbers by hand.

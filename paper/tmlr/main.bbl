@@ -1,0 +1,252 @@
+\begin{thebibliography}{24}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Cao et~al.(2022)Cao, Shi, Pan, Nie, Xiang, Hou, Li, He, and
+  Zhang]{cao-etal-2022-kqa}
+Shulin Cao, Jiaxin Shi, Liangming Pan, Lunyiu Nie, Yutong Xiang, Lei Hou,
+  Juanzi Li, Bin He, and Hanwang Zhang.
+\newblock {KQA} pro: A dataset with explicit compositional programs for complex
+  question answering over knowledge base.
+\newblock In \emph{Proceedings of the 60th Annual Meeting of the Association
+  for Computational Linguistics (Volume 1: Long Papers)}, pp.\  6101--6119,
+  2022.
+\newblock \doi{10.18653/v1/2022.acl-long.422}.
+\newblock URL \url{https://aclanthology.org/2022.acl-long.422/}.
+
+\bibitem[Chen et~al.(2021)Chen, Liu, Yu, Lin, Lou, and
+  Jiang]{chen-etal-2021-retrack}
+Shuang Chen, Qian Liu, Zhiwei Yu, Chin-Yew Lin, Jian-Guang Lou, and Feng Jiang.
+\newblock {R}e{T}ra{C}k: A flexible and efficient framework for knowledge base
+  question answering.
+\newblock In \emph{Proceedings of the 59th Annual Meeting of the Association
+  for Computational Linguistics and the 11th International Joint Conference on
+  Natural Language Processing: System Demonstrations}, pp.\  325--336, 2021.
+\newblock \doi{10.18653/v1/2021.acl-demo.39}.
+\newblock URL \url{https://aclanthology.org/2021.acl-demo.39/}.
+
+\bibitem[Dettmers et~al.(2023)Dettmers, Pagnoni, Holtzman, and
+  Zettlemoyer]{dettmers2023qlora}
+Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer.
+\newblock {QLoRA}: Efficient finetuning of quantized {LLMs}.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~36, 2023.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2023/hash/1feb87871436031bdc0f2beaa62a049b-Abstract-Conference.html}.
+
+\bibitem[Guo et~al.(2023)Guo, Luo, Lai, and Yin]{guo-etal-2023-parse}
+Wangzhen Guo, Linyin Luo, Hanjiang Lai, and Jian Yin.
+\newblock From parse-execute to parse-execute-refine: Improving semantic parser
+  for complex question answering over knowledge base.
+\newblock In \emph{Proceedings of the 2023 Conference on Empirical Methods in
+  Natural Language Processing}, pp.\  11771--11780, 2023.
+\newblock \doi{10.18653/v1/2023.emnlp-main.720}.
+\newblock URL \url{https://aclanthology.org/2023.emnlp-main.720/}.
+
+\bibitem[Huang et~al.(2024)Huang, Cheng, Huang, Shen, Xu, Zhang, and
+  Qu]{huang-etal-2024-queryagent}
+Xiang Huang, Sitao Cheng, Shanshan Huang, Jiayu Shen, Yong Xu, Chaoyun Zhang,
+  and Yuzhong Qu.
+\newblock {Q}uery{A}gent: A reliable and efficient reasoning framework with
+  environmental feedback based self-correction.
+\newblock In \emph{Proceedings of the 62nd Annual Meeting of the Association
+  for Computational Linguistics (Volume 1: Long Papers)}, pp.\  5014--5035,
+  2024.
+\newblock \doi{10.18653/v1/2024.acl-long.274}.
+\newblock URL \url{https://aclanthology.org/2024.acl-long.274/}.
+
+\bibitem[Jiang et~al.(2023{\natexlab{a}})Jiang, Zhou, Dong, Ye, Zhao, and
+  Wen]{jiang-etal-2023-structgpt}
+Jinhao Jiang, Kun Zhou, Zican Dong, Keming Ye, Xin Zhao, and Ji-Rong Wen.
+\newblock {S}truct{GPT}: A general framework for large language model to reason
+  over structured data.
+\newblock In \emph{Proceedings of the 2023 Conference on Empirical Methods in
+  Natural Language Processing}, pp.\  9237--9251, 2023{\natexlab{a}}.
+\newblock \doi{10.18653/v1/2023.emnlp-main.574}.
+\newblock URL \url{https://aclanthology.org/2023.emnlp-main.574/}.
+
+\bibitem[Jiang et~al.(2023{\natexlab{b}})Jiang, Zhou, Zhao, and
+  Wen]{jiang2023unikgqa}
+Jinhao Jiang, Kun Zhou, Xin Zhao, and Ji-Rong Wen.
+\newblock {UniKGQA}: Unified retrieval and reasoning for solving multi-hop
+  question answering over knowledge graph.
+\newblock In \emph{International Conference on Learning Representations},
+  2023{\natexlab{b}}.
+\newblock URL \url{https://openreview.net/forum?id=Z63RvyAZ2Vh}.
+
+\bibitem[Keysers et~al.(2020)Keysers, Sch{"a}rli, Scales, Buisman, Furrer,
+  Kashubin, Momchev, Sinopalnikov, Stafiniak, Tihon, Tsarkov, Wang, van Zee,
+  and Bousquet]{keysers2020cfq}
+Daniel Keysers, Nathanael Sch{"a}rli, Nathan Scales, Hylke Buisman, Daniel
+  Furrer, Sergii Kashubin, Nikola Momchev, Danila Sinopalnikov, Lukasz
+  Stafiniak, Tibor Tihon, Dmitry Tsarkov, Xiao Wang, Marc van Zee, and Olivier
+  Bousquet.
+\newblock Measuring compositional generalization: A comprehensive method on
+  realistic data.
+\newblock In \emph{International Conference on Learning Representations}, 2020.
+\newblock URL \url{https://openreview.net/forum?id=SygcCnNKwr}.
+
+\bibitem[Kim \& Linzen(2020)Kim and Linzen]{kim-linzen-2020-cogs}
+Najoung Kim and Tal Linzen.
+\newblock {COGS}: A compositional generalization challenge based on semantic
+  interpretation.
+\newblock In \emph{Proceedings of the 2020 Conference on Empirical Methods in
+  Natural Language Processing}, pp.\  9087--9105, 2020.
+\newblock \doi{10.18653/v1/2020.emnlp-main.731}.
+\newblock URL \url{https://aclanthology.org/2020.emnlp-main.731/}.
+
+\bibitem[Liang et~al.(2017)Liang, Berant, Le, Forbus, and
+  Lao]{liang-etal-2017-nsm}
+Chen Liang, Jonathan Berant, Quoc Le, Kenneth~D. Forbus, and Ni~Lao.
+\newblock Neural symbolic machines: Learning semantic parsers on {F}reebase
+  with weak supervision.
+\newblock In \emph{Proceedings of the 55th Annual Meeting of the Association
+  for Computational Linguistics (Volume 1: Long Papers)}, pp.\  23--33, 2017.
+\newblock \doi{10.18653/v1/P17-1003}.
+\newblock URL \url{https://aclanthology.org/P17-1003/}.
+
+\bibitem[Luo et~al.(2024)Luo, Li, Haffari, and Pan]{luo2024rog}
+Linhao Luo, Yuan-Fang Li, Gholamreza Haffari, and Shirui Pan.
+\newblock Reasoning on graphs: Faithful and interpretable large language model
+  reasoning.
+\newblock In \emph{International Conference on Learning Representations}, 2024.
+\newblock URL
+  \url{https://proceedings.iclr.cc/paper_files/paper/2024/hash/3e2aeb66481dd63a32421bf032b70384-Abstract-Conference.html}.
+
+\bibitem[{Open Contracting Partnership}(2026)]{ocds-standard}
+{Open Contracting Partnership}.
+\newblock Open contracting data standard 1.1.5: Reference.
+\newblock Online documentation, 2026.
+\newblock URL \url{https://standard.open-contracting.org/latest/en/schema/}.
+\newblock Accessed 12 August 2026.
+
+\bibitem[Oren et~al.(2020)Oren, Herzig, Gupta, Gardner, and
+  Berant]{oren-etal-2020-compositional}
+Inbar Oren, Jonathan Herzig, Nitish Gupta, Matt Gardner, and Jonathan Berant.
+\newblock Improving compositional generalization in semantic parsing.
+\newblock In \emph{Findings of the Association for Computational Linguistics:
+  EMNLP 2020}, pp.\  2482--2495, 2020.
+\newblock \doi{10.18653/v1/2020.findings-emnlp.225}.
+\newblock URL \url{https://aclanthology.org/2020.findings-emnlp.225/}.
+
+\bibitem[Patidar et~al.(2023)Patidar, Faldu, Singh, Vig, Bhattacharya, and
+  Mausam]{patidar-etal-2023-grailqability}
+Mayur Patidar, Prayushi Faldu, Avinash Singh, Lovekesh Vig, Indrajit
+  Bhattacharya, and Mausam.
+\newblock Do {I} have the knowledge to answer? investigating answerability of
+  knowledge base questions.
+\newblock In \emph{Proceedings of the 61st Annual Meeting of the Association
+  for Computational Linguistics (Volume 1: Long Papers)}, pp.\  10341--10357,
+  2023.
+\newblock \doi{10.18653/v1/2023.acl-long.576}.
+\newblock URL \url{https://aclanthology.org/2023.acl-long.576/}.
+
+\bibitem[Scholak et~al.(2021)Scholak, Schucher, and
+  Bahdanau]{scholak-etal-2021-picard}
+Torsten Scholak, Nathan Schucher, and Dzmitry Bahdanau.
+\newblock {PICARD}: Parsing incrementally for constrained auto-regressive
+  decoding from language models.
+\newblock In \emph{Proceedings of the 2021 Conference on Empirical Methods in
+  Natural Language Processing}, pp.\  9895--9901, 2021.
+\newblock \doi{10.18653/v1/2021.emnlp-main.779}.
+\newblock URL \url{https://aclanthology.org/2021.emnlp-main.779/}.
+
+\bibitem[Shaw et~al.(2021)Shaw, Chang, Pasupat, and
+  Toutanova]{shaw-etal-2021-compositional}
+Peter Shaw, Ming-Wei Chang, Panupong Pasupat, and Kristina Toutanova.
+\newblock Compositional generalization and natural language variation: Can a
+  semantic parsing approach handle both?
+\newblock In \emph{Proceedings of the 59th Annual Meeting of the Association
+  for Computational Linguistics and the 11th International Joint Conference on
+  Natural Language Processing (Volume 1: Long Papers)}, pp.\  922--938, 2021.
+\newblock \doi{10.18653/v1/2021.acl-long.75}.
+\newblock URL \url{https://aclanthology.org/2021.acl-long.75/}.
+
+\bibitem[Shu et~al.(2022)Shu, Yu, Li, Karlsson, Ma, Qu, and
+  Lin]{shu-etal-2022-tiara}
+Yiheng Shu, Zhiwei Yu, Yuhan Li, B{"o}rje~F. Karlsson, Tingting Ma, Yuzhong Qu,
+  and Chin-Yew Lin.
+\newblock {TIARA}: Multi-grained retrieval for robust question answering over
+  large knowledge base.
+\newblock In \emph{Proceedings of the 2022 Conference on Empirical Methods in
+  Natural Language Processing}, pp.\  8108--8121, 2022.
+\newblock \doi{10.18653/v1/2022.emnlp-main.555}.
+\newblock URL \url{https://aclanthology.org/2022.emnlp-main.555/}.
+
+\bibitem[Soylu et~al.(2022)Soylu, Corcho, Elves{ae}ter, Badenes-Olmedo, Blount,
+  Yedro~Mart{\'i}nez, Kovacic, Posinkovic, Makgill, Taggart, Simperl, Lech,
+  Roman, and Lehmann]{distinto2022theybuyforyou}
+Ahmet Soylu, Oscar Corcho, Brian Elves{ae}ter, Carlos Badenes-Olmedo, Tom
+  Blount, Fernando Yedro~Mart{\'i}nez, Mateja Kovacic, Marco Posinkovic, Ian
+  Makgill, Chris Taggart, Elena Simperl, Tomasz~C. Lech, Dumitru Roman, and
+  Jens Lehmann.
+\newblock Theybuyforyou platform and knowledge graph: Expanding horizons in
+  public procurement with open linked data.
+\newblock \emph{Semantic Web}, 13\penalty0 (2):\penalty0 265--291, 2022.
+\newblock \doi{10.3233/SW-210442}.
+\newblock URL \url{https://doi.org/10.3233/SW-210442}.
+
+\bibitem[Sun et~al.(2018)Sun, Dhingra, Zaheer, Mazaitis, Salakhutdinov, and
+  Cohen]{sun-etal-2018-open}
+Haitian Sun, Bhuwan Dhingra, Manzil Zaheer, Kathryn Mazaitis, Ruslan
+  Salakhutdinov, and William Cohen.
+\newblock Open domain question answering using early fusion of knowledge bases
+  and text.
+\newblock In \emph{Proceedings of the 2018 Conference on Empirical Methods in
+  Natural Language Processing}, pp.\  4231--4242, 2018.
+\newblock \doi{10.18653/v1/D18-1455}.
+\newblock URL \url{https://aclanthology.org/D18-1455/}.
+
+\bibitem[Sun et~al.(2019)Sun, Bedrax-Weiss, and Cohen]{sun-etal-2019-pullnet}
+Haitian Sun, Tania Bedrax-Weiss, and William Cohen.
+\newblock {P}ull{N}et: Open domain question answering with iterative retrieval
+  on knowledge bases and text.
+\newblock In \emph{Proceedings of the 2019 Conference on Empirical Methods in
+  Natural Language Processing and the 9th International Joint Conference on
+  Natural Language Processing}, pp.\  2380--2390, 2019.
+\newblock \doi{10.18653/v1/D19-1242}.
+\newblock URL \url{https://aclanthology.org/D19-1242/}.
+
+\bibitem[Wang et~al.(2021)Wang, Lapata, and
+  Titov]{wang-etal-2021-learning-executions}
+Bailin Wang, Mirella Lapata, and Ivan Titov.
+\newblock Learning from executions for semantic parsing.
+\newblock In \emph{Proceedings of the 2021 Conference of the North American
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies}, pp.\  2747--2759, 2021.
+\newblock \doi{10.18653/v1/2021.naacl-main.219}.
+\newblock URL \url{https://aclanthology.org/2021.naacl-main.219/}.
+
+\bibitem[Wang et~al.(2024)Wang, Zhang, Li, Eisenschlos, Perot, Wang,
+  Miculicich, Fujii, Shang, Lee, and Pfister]{wang2024chainoftable}
+Zilong Wang, Hao Zhang, Chun-Liang Li, Julian~Martin Eisenschlos, Vincent
+  Perot, Zifeng Wang, Lesly Miculicich, Yasuhisa Fujii, Jingbo Shang, Chen-Yu
+  Lee, and Tomas Pfister.
+\newblock Chain-of-table: Evolving tables in the reasoning chain for table
+  understanding.
+\newblock In \emph{International Conference on Learning Representations}, 2024.
+\newblock URL
+  \url{https://proceedings.iclr.cc/paper_files/paper/2024/hash/f53fd88a4340063ecd258c0ae9948b40-Abstract-Conference.html}.
+
+\bibitem[Wolfson et~al.(2020)Wolfson, Geva, Gupta, Gardner, Goldberg, Deutch,
+  and Berant]{wolfson-etal-2020-break}
+Tomer Wolfson, Mor Geva, Ankit Gupta, Matt Gardner, Yoav Goldberg, Daniel
+  Deutch, and Jonathan Berant.
+\newblock Break it down: A question understanding benchmark.
+\newblock \emph{Transactions of the Association for Computational Linguistics},
+  8:\penalty0 183--198, 2020.
+\newblock \doi{10.1162/tacl_a_00309}.
+\newblock URL \url{https://aclanthology.org/2020.tacl-1.13/}.
+
+\bibitem[Yang et~al.(2025)Yang, Li, Yang, Zhang, Hui, Zheng, Yu, Gao, Huang,
+  Lv, et~al.]{yang2025qwen3}
+An~Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo~Zheng, Bowen
+  Yu, Chang Gao, Chengen Huang, Chenxu Lv, et~al.
+\newblock {Qwen3} technical report.
+\newblock \emph{arXiv preprint arXiv:2505.09388}, 2025.
+\newblock URL \url{https://arxiv.org/abs/2505.09388}.
+
+\end{thebibliography}

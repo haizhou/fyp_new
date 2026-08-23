@@ -1,0 +1,40 @@
+{
+  "figure": "fig01_runtime_bridge",
+  "example_id": "L2::bridge_join_0502#L2a",
+  "question": "Record check: how many contract notices were published by buyers that have awarded a contract to Dodd Group (Midlands) Limited?",
+  "branch_taken": "saved Step-1 understanding -> deterministic intent compiler",
+  "branch_not_taken": "Step-2 typed graph planner",
+  "replay": "local deterministic replay; no model call",
+  "intermediate_cardinalities": {
+    "A": 21,
+    "B": 16,
+    "C": 1940
+  },
+  "answer": 1940,
+  "runtime_checks": {
+    "graph_execution": "passed",
+    "evidence_verdict": "kg_supported",
+    "evidence_count": 1940,
+    "document_status": "not_needed",
+    "answer_sanity_ok": true,
+    "population_coverage_check_passed": false,
+    "coverage_sample_size": 200,
+    "coverage_sample_without_supplier": 8
+  },
+  "offline_audit": {
+    "oracle_match": true,
+    "repair_attempts": 0
+  },
+  "limitations": [
+    "population coverage: of 1940 matched contracts, 8 with no recorded supplier (all counted; a supplier/buyer-complete figure would be lower)",
+    "planner caveat: The question asks for 'contract notices' but the provided schema context only mentions 'contract' and 'award' relations; it does not explicitly define a 'contract notice' record type or the field to count.",
+    "planner caveat: The program uses placeholder field_text values ('supplier is awarded contract to', 'buyer organisation') that are not explicitly present in the retrieved schema fragments; the exact field names for these relations are underspecified."
+  ],
+  "sources": {
+    "saved_step1_and_graph": "data/qa/teacher_full_v1/verified_sft.jsonl:3389",
+    "accepted_compact_trace": "data/qa/teacher_full_v1/traces.jsonl:6528",
+    "current_runtime": "src/procurement_graph/reasoning/pipeline.py",
+    "current_typed_planning": "src/procurement_graph/reasoning/typed_planning.py",
+    "current_kg": "data/kg"
+  }
+}

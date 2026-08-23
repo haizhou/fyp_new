@@ -1,0 +1,554 @@
+\section{Full Procurement Runtime Specification}
+\label{app:runtime}
+
+This appendix makes the main, two-stage procurement system explicit before describing the
+single-call algebra used by PACS and WTQ.  The two representations share a deterministic backend,
+but they are not interchangeable and are never combined within one reported prediction.
+
+\subsection{Intermediate representations}
+
+Step 1 returns an \emph{intent program}.  Its answer signature declares the operation, value type,
+and requested answer field; its ordered steps declare literal filters, dependencies, and the final
+answer step.  An unsupported or ambiguous item instead carries a reason and an empty official
+program.  A valid intent is either compiled directly or supplied as a briefing to Step 2.
+
+Step 2 returns the graph-plan interface in Table \ref{tab:graph-ir}.  This representation is used
+for a multi-hop dependency such as records $\rightarrow$ emitted suppliers $\rightarrow$ records
+bound by those suppliers $\rightarrow$ a scalar or set answer.  The compiler normalises supported
+planner idioms, constructs a directed acyclic graph, and lowers every executable variable to a
+backend query specification.
+
+\begin{table}[h]
+  \centering
+  \caption{Graph-plan intermediate representation used by the full procurement runtime.}
+  \label{tab:graph-ir}
+  \small
+  \begin{tabularx}{\linewidth}{p{0.19\linewidth}p{0.25\linewidth}X}
+    \toprule
+    Object & Required content & Deterministic checks \\
+    \midrule
+    Variable & identifier, kind, semantic role, literal constraints, optional emitted field & unique identifier; legal field and value type; no invented root input \\
+    Dependency & upstream variable and downstream consumer & reference exists; topological order; no cycle \\
+    Relation & source variable/field and target variable/bind field & emitted and bound types agree; no unconstrained bind \\
+    Return & input variable, operation, answer field/type, optional grouping or comparator & operation accepts the variable kind; requested count target and direction agree with the question \\
+    Guards & exhaustive reduction, deduplication key, additivity and optional population conditions & safe aggregate and declared backend semantics \\
+    Abstention & unsupported or ambiguous reason & no answering graph may coexist with a terminal non-answer decision \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Online algorithm}
+
+For one question, the implemented runtime performs the following steps.
+
+\begin{enumerate}
+  \item Select a schema slice from question keywords.  This is rule-based schema selection, not
+  dense retrieval over records.
+  \item Ask the Step-1 model for an intent program at temperature zero.  Validate references,
+  dependency order, return type, answer signature, and any terminal non-answer reason.
+  \item If the intent is valid, compilable, and not vetoed, compile it deterministically.  Otherwise
+  call the Step-2 typed graph planner.  In the evaluation protocol, at most two structural samples
+  are considered, and a sample is retried only after a detectable compile or consistency failure.
+  \item Ground aliases, fields, entity literals, emitted values, downstream bindings, aggregation
+  guards, and the deduplication key.  Run schema, conflict, and exhaustive-reduction preflight.
+  \item Execute graph variables in dependency order.  Derived value sets become hidden membership
+  constraints on downstream record variables.  Compute the declared return operation from the
+  resulting record population.
+  \item Run postflight, answer-sanity, and evidence-release checks.  Return an answer card only when
+  the resulting state is releasable.  A clean no-result, unsupported, or ambiguous state is final.
+  \item If a compile, grounding, or execution defect is explicitly repairable, supply the structured
+  failure to the planner and repeat Steps 3--6.  Main evaluation permits one feedback replan;
+  teacher collection permits two.
+\end{enumerate}
+
+The online path never receives a gold answer.  Structural sampling therefore cannot repair an
+executable-but-semantically-wrong plan unless a runtime check detects its defect.
+
+The current compiler also has a known fidelity gap.  Its post-compile check can add a missing year,
+CPV, or category atom to the flat query specification, but the pipeline executes an existing graph
+plan in preference to that flat specification.  Until the graph is recompiled or its terminal
+variable is updated, this completion is not a guarantee that the executed graph contains the atom.
+
+\subsection{Evidence and release contract}
+
+Table \ref{tab:evidence-contract} distinguishes exact execution state from bounded audit material.
+This distinction prevents a sample of identifiers from being mistaken for the complete population
+used by a count or sum.
+
+\begin{table}[h]
+  \centering
+  \caption{Information produced and retained by the procurement runtime.}
+  \label{tab:evidence-contract}
+  \small
+  \begin{tabularx}{\linewidth}{p{0.24\linewidth}p{0.28\linewidth}X}
+    \toprule
+    Quantity & Runtime semantics & Retention boundary \\
+    \midrule
+    Answer and population count & exact deterministic result under the frozen record view & stored in a rich trace; prediction and correctness are retained by the slim main evaluator \\
+    Variable trace & grounded constraints, dependencies, emitted field, status, and output size & available when rich tracing is enabled; omitted from the main 2,285-row result files \\
+    Contract evidence & matching contract identifiers and rows & exact total count, but identifiers/rows are capped at 200 per execution result \\
+    Public evidence view & operation, answer, count, identifiers, and OCIDs & serialises at most 50 identifiers and 50 OCIDs from the runtime bundle \\
+    Source documents & URL and document metadata extracted from OCDS & no production document inspector or passage-level citation scorer \\
+    Oracle & typed answer used for offline curation and scoring & never included in online prompts or student targets \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Illustrative trace provenance}
+
+The candidate running example supplied for Figure \ref{fig:overview} is
+\texttt{L2::bridge\_join\_0502\#L2a}: ``Record check: how many contract notices were published by
+buyers that have awarded a contract to Dodd Group (Midlands) Limited?''  The saved Step-1 intent takes the
+deterministic compiler branch; Step 2 is bypassed.  A no-model replay on the current frozen backend
+finds 21 source records, emits 16 buyer values, binds those values into 1,940 target records, and
+returns 1,940, matching the stored oracle.  The release includes a limitation: eight of the first
+200 matched rows have no recorded supplier field.  This is a reconstruction from a saved Step-1
+artifact plus current deterministic replay, not a fresh final-test model call.  The exact source
+locations and counts are recorded in
+\path{paper/tmlr_v3/figs/src/fig01_runtime_bridge.manifest.json}; a replacement hand-drawn figure
+should preserve this qualification or use a new rich trace with its own manifest.
+
+\section{Evaluation Protocol Matrix}
+\label{app:protocol-matrix}
+
+Table \ref{tab:protocol-matrix} records the decoder and authority boundaries needed to interpret
+the four result sets.  A dash means that the component does not exist in that protocol, rather than
+that it failed to run.
+
+\begin{table}[h]
+  \centering
+  \caption{Inference and curation protocols.  ``Oracle'' refers to access during the named
+  procedure, not to whether an oracle later exists for scoring.}
+  \label{tab:protocol-matrix}
+  \small
+  \begin{tabularx}{\linewidth}{p{0.17\linewidth}p{0.19\linewidth}p{0.17\linewidth}p{0.13\linewidth}X}
+    \toprule
+    Protocol & Plan form & Decoding & Repair & Oracle and saved output \\
+    \midrule
+    Teacher harvest (9,267) & Step-1 intent; conditional Step-2 graph & temperature 0; two structural samples & at most 2 & oracle-hidden online, then oracle/shape gate offline; rich trace and separate training sinks \\
+    Procurement main (2,285; primary 2,025) & same full runtime & temperature 0; two structural samples & at most 1 & no online oracle; saved evaluator files retain slim per-item predictions \\
+    Development (260) & same full runtime; checkpoint varies & temperature 0; two structural samples & at most 1 & no online oracle; paired predictions by question \\
+    PACS (922) & one recursive algebra tree & temperature 0; primary protocol is prompt-only JSON & none & no online oracle; tree, execution status, answer, and offline score saved \\
+    WTQ (4,344) & one recursive algebra tree with per-table schema & temperature 0; JSON-schema guided & none in the reported pristine run & no online oracle; answer items rescored by the official evaluator \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The main procurement run directories do not preserve one complete command and checkpoint manifest.
+The PACS corrected per-item file and the exact WTQ C-final training snapshot are also absent.  These
+are historical artifact gaps, not omitted algorithmic choices; they are stated here to delimit the
+level of reproduction currently possible.
+
+\section{Recursive Algebra}
+\label{app:algebra}
+
+The direct-composition language is a closed tree algebra.  Programs are limited to depth 16 and
+64 nodes.  Table \ref{tab:algebra} gives the public node signatures; predicates include equality,
+membership, substring containment, existence, numeric bounds, negation, disjunction, and
+membership in a computed \values{} set.
+
+\begin{table}[h]
+  \centering
+  \caption{Recursive-algebra operators.  The validator checks compositional types and required
+  arguments before execution.}
+  \label{tab:algebra}
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    Node & Signature & Function \\
+    \midrule
+    \texttt{filter} & predicates $\rightarrow$ \records & filter records \\
+    \texttt{values} & \records $\rightarrow$ \values & project distinct values \\
+    \texttt{count}, \texttt{sum} & \records $\rightarrow$ \numbertype & aggregate records \\
+    \texttt{size} & \values $\rightarrow$ \numbertype & set cardinality \\
+    \texttt{exists} & \records $\rightarrow$ \booltype & test non-emptiness \\
+    \texttt{select}, \texttt{extreme} & \records $\rightarrow$ \valuetype & scalar or extremal lookup \\
+    \texttt{groupby} & \records $\rightarrow$ \groups & grouped count or sum \\
+    \texttt{argext}, \texttt{top} & \groups $\rightarrow$ scalar/ranking & rank groups \\
+    \texttt{combine} & \numbertype$^2\rightarrow$ scalar & arithmetic or comparison \\
+    \texttt{vcompare} & \valuetype$^2\rightarrow$ \booltype & compare values \\
+    \texttt{setop} & \values$^2\rightarrow$ \values & union, intersection, difference \\
+    \texttt{gcombine} & \groups$^2\rightarrow$ \groups & combine aligned groups \\
+    \texttt{keys\_where} & \groups$\rightarrow$ \values & threshold group keys \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Counts and grouped counts deduplicate contract identifiers.  Projections remove null and empty
+values and return sorted distinct strings.  Sums use decimal accumulation.  Ranking ties are
+ordered by their stored string keys.  A Boolean matches only a Boolean, so \texttt{True} is not
+equal to numeric one.  The type checker does not by itself enforce every domain convention:
+additivity, schema membership, and currency remain separate contracts.
+
+\section{Data Construction and Schema}
+\label{app:data}
+
+\paragraph{Release selection.}
+The loader streams yearly compressed JSON Lines files, skips malformed rows, flattens the required
+OCDS fields, and retains the latest parseable release per OCID.  It also stores the years in which
+the process was observed.  This creates a current snapshot rather than a merged event history.
+
+\paragraph{Entity resolution.}
+Registry identifiers have priority.  Platform identifiers are linked only under the same OCID,
+normalised name, and role, and only if all observations identify one official entity.  The second
+phase uses government lookup, exact name and region, then exact name.  Empty normalised names remain
+singletons.  Fuzzy similarity creates review candidates only.  Reviewed safe edges are applied by
+a cluster consistency check.  The current artifacts contain 204,711 raw aliases and 131,502
+canonical organisations; 82,013 remain singletons.
+
+\paragraph{Values and provenance.}
+The amount source precedence is award, linked contract, then tender.  Award- and contract-sourced
+values may be labelled additive; tender ceilings are not.  Numeric zero is retained.  Currency is
+stored but not converted.  Evidence nodes retain the source field and source document linkage.
+
+\begin{table}[h]
+  \centering
+  \caption{Retained graph snapshot.  One contract may have several supplier edges.}
+  \label{tab:kg-schema}
+  \small
+  \begin{tabular}{lr@{\hskip 3em}lr}
+    \toprule
+    Node type & Count & Edge type & Count \\
+    \midrule
+    Contract & 215,221 & \texttt{buyer\_of} & 215,218 \\
+    Organisation & 131,502 & \texttt{supplier\_of} & 334,063 \\
+    CPV & 3,870 & \texttt{categorized\_by} & 164,691 \\
+    Evidence & 535,731 & \texttt{evidence\_for} & 1,326,240 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Benchmark Construction and Integrity}
+\label{app:benchmark}
+
+The initial procurement generator creates executable answer specifications from the graph.  Gate A
+checks conflicts, identifier integrity, deterministic execution, and aggregate sanity before
+surface generation.  A second language-model stage writes the question; Gate B checks that visible
+filters and operations agree with the specification.  The initial artifacts contain 10,000 answer
+specifications, 9,053 generated questions, and 9 Gate-B failures, yielding 9,044 rows.  Later
+curation adds answerability twins, whole-plan split assignment, class balancing, and surface
+variation to obtain 12,828 graph-benchmark rows: 9,267 train, 671 development-select, 556
+development-tune, 49 smoke, and 2,285 final-test rows.
+
+Plan identifiers do not cross from train to final test in the stored split.  A separate string
+audit nevertheless finds two identical question--answer pairs and five deduplication groups across
+that boundary.  The split should therefore be described as plan-ID separated, not fully
+duplicate-free.
+
+\begin{table}[h]
+  \centering
+  \caption{Composition of the 2,285-row frozen procurement partition.  The 260-row development
+  subset contains 20 rows from each bucket and is removed by identifier to form the 2,025-row
+  primary column.}
+  \label{tab:final-buckets}
+  \small
+  \begin{tabular}{lr@{\hskip 2.2em}lr@{\hskip 2.2em}lr}
+    \toprule
+    Bucket & Rows & Bucket & Rows & Bucket & Rows \\
+    \midrule
+    Ambiguous & 120 & Boolean & 121 & Bridge join & 350 \\
+    No result & 120 & Categorical & 120 & Comparison & 306 \\
+    Unsupported & 120 & Count & 250 & Factoid & 250 \\
+    Min/max & 107 & Set & 93 & Sum & 200 \\
+    Top-$k$ & 128 & Answerable total & 1,925 & Grand total & 2,285 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \caption{Capability breakdown on the 260-question development diagnostic (20 items per row).
+  Exact counts are reported because the balanced cells are small.}
+  \label{tab:bucket-analysis}
+  \small
+  \begin{tabular}{lrrr@{\qquad}lrrr}
+    \toprule
+    Capability & KG-only & RAG-40 & Local Q & Capability & KG-only & RAG-40 & Local Q \\
+    \midrule
+    Ambiguous & 15 & 5 & 19 & Comparison & 8 & 3 & 17 \\
+    No result & 20 & 13 & 20 & Count & 17 & 3 & 20 \\
+    Unsupported & 20 & 20 & 19 & Factoid & 5 & 17 & 15 \\
+    Boolean & 11 & 0 & 14 & Min/max & 18 & 0 & 20 \\
+    Bridge join & 7 & 0 & 14 & Set & 9 & 1 & 15 \\
+    Categorical & 5 & 13 & 13 & Sum & 19 & 0 & 20 \\
+    & & & & Top-$k$ & 1 & 0 & 18 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{PACS Details}
+\label{app:pacs}
+
+PACS instantiates seven families at levels L1--L3.  Construction samples executable typed trees,
+runs the production and separate evaluators, requires answer agreement and non-degeneracy, and
+excludes exact tree hashes found in Compose-v3 training or validation.  Missing-operator and
+no-result controls are added separately.  The evaluated surface files contain 922 rows.  Table
+\ref{tab:pacs-composition} reports the actual status and exposure labels used by evaluation.
+
+\begin{table}[h]
+  \centering
+  \caption{Corrected PACS v1.1 composition.  ``Seen'' refers to the declared program-shape label,
+  not exact tree overlap.}
+  \label{tab:pacs-composition}
+  \small
+  \begin{tabular}{lr@{\hskip 3em}lr}
+    \toprule
+    Status & Rows & Shape label & Rows \\
+    \midrule
+    Answerable & 730 & Seen & 431 \\
+    Unsupported & 138 & Unseen & 491 \\
+    No result & 54 & Total & 922 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The original surface channels treated 36 answerable false or zero-valued denotations as no-result.
+The corrected v1.1 manifest restores them to the answerable class.  Saved predictions were joined
+by item identifier and their trees were re-executed; no model was called.  This changes Compose-v3
+channel A from 687 to 722 correct and channel B from 675 to 711 correct.  The repository does not
+retain the original status-transformation script, so the paper artifact records this deterministic
+correction explicitly.  The seal implementation also differs from its comments.  It checks exact
+question and tree hashes, entity anchors, and a sampled trigram screen, but it does not implement a
+separate template-identity gate and compares only every seventh training trigram set.  These facts
+motivate the qualified description in Section \ref{sec:experiments}.
+
+The declared seen/unseen labels mix answerable and status rows, so they are a difficulty diagnostic
+rather than a pure measure of logical-form novelty.  Exact question and tree-hash overlap with the
+PACS test is absent; this is a narrower claim than saying that every program shape is unseen.
+
+\section{WikiTableQuestions Evaluation}
+\label{app:wtq}
+
+The WTQ evaluation uses 4,344 questions over 421 test tables absent from the training-table
+partition.  Each table is exposed through two aligned views.  The typed view adds deterministic
+numeric, date, year, month, and normalised-string columns for computation; the raw view preserves
+the strings returned to the official scorer.  Row identifiers and derived columns are never shown
+as answer values.
+
+For official scoring, each predicted answer item first replaces tab and newline characters with a
+space.  The question identifier and cleaned items are then joined with tab delimiters and passed to
+\path{scripts/wtq/official_evaluator.py} version 1.0.2 with the original CoreNLP-tagged targets.
+This detail changes three borderline items relative to calling the normaliser directly.  Table
+\ref{tab:wtq-official} records the official counts and paired transitions reconstructed from saved
+answer items.
+
+\begin{table}[h]
+  \centering
+  \caption{WTQ pristine-unseen official evaluation.  Gain/loss compares each row with the row
+  immediately above using exact McNemar tests.}
+  \label{tab:wtq-official}
+  \small
+  \begin{tabular}{lrrl}
+    \toprule
+    Planner or supervision & Correct / 4,344 & Accuracy (\%) & Gain/loss; $p$ \\
+    \midrule
+    Untuned Qwen3-8B & 978 & 22.51 & -- \\
+    Procurement Compose-v3 & 1,187 & 27.33 & 387/178; $8.50\times10^{-19}$ \\
+    Answer-only self-harvest (A) & 1,930 & 44.43 & 833/90; $1.77\times10^{-151}$ \\
+    Translated gold programs (C) & 2,250 & 51.80 & 628/308; $6.20\times10^{-26}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The A run records 4,709 answer-matched examples.  The C run used approximately 5,423 translated
+program examples selected by translation, type, execution, and answer agreement.  Its exact
+training snapshot is not present in the current repository: the historical commit, current file,
+and staged file contain different later reconstructions.  The official per-item predictions remain
+available, but this missing snapshot prevents a turnkey retraining claim.
+
+\section{Grounding and Target Audits}
+\label{app:grounding-audit}
+
+The fixed-plan replay executes the same saved proposal before and after deterministic grounding on
+the same frozen backend.  Of 136 plans with typed oracles, 89 are correct before grounding and 103
+after it.  Fourteen move from wrong to correct, none moves from correct to wrong, and one previously
+non-executable plan becomes executable but remains incorrect.  All 14 rescues are sums for which
+grounding inserts the additive-value guard.  This isolates one runtime transformation; it does not
+estimate the effect of grounding-derived rows on a trained model.
+
+The teacher artifacts contain 237 successful repairs attributed to schema, runtime-specification,
+or entity-grounding failures.  Of 229 targets that can be checked mechanically against mapped
+question constraints, 173 contain every mapped constraint and 56 are flagged.  Category is absent
+from 43 flagged mappings, followed by buyer (6), supplier (3), signed-date guard (3), title (2), and
+CPV (2); categories may overlap within one target.  A missing condition can be extensionally
+redundant on one graph snapshot, allowing an incomplete plan to match the answer oracle.  This is
+why the paper does not equate denotation agreement with full semantic equivalence.
+
+\section{Training Data and Configurations}
+\label{app:config}
+
+Table \ref{tab:training-data} separates candidate harvest counts from final exported training
+splits.  A candidate count is not an accuracy and overlapping objectives do not create new unique
+questions.
+
+\begin{table}[h]
+  \centering
+  \caption{Graph-plan teacher harvest and capped exports.}
+  \label{tab:training-data}
+  \small
+  \begin{tabularx}{\linewidth}{XrX}
+    \toprule
+    Artifact & Harvest rows & Exported train/validation \\
+    \midrule
+    Training questions & 9,267 & -- \\
+    Traces producing an answer after runtime checks & 6,860 & -- \\
+    Oracle matches before shape filtering & 5,605 & -- \\
+    Direct graph target pool passing both offline gates & 5,598 & included subject to caps \\
+    Hard negative routes after an offline gate failure & 1,262 & -- \\
+    Successful repair targets & 1,725 & 1,679 / 46 \\
+    Preference pairs & 390 & 390 / -- \\
+    Abstention target pool & 590 & included subject to a ten percent cap \\
+    Final plan SFT export & -- & 2,787 / 57 \\
+    Step-1 intent targets & -- & 5,091 / 96 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Table \ref{tab:training-config} records the configurations actually consumed by the reported
+checkpoints.  Every row uses 4-bit QLoRA on all target modules, rank 64, $\alpha=128$, dropout
+0.05, bfloat16 compute, effective batch 16, cosine decay, and one CUDA process.  Step-2 SFT trains
+on 4,466 rows comprising 2,787 plan SFT rows and 1,679 repair targets.  Its configured validation set contains the
+57 plan SFT rows; the separately exported 46 repair validation rows are not selected by the
+training YAML.
+
+\begin{table}[h]
+  \centering
+  \caption{Training and continuation configurations.  Q/L denotes matched Qwen3-8B and
+  Llama-3.1-8B variants.}
+  \label{tab:training-config}
+  \small
+  \begin{tabularx}{\linewidth}{p{0.15\linewidth}p{0.23\linewidth}p{0.17\linewidth}p{0.10\linewidth}p{0.10\linewidth}X}
+    \toprule
+    Stage & Initialisation and train rows & Objective & Epochs & LR & Cutoff / validation \\
+    \midrule
+    Step-2 SFT (Q/L) & base; 2,787 plan + 1,679 repair & token SFT & 3 & $10^{-4}$ & 6,144 / 57 plan \\
+    Step-1 SFT (Q/L) & base; 5,091 intent programs & token SFT & 3 & $10^{-4}$ & 6,144 / 96 \\
+    Qwen RSFT & Qwen SFT; 3,019 plan + 3,169 repair & token SFT & 2 & $5\times10^{-5}$ & 6,144 / 65 plan \\
+    Llama RSFT & Llama SFT; 3,026 plan + 3,190 repair & token SFT & 2 & $5\times10^{-5}$ & 6,144 / 66 plan \\
+    Qwen DPO & Qwen RSFT; 390 teacher + 689 on-policy pairs & sigmoid DPO, $\beta=.1$ & 1 & $5\times10^{-6}$ & 6,144 / none \\
+    Llama DPO & Llama RSFT; 390 teacher + 693 on-policy pairs & sigmoid DPO, $\beta=.1$ & 1 & $5\times10^{-6}$ & 6,144 / none \\
+    Compose-v3 & fresh Qwen; 12,414 trees & token SFT & 2 & $10^{-4}$ & 4,096 / 253 \\
+    WTQ A & fresh Qwen; 4,615 answer-matched trees & token SFT & 2 & $10^{-4}$ & 4,096 / 94 \\
+    WTQ C & fresh Qwen; about 5,423 translated programs & token SFT & 2 & $10^{-4}$ & 4,096 / snapshot missing \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Training logs record Transformers 5.6.0 and the expected example and optimiser-step counts.  The
+evaluation server logs record vLLM 0.24.0, seed 0, bfloat16, maximum sequence length 8,192, LoRA
+rank 64, and disabled Qwen thinking.  They do not record a formal GPU-model manifest.  The paper
+therefore reports one-device execution without claiming a hardware model that cannot be recovered
+from the preserved logs.
+
+\section{Artifact and Reproduction Notes}
+\label{app:artifacts}
+
+The implementation entry points are:
+\begin{itemize}
+  \item \path{pipelines/01_ingest.py} through \path{pipelines/04_extract.py}, followed by
+  \path{pipelines/40_build_kg.py} and \path{pipelines/41_validate_kg.py};
+  \item \path{scripts/apply_safe_er_merges.py} for the reviewed cluster-safe ER layer;
+  \item \path{scripts/run_teacher.py} and \path{scripts/export_llamafactory.py} for graph-plan
+  curation and export;
+  \item \path{scripts/run_compare.py} for the full runtime, and
+  \path{scripts/run_compose_probe_eval.py} for direct composition;
+  \item \path{scripts/analyze_grounding_impact.py} for the fixed-plan replay.
+\end{itemize}
+
+Paper-side derived counts and provenance notes are stored in
+\path{paper/tmlr_v3/artifacts/derived_metrics.json} and
+\path{paper/tmlr_v3/artifacts/ARTIFACT_LEDGER.md}.  The compact KG-only development summary records
+the SHA256 values of the 260-row input, runner, full per-item result, and source summary without
+copying the 9 MB diagnostic result into the paper directory.
+
+The prompt/call contract, source and configuration hashes, selection authority, serving settings,
+and ablation classification are recorded in
+\path{paper/tmlr_v3/artifacts/REPRODUCIBILITY_MANIFEST.md}.  The historical teacher summary stores
+the Step-1 and Step-2 model names but omits the command, prompt hash, worker count, and most call
+parameters.  Those fields are explicitly marked as reconstructed from the audited runner.  The
+main procurement run directories likewise lack a unified arm-to-checkpoint manifest, and the
+currently linked adapter directories are not portable repository artifacts.
+
+Full production builds use canonical output paths.  Partial year, limit, or sample runs require an
+explicit non-canonical output location, preventing diagnostic runs from replacing the canonical
+tables.  The current working tree contains staged data artifacts and unstaged correctness fixes;
+a release version must record a source commit, data hashes, checkpoint hashes, decoder settings,
+and scorer version together.  We bind the present paper to its enumerated artifacts rather than
+claiming that every historical summary can be regenerated from an unspecified working tree.
+
+\section{Project-Brief Traceability}
+\label{app:brief}
+
+Table \ref{tab:brief-coverage} maps the original project requirements to implemented evidence and
+remaining gaps.  It distinguishes a completed component from one that is designed or only partly
+evaluated.
+
+\begin{table}[h]
+  \centering
+  \caption{Coverage of the original LLM--KG procurement project brief.}
+  \label{tab:brief-coverage}
+  \small
+  \begin{tabularx}{\linewidth}{p{0.25\linewidth}p{0.14\linewidth}X}
+    \toprule
+    Requirement & Status & Evidence and boundary \\
+    \midrule
+    Structured/semi-structured ETL and KG schema & Implemented & versioned OCDS ingestion, rich extraction, four node types, four edge types, validation before write \\
+    Entity resolution and aliases & Implemented & registry-first and precision-first deterministic rules, reviewed safe merges, alias audit, unresolved singletons \\
+    Natural language to executable KG computation & Implemented & typed Step-1 intent, deterministic fast path, conditional graph planner, grounding and executor \\
+    Multi-hop, aggregation, temporal and set reasoning & Implemented & bridge dependencies, count/sum/extrema/top-$k$/set/Boolean operations, year and date constraints \\
+    Evidence-linked reasoning trace & Partial & variable traces and contract identifiers exist; main evaluation stores slim outputs and no source-passage citation score \\
+    Reliability controls & Implemented & typed/schema checks, exhaustive execution, pre/postflight, answer sanity, explicit abstention, bounded replan \\
+    Factual, compositional and non-answer evaluation & Implemented & procurement final partition, PACS, and explicit ambiguous/unsupported/no-result classes \\
+    Citation accuracy & Not evaluated & document metadata exist, but there is no production passage inspector or citation gold set \\
+    Sensitivity to KG incompleteness & Not evaluated & no controlled node/edge deletion or missing-field intervention study \\
+    Closed-book, RAG, LLM+KG, and deterministic controls & Implemented & all four families are reported; the deterministic control is rule/decomposition over the KG rather than SPARQL/Cypher \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{Ablation Coverage and Causal Scope}
+\label{app:ablations}
+
+Table \ref{tab:ablation-scope} separates a controlled intervention from a checkpoint or robustness
+comparison.  This distinction matters because a fixed test set alone does not make a training
+ladder a component ablation.
+
+\begin{table}[h]
+  \centering
+  \caption{What each existing comparison holds fixed and what it can establish.}
+  \label{tab:ablation-scope}
+  \small
+  \begin{tabularx}{\linewidth}{p{0.23\linewidth}p{0.23\linewidth}p{0.22\linewidth}X}
+    \toprule
+    Evidence & Held fixed & Changed & Interpretation \\
+    \midrule
+    Pre/post grounding replay (136) & saved question, plan, KG, executor, oracle & deterministic grounding transformation & narrow runtime intervention; chiefly the additive-sum guard \\
+    Checkpoint ladder (260) & questions, scorer, runtime budget, base within family & corpus, initial adapter, and objective across stages & sequential comparison, not matched ablation \\
+    Hybrid/fully local runtime & questions and downstream runtime & Step-1 model and historical deployment configuration & system-configuration comparison; manifest limits causal attribution \\
+    PACS A/B & program, oracle, and planner & surface rendering & paraphrase robustness \\
+    WTQ base/v3/A/C & test set and official scorer & source and amount of supervision & supervision ladder, not single-component ablation \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The existing artifacts therefore support two restrained conclusions.  First, deterministic
+grounding can repair a specific class of saved sum plans at runtime.  Second, full SFT improves the
+paired end-to-end checkpoint on both base models.  They do not identify the fraction of the SFT
+gain caused by grounding-derived rows.  A causal claim would require corpora matched for unique
+question, family, depth, output type, target length, and optimiser tokens while adding only ordinary
+repair, grounding-derived repair, or grounding-derived preferences.  Other missing component
+tests include guided versus unconstrained decoding, online grounding on/off, release checks and
+feedback repair on/off, and deterministic fast path versus forced Step 2.  We list these as needed
+experiments rather than retroactively labelling existing comparisons as ablations.
+
+\section{Recommended Additional Evaluation}
+\label{app:future-eval}
+
+The matched grounding-data ablation should use at least three seeds and paired decoding on one
+frozen test.  Before training, all four corpora should be matched by unique question, family,
+program depth, output type, target length, and total optimiser tokens.  After training, each output
+should be labelled for field, role, operator, return type, dependency, explicit-constraint recall,
+hidden guard, validity, executability, answer correctness, and abstention.  Reporting a transition
+matrix for each decision reveals whether an apparent accuracy gain came from the intended hard
+signal or from generic JSON and domain-language adaptation.  Predicate-sensitive counterfactual
+worlds should be part of the test so that dropping any evaluated constraint changes the denotation.

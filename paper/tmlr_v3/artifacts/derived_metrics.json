@@ -1,0 +1,84 @@
+{
+  "procurement_main_non_development": {
+    "n": 2025,
+    "answerable": 1725,
+    "non_answerable": 300,
+    "systems": {
+      "closed_book": {"correct": 317, "accuracy": 0.1565},
+      "plan_guided_rag": {"correct": 496, "accuracy": 0.2449},
+      "top40_rag": {"correct": 778, "accuracy": 0.3842},
+      "cloud_teacher": {"correct": 1401, "accuracy": 0.6919},
+      "hybrid_llama": {"correct": 1527, "accuracy": 0.7541},
+      "hybrid_qwen": {"correct": 1574, "accuracy": 0.7773},
+      "fully_local_llama": {"correct": 1681, "accuracy": 0.8301},
+      "fully_local_qwen": {"correct": 1736, "accuracy": 0.8573}
+    },
+    "fully_local_qwen_breakdown": {
+      "answerable_correct": 1436,
+      "answerable_total": 1725,
+      "non_answerable_correct": 300,
+      "non_answerable_total": 300
+    }
+  },
+  "procurement_inclusive": {
+    "n": 2285,
+    "systems": {
+      "closed_book": {"correct": 380, "accuracy": 0.1663},
+      "plan_guided_rag": {"correct": 584, "accuracy": 0.2556},
+      "top40_rag": {"correct": 896, "accuracy": 0.3921},
+      "cloud_teacher": {"correct": 1594, "accuracy": 0.6976},
+      "hybrid_llama": {"correct": 1736, "accuracy": 0.7597},
+      "hybrid_qwen": {"correct": 1783, "accuracy": 0.7803},
+      "fully_local_llama": {"correct": 1904, "accuracy": 0.8333},
+      "fully_local_qwen": {"correct": 1957, "accuracy": 0.8565}
+    }
+  },
+  "development_260": {
+    "qwen": {"untuned": 183, "sft": 211, "rsft": 212, "dpo": 217},
+    "llama": {"untuned": 156, "sft": 216, "rsft": 215, "dpo": 201},
+    "kg_only": 155,
+    "cloud_teacher": 192,
+    "fully_local_qwen": 224,
+    "fully_local_llama": 219,
+    "by_capability": {
+      "ambiguous": {"kg_only": 15, "strong_rag": 5, "fully_local_qwen": 19},
+      "no_result": {"kg_only": 20, "strong_rag": 13, "fully_local_qwen": 20},
+      "unsupported": {"kg_only": 20, "strong_rag": 20, "fully_local_qwen": 19},
+      "boolean": {"kg_only": 11, "strong_rag": 0, "fully_local_qwen": 14},
+      "bridge_join": {"kg_only": 7, "strong_rag": 0, "fully_local_qwen": 14},
+      "categorical": {"kg_only": 5, "strong_rag": 13, "fully_local_qwen": 13},
+      "comparison": {"kg_only": 8, "strong_rag": 3, "fully_local_qwen": 17},
+      "count": {"kg_only": 17, "strong_rag": 3, "fully_local_qwen": 20},
+      "factoid": {"kg_only": 5, "strong_rag": 17, "fully_local_qwen": 15},
+      "min_max": {"kg_only": 18, "strong_rag": 0, "fully_local_qwen": 20},
+      "set": {"kg_only": 9, "strong_rag": 1, "fully_local_qwen": 15},
+      "sum": {"kg_only": 19, "strong_rag": 0, "fully_local_qwen": 20},
+      "top_k": {"kg_only": 1, "strong_rag": 0, "fully_local_qwen": 18}
+    }
+  },
+  "pacs_v1_1": {
+    "n": 922,
+    "status": {"answerable": 730, "unsupported": 138, "no_result": 54},
+    "base_a": {"correct": 312, "accuracy": 0.3384},
+    "teacher_a": {"correct": 470, "accuracy": 0.5098},
+    "compose_v3_a": {"correct": 722, "accuracy": 0.7831},
+    "compose_v3_b": {"correct": 711, "accuracy": 0.7711},
+    "correction": "Saved trees were re-executed after 36 false or zero-valued rows were restored to answerable; no model call."
+  },
+  "wtq_official": {
+    "n": 4344,
+    "tables": 421,
+    "base": {"correct": 978, "accuracy": 0.2251},
+    "procurement_compose_v3": {"correct": 1187, "accuracy": 0.2733},
+    "answer_only_a": {"correct": 1930, "accuracy": 0.4443},
+    "gold_program_c": {"correct": 2250, "accuracy": 0.5180}
+  },
+  "grounding_fixed_plan_replay": {
+    "n_with_oracle": 136,
+    "correct_before": 89,
+    "correct_after": 103,
+    "wrong_to_correct": 14,
+    "correct_to_wrong": 0,
+    "newly_executable_still_wrong": 1
+  }
+}

@@ -1,0 +1,87 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Public procurement records describe how public buyers solicit work, choose suppliers, and publish
+awards and contracts.  The Open Contracting Data Standard (OCDS) gives these disclosures a common
+model covering parties, tenders, awards, contracts, and linked documents \citep{ocds-standard}.
+Data published this way can answer questions such as which suppliers serve several buyers,
+whether disclosure is complete for a class of notices, or how activity shifts across years.  None
+of these is a document lookup.  An answer may depend on the role an organisation plays in one
+record, on a set of organisations derived from that record, on a second retrieval bound by the
+derived set, and on a final count, comparison, or ranking.
+
+Finding \emph{relevant} evidence is not the same as recovering the \emph{complete} denotation an
+aggregate needs.  Let $R(q)$ be the full set of contract records satisfying question $q$, and let
+a top-$k$ retriever return $\widehat{R}(q)\subset R(q)$.  Even when $\widehat{R}(q)$ holds
+convincing examples, it does not follow that
+\begin{equation}
+ |\widehat{R}(q)|=|R(q)|, \qquad
+ \sum_{r\in\widehat{R}(q)}v(r)=\sum_{r\in R(q)}v(r),
+ \label{eq:retrieval-not-aggregation}
+\end{equation}
+nor that a ranking computed from the retrieved subset shares the true maximum.  Retrieval-centred
+KGQA systems find answer-bearing subgraphs well \citep{sun-etal-2019-pullnet, jiang2023unikgqa,
+luo2024rog}.  Exact counts and set operations need something further: an explicit scope, typed
+intermediate values, and exhaustive execution inside a declared data universe.
+
+Letting a language model write the answer directly fails differently.  A model can produce a
+well-formed query that swaps buyer and supplier roles, projects a contract identifier where the
+question asked for an organisation name, or sums a non-additive monetary field.  The answers stay
+fluent and look plausible.  Prior work has responded by representing complex questions as
+executable programs \citep{cao-etal-2022-kqa, wolfson-etal-2020-break}, constraining formal
+generation \citep{scholak-etal-2021-picard, shu-etal-2022-tiara}, and feeding execution or
+environment signals back into the parser \citep{chen-etal-2021-retrack,
+huang-etal-2024-queryagent}.  We take that starting point and push it into a division of labour:
+the model proposes a typed computation, and the data system decides every factual value.
+
+We build this at two levels, and keep them separate in the evaluation as well as in the code.  A
+compact model is trained to translate procurement questions into a closed algebra of record
+filters, distinct projections, semi- and anti-joins, set operations, grouping, aggregation,
+comparison, and ranking; each program it emits is type checked and executed over a frozen record
+universe, and an offline scorer compares the result with a fixed oracle.  Around that model, a
+deployment runtime adds a structured understanding stage and a conditional planner.  Intents that
+compile deterministically take a compiler path and the rest go to a typed graph planner, after
+which the plan is grounded against allowed schema fields, executed exhaustively, and put through
+preflight, postflight, answer-sanity, and evidence checks.  Structural defects can trigger
+bounded replanning, but a clean empty result ends the process, so the system cannot keep searching
+until it finds an answer it prefers.  The first protocol never invokes the understander, planner,
+evidence bundle, or repair loop, which stops an offline oracle check from being reported as an
+inference-time verifier and stops a component that was never called from taking credit for an
+item.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig01_running_example.png}
+  \caption{One bridge question over the frozen procurement graph.  Retrieval-augmented reading
+  retrieves 40 records, among them all 23 naming the supplier, and answers 14; an untuned model
+  of the same size emits a program that type checks and executes cleanly but stops after the
+  first hop and returns 23.  Our runtime executes the two-hop bridge exhaustively---23 source
+  records, 16 buyer values, 4{,}257 notices---and releases an answer only once execution,
+  evidence, and answer-sanity checks pass.  Every value comes from one saved run; its provenance
+  and limits are given in Appendix \ref{app:examples}.}
+  \label{fig:visual-thesis}
+\end{figure}
+
+The experiments use a provenance-preserving graph built from UK procurement releases for
+2022--2026 and a frozen \PacsN{}-question compositional test.  The typed-program model reaches
+\PacsOursA\% strict accuracy on the canonical surface, \PacsGainBase{} points above the same
+untuned 8B base model and \PacsGainTeacher{} points above a cloud planner, and loses only
+\PacsSurfaceDrop{} points under independent surface naturalisation.  Gains concentrate on
+overlap/exclusion and relational composition, while supplier concentration and
+disclosure/compliance stay much harder.  A separate balanced \RuntimeN{}-item artifact puts the
+complete runtime at \RuntimeOurs\% against \RuntimeBase\% untuned; we treat it as secondary
+evidence, because its stored outputs travel less well than the PACS artifacts.
+
+Four things follow from this design.  The first is the procurement graph itself, with a
+deterministic query-record projection and explicit entity-resolution, additivity, and coverage
+checks, which is what makes any denotation over it well defined.  The second is the closed typed
+algebra together with the program-first supervision pipeline that teaches a compact model to
+write in it.  The third is a runtime that keeps learned understanding and planning apart from
+grounding, exhaustive execution, evidence checks, bounded repair, and controlled non-answering.
+The fourth is PACS, a frozen compositional test with two surface channels, operator-family and
+depth diagnostics, answerability controls, and a published account of where its isolation and
+scoring procedures fall short.  None of this guarantees that the source data are complete in the
+world, that stored organisation names are unique legal entities, or that passing an execution
+check proves semantic correctness.  The claim we do make is testable: inside a declared frozen
+data universe, the computation a model proposes can be type checked, executed, traced, and
+rejected when its implemented preconditions fail.

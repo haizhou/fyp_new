@@ -1,0 +1,499 @@
+{
+  "runtime": {
+    "files": [
+      {
+        "path": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "n": 100,
+        "saved_match": 81,
+        "changed": 13,
+        "changed_and_saved_match": 13,
+        "grounding_failed": 0,
+        "changes": {
+          "added value_is_additive guard for sum": 13
+        },
+        "counterfactual_n": 100,
+        "scored_counterfactual_n": 100,
+        "raw_correct": 72,
+        "grounded_correct": 82,
+        "counterfactual_impacts": {
+          "correct_both": 72,
+          "no_observed_effect": 18,
+          "rescued_to_correct": 10
+        }
+      },
+      {
+        "path": "data/qa/eval/hard20_runtime_nano.jsonl",
+        "n": 20,
+        "saved_match": 15,
+        "changed": 4,
+        "changed_and_saved_match": 4,
+        "grounding_failed": 0,
+        "changes": {
+          "added value_is_additive guard for sum": 4
+        },
+        "counterfactual_n": 20,
+        "scored_counterfactual_n": 20,
+        "raw_correct": 11,
+        "grounded_correct": 15,
+        "counterfactual_impacts": {
+          "correct_both": 11,
+          "no_observed_effect": 5,
+          "rescued_to_correct": 4
+        }
+      },
+      {
+        "path": "data/qa/eval/hard20_nlu_runtime_nano_semantic.jsonl",
+        "n": 20,
+        "saved_match": 10,
+        "changed": 1,
+        "changed_and_saved_match": 0,
+        "grounding_failed": 0,
+        "changes": {
+          "aliased answer_field 'contract_value'->'value_amount'": 1,
+          "forced sum answer_field to value_amount": 1
+        },
+        "counterfactual_n": 20,
+        "scored_counterfactual_n": 16,
+        "raw_correct": 6,
+        "grounded_correct": 6,
+        "counterfactual_impacts": {
+          "no_observed_effect": 9,
+          "correct_both": 6,
+          "not_scored_no_oracle": 4,
+          "made_executable_but_not_correct": 1
+        }
+      }
+    ],
+    "changes": {
+      "added value_is_additive guard for sum": 17,
+      "aliased answer_field 'contract_value'->'value_amount'": 1,
+      "forced sum answer_field to value_amount": 1
+    },
+    "counterfactual_impacts": {
+      "correct_both": 89,
+      "no_observed_effect": 32,
+      "rescued_to_correct": 14,
+      "not_scored_no_oracle": 4,
+      "made_executable_but_not_correct": 1
+    },
+    "change_impacts": {
+      "added value_is_additive guard for sum :: rescued_to_correct": 14,
+      "added value_is_additive guard for sum :: correct_both": 3,
+      "aliased answer_field 'contract_value'->'value_amount' :: made_executable_but_not_correct": 1,
+      "forced sum answer_field to value_amount :: made_executable_but_not_correct": 1
+    },
+    "counterfactual_n": 140,
+    "scored_counterfactual_n": 136,
+    "raw_correct": 89,
+    "grounded_correct": 103,
+    "absolute_accuracy_gain": 0.10294117647058823,
+    "saved_vs_current_replay_disagreements": [
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "factoid_0021_supplier_name",
+        "saved_match": false,
+        "replayed_grounded_status": "passed",
+        "replayed_grounded_answer": "CSG Usher's Ltd",
+        "oracle": "CSG Usher's Ltd"
+      }
+    ],
+    "changed_examples": [
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0606",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "1532262913.14",
+        "oracle": "1532262913.14",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_1256",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "271207050320.29",
+        "oracle": "271207050320.29",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0894",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "10781480297.13",
+        "oracle": "10781480297.13",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0243",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "1601425545.51",
+        "oracle": "1601425545.51",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_1114",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "126201891747.18",
+        "oracle": "126201891747.18",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0464",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "12361200.19",
+        "oracle": "12361200.19",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0209",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "36833503.83",
+        "oracle": "36833503.83",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0084",
+        "category": "boundary",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "passed",
+        "raw_answer": "3750045000.0",
+        "grounded_status": "passed",
+        "grounded_answer": "3750045000.0",
+        "oracle": "3750045000.0",
+        "impact": "correct_both"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0178",
+        "category": "boundary",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "passed",
+        "raw_answer": "29.01",
+        "grounded_status": "passed",
+        "grounded_answer": "29.01",
+        "oracle": "29.01",
+        "impact": "correct_both"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0221",
+        "category": "boundary",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "2001600000.0",
+        "oracle": "2001600000.0",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_1260",
+        "category": "boundary",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "passed",
+        "raw_answer": "70006381144.06",
+        "grounded_status": "passed",
+        "grounded_answer": "70006381144.06",
+        "oracle": "70006381144.06",
+        "impact": "correct_both"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_1415",
+        "category": "boundary",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "2135687071.52",
+        "oracle": "2135687071.52",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard100_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_1450",
+        "category": "boundary",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "3222800000.0",
+        "oracle": "3222800000.0",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard20_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0907",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "521835600.46",
+        "oracle": "521835600.46",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard20_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0705",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "430604718713.59",
+        "oracle": "430604718713.59",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard20_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_1028",
+        "category": "sum",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "47294244927.96",
+        "oracle": "47294244927.96",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard20_runtime_nano.jsonl",
+        "id": "sum_additive_year_category_0842",
+        "category": "boundary",
+        "changes": [
+          "added value_is_additive guard for sum"
+        ],
+        "raw_status": "incomplete_evidence",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "368364668163.20",
+        "oracle": "368364668163.20",
+        "impact": "rescued_to_correct"
+      },
+      {
+        "file": "data/qa/eval/hard20_nlu_runtime_nano_semantic.jsonl",
+        "id": "nlu_decomp_03_buyer_goods_total",
+        "category": "bounded_decomposition",
+        "changes": [
+          "aliased answer_field 'contract_value'->'value_amount'",
+          "forced sum answer_field to value_amount"
+        ],
+        "raw_status": "schema_error",
+        "raw_answer": null,
+        "grounded_status": "passed",
+        "grounded_answer": "67103.42",
+        "oracle": "667103.42",
+        "impact": "made_executable_but_not_correct"
+      }
+    ]
+  },
+  "teacher_data": {
+    "teacher_dir": "data/qa/teacher_full_v1",
+    "traces": 9267,
+    "verified_runtime": 6860,
+    "verified_and_oracle": 5605,
+    "plan_sft": 5598,
+    "plan_sft_oracle_mismatch": 0,
+    "repair_sft": 1725,
+    "grounding_related_successful_repairs": 237,
+    "grounding_repair_families": {
+      "semantic_schema_grounding": 216,
+      "runtime_spec_grounding": 17,
+      "entity_grounding": 4
+    },
+    "dpo_pairs": 390,
+    "oracle_gated_dpo_pairs": 242,
+    "hard_negatives": 1262,
+    "abstain_sft": 590,
+    "grounding_repair_examples": [
+      {
+        "id": "L2::coverage_fixed_0141#L2a#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::coverage_fixed_0770#L2a#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::coverage_fixed_0289#L2a#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::coverage_fixed_1358#L2a#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L1::cpv_count_0240#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:type_gate_rejected:A:procurement_category only accepts goods/services/works"
+      },
+      {
+        "id": "L2::bridge_join_0655#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::bridge_join_1622#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::bridge_join_0617#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:type_gate_rejected:A:type_gate_rejected"
+      },
+      {
+        "id": "L2::bridge_join_1169#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::bridge_join_1811#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::bridge_join_1913#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:type_gate_rejected:C:type_gate_rejected"
+      },
+      {
+        "id": "L2::bridge_join_0059#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::bridge_join_0056#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:type_gate_rejected:C:type_gate_rejected"
+      },
+      {
+        "id": "L2::bridge_join_1703#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:type_gate_rejected:A:type_gate_rejected"
+      },
+      {
+        "id": "L2::bridge_join_0089#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:type_gate_rejected:A:type_gate_rejected"
+      },
+      {
+        "id": "L2::naturalized_0337#L2a#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L1::factoid_0809_award_date_signed#dv",
+        "family": "entity_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_graph_plan:entity_not_found:NHS Supply Chain operated by North of England Commercial Procurement Collaborative (hosted by Leeds and York Partnership NHS Foundation Trust) acting on behalf of Supply Chain Coordination Ltd:A"
+      },
+      {
+        "id": "L1::factoid_0860_buyer_name#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::extended_ops_0616#L2a#dv",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold;no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      },
+      {
+        "id": "L2::extended_ops_0054#L2a",
+        "family": "semantic_schema_grounding",
+        "failure_stage": "plan_compile",
+        "failure_reason": "invalid_intent_program:no_confident_schema_match:A:no schema candidate exceeded the confidence threshold"
+      }
+    ],
+    "interpretation": "Grounding-related repair rows are successful repaired targets selected after the full pipeline and external training-time checks. They show a data-path influence on later optimisation, not the causal checkpoint gain from those rows."
+  },
+  "causal_boundary": "The no-LLM counterfactual isolates deterministic execution-time grounding on saved plans. Existing SFT/RSFT/DPO checkpoint comparisons do not isolate the training effect of grounding-derived examples; that requires a controlled data ablation."
+}

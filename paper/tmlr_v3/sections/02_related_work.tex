@@ -1,0 +1,72 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Executable reasoning over structured data.}
+Semantic parsers map language to programs over tables, databases, or knowledge graphs
+\citep{pasupat2015compositional,wang2020ratsql,cheng2023binder}.  Table specialised models instead
+encode a table jointly with the question \citep{herzig2020tapas,yin2020tabert,liu2022tapex}, while
+recent language model systems generate SQL, logical forms, relation paths, or structured data calls
+\citep{jiang2023structgpt,luo2024chatkbqa,luo2024rog}.  Explicit programs move factual calculation
+outside the language model and expose intermediate structure.  They do not by themselves define
+the meaning of a field, entity, or relation in the underlying data.  In procurement, aliases, buyer
+and supplier roles, release versions, amount additivity, and provenance must be fixed before a
+program has a stable interpretation.
+
+\paragraph{Verification during inference.}
+Encoders and linkers that represent the schema reduce reference errors, while constrained decoders prevent
+illegal output prefixes \citep{wang2020ratsql,scholak2021picard}.  Execution offers another signal.
+LEVER learns to rank candidate programs using the question, program, and execution result
+\citep{ni2023lever}.  Self Correction Distillation trains smaller models to correct errors in
+structured data question answering
+\citep{zhu2026scd}.  These methods show that feedback can improve selection or revision, but the
+feedback source determines what can be inferred from acceptance.  Grammar checks establish form,
+schema grounding establishes that references exist, and execution establishes a denotation in one
+environment.  Our online path makes these states explicit, adds evidence and release decisions,
+and permits one replan conditioned on feedback.  It does not call that replan learning because model
+parameters and state across questions remain fixed.
+
+\paragraph{Execution as a training signal.}
+Execution has also been used as a training signal.  Learning from Executions treats executability
+as weak supervision for unlabelled utterances \citep{wang2021executions}.  STaR retains generated
+rationales that reach a reference answer and repeats generation and training
+\citep{zelikman2022star}.  ReST and ExeSQL similarly alternate candidate
+generation, feedback based selection, and model updating
+\citep{gulcehre2023rest,zhang2025exesql}.  Execution accuracy has also been used to construct both
+off policy and on policy preference data for DPO \citep{zhai2025excot}.  These systems motivate the
+use of environment feedback,
+but they also expose a selection problem.  A coarse reward can admit plans whose result is
+acceptable for the wrong reason.  Our training path therefore distinguishes candidate generation,
+runtime checks, answer shape, and a hidden typed oracle.  In the later student harvest, Step 2 plans
+come from the student while the cloud Step 1 understander remains fixed.  The initial corpus is
+filtered teacher distillation.
+
+\paragraph{Denotation and semantic faithfulness.}
+Supervision from denotations alone can be underspecified because several programs can share one
+answer.  Fictitious worlds and representations of execution results across perturbed inputs have
+been used to distinguish spurious programs \citep{pasupat2016denotations,lee2023spurious}.  The same issue remains
+when a plan that matches the oracle omits a condition that is redundant in the current snapshot.  We
+therefore keep type validity, grounding, runtime acceptance, oracle agreement, and constraint
+retention as separate judgements.  In a targeted repair audit, this separation turns candidates
+that pass the verifier but give an incorrect answer, and plans that match the answer while omitting
+a constraint, into measured outcomes rather than treating them as verified reasoning.
+
+\paragraph{Answerability, provenance, and procurement.}
+Unanswerable and selective question answering evaluates whether a system withholds unsupported
+answers rather than optimising accuracy only on answerable items
+\citep{rajpurkar2018know,kamath2020selective}.  In knowledge graph question answering, supporting
+evidence may be exposed as relation paths or subgraphs \citep{luo2024rog}.  In retrieval augmented
+generation it commonly takes the form of retrieved passages \citep{lewis2020rag}.  Our system
+records contract identifiers and execution traces and
+evaluates ambiguous, unsupported, and no result cases.  It does not verify citations against source
+document text, so we describe its answers as linked to provenance rather than verified against
+citations.
+TheyBuyForYou demonstrates how procurement and company data can be integrated as open linked data
+\citep{soylu2022theybuyforyou}.  We use a fixed UK procurement snapshot as an executable empirical
+substrate in which role, population completeness, aggregation, and abstention can be tested
+together.
+
+The closest work asks how execution can improve program generation or training.  We ask the
+complementary question of how much authority that signal should have when the same environment
+supports online decisions and offline data selection.  The distinction between runtime acceptance,
+oracle agreement, and semantic faithfulness is the organising principle of our method and
+evaluation.

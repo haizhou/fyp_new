@@ -98,6 +98,15 @@ class TestApplyGovLookup:
         assert len(matched) == 0
         assert len(remaining) == 1
 
+    def test_missing_name_stays_in_remaining(self):
+        """A missing display name is not a lookup match and must not crash or disappear."""
+        df = make_unresolved([
+            {"canonical_id": "GB-FTS-NAN", "canonical_name": float("nan")},
+        ])
+        matched, remaining = apply_gov_lookup(df, SAMPLE_GOV_LOOKUP)
+        assert len(matched) == 0
+        assert remaining["canonical_id"].tolist() == ["GB-FTS-NAN"]
+
     def test_empty_input(self):
         df = make_unresolved([])
         matched, remaining = apply_gov_lookup(df, SAMPLE_GOV_LOOKUP)
@@ -273,6 +282,19 @@ class TestMergeByNameRegion:
         merged, singletons = merge_by_name_region(df)
         assert len(merged) == 0
         assert len(singletons) == 1
+
+    def test_empty_normalised_names_are_preserved_as_singletons(self):
+        """Blank/unusable names cannot merge, but Phase 2 must not drop them."""
+        df = make_unresolved([
+            {"canonical_id": "GB-FTS-BLANK", "canonical_name": "", "address_region": "UKJ32"},
+            {"canonical_id": "GB-FTS-PUNCT", "canonical_name": "!!!", "address_region": ""},
+            {"canonical_id": "GB-FTS-NAN", "canonical_name": float("nan"), "address_region": "UKI"},
+        ])
+        merged, singletons = merge_by_name_region(df)
+        assert len(merged) == 0
+        assert set(singletons["canonical_id"]) == {
+            "GB-FTS-BLANK", "GB-FTS-PUNCT", "GB-FTS-NAN",
+        }
 
     def test_merged_id_is_deterministic(self):
         """Same name+region should always produce the same MERGED-* id."""

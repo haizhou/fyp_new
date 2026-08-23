@@ -1,0 +1,76 @@
+\section{Analysis and Discussion}
+\label{sec:analysis}
+
+\subsection{Where the aggregate gain comes from}
+
+The specialised parser's \PacsOursCorrectA{} strict successes consist of 549 correct executed
+answers and 138 correct explicit abstentions.  In contrast, the untuned model produces only 291
+correct answers and 41 correct abstentions; it answers 114 out-of-grammar cases and emits 104
+invalid trees.  Typed-program supervision therefore changes both semantic coverage and the
+model's willingness to use the unsupported action.  It is not merely a syntax repair: the base
+model already emits a high fraction of type-valid trees, yet many encode the wrong role,
+projection, or composition.
+
+The cloud planner produces 324 correct answers and 126 correct abstentions, but also 161 invalid
+trees, 57 unparseable outputs, and 25 API errors.  Counting service errors as failures is
+appropriate for an end-to-end single-run comparison, but it mixes model capability with provider
+availability.  A future controlled comparison should repeat the run, report provider failures
+separately, and keep the same retry budget for every system.
+
+\subsection{Strict and safe outcomes answer different questions}
+
+The specialised Channel-A run contains 73 literal-faithful empty-result executions.  The strict
+metric does not credit them because the benchmark requires an explicit abstention for those
+non-answerable controls.  The supplementary safe metric does, raising the score from 74.51\% to
+82.43\%.  This gap is informative but should not be presented as a second answer-accuracy number:
+it measures whether the model avoided an unsupported factual answer under a broader operational
+policy.  The full outcome counts and definition appear in Appendix \ref{app:full-results}.
+
+This distinction also exposes a product decision.  A user asking for a count over an empty scope
+might reasonably prefer ``0'', while a missing-operator question requires an explicit statement
+that the operation is unsupported.  A production interface should make these policies visible
+rather than merge both into a generic refusal label.
+
+\subsection{Composition is not equivalent to depth}
+
+The non-monotonic L1/L2/L3 results show that depth is an incomplete difficulty measure.  An L3
+set difference can be structurally regular and well represented in supervision, whereas an L2
+grouped concentration query may require a rarer operator and harder return type.  The family
+results support reporting a two-dimensional family-by-depth matrix, with cell counts beside
+percentages, rather than a single line labelled ``accuracy versus complexity.''  The final
+figure brief in the repository specifies this diagnostic and retains the exact table in the
+appendix.
+
+Declared unseen shapes also do not imply unseen primitives.  PACS records whether an exact shape
+signature occurs in the training export, but it does not calculate atom and compound divergence
+as CFQ does.  The 74.95\% unseen-shape score therefore supports generalisation to the benchmark's
+declared structural holdout; it does not establish systematic compositional generalisation in
+the stronger formal sense.
+
+\subsection{What the full-runtime result can and cannot attribute}
+
+The \RuntimeOurs\% system result is consistent with the intended benefit of specialised planning
+inside an execute-and-check runtime.  Category gains on bridge, comparison, and set questions
+align with the PACS family improvements.  Nevertheless, the comparison does not isolate the
+understander, router, deterministic compiler, graph planner, verifier, or repair loop.  A causal
+component claim would require compiler-only, always-planner, conditional-routing, no-verifier,
+and no-repair variants on the same snapshot and budget.  We therefore report the observed full
+stack difference and avoid assigning it to any single component.
+
+The runtime's strongest methodological property is instead inspectability.  A failure can be
+localised to an unparseable intent, routing veto, graph inconsistency, grounding error,
+preflight failure, empty intermediate set, postflight defect, or evidence decision.  This is a
+practical improvement over direct answer generation even when the final accuracy is unchanged.
+It should be called \emph{auditable} rather than \emph{fully interpretable}: the learned
+understander and planner do not provide a complete causal explanation of their own decisions.
+
+\subsection{Data quality remains part of model quality}
+
+The bridge example returns 17 distinct stored names, but multiple strings appear to refer to the
+same organisational family.  An exact set match can therefore be correct under the benchmark
+and still be inconvenient for a user who expects resolved legal entities.  Similarly, a correct
+program over an unnormalised currency column can return a reproducible but semantically
+mislabelled total.  These are not peripheral data-engineering issues: they define the denotation
+against which the model is trained and scored.  Future versions should version the entity and
+currency semantics together with the benchmark, rather than updating the KG under an unchanged
+test label.

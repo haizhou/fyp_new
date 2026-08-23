@@ -1,0 +1,53 @@
+\section{Trace and Output Examples}
+\label{app:examples}
+
+\subsection{Direct compositional success and base failure}
+
+For PACS item \texttt{PACS::F6:L3:f6\_other\_buyers\_via\_suppliers:0011\#a}, the question asks
+which buyer-name values are connected through the lead suppliers of an anchor buyer, excluding
+the exact anchor string.  The untuned model emits the following compressed computation:
+\begin{verbatim}
+VALUES contract_node_id [supplier_name = anchor]
+  DIFFERENCE
+VALUES contract_node_id [buyer_name = anchor]
+\end{verbatim}
+It reverses the role in the first filter and projects contract IDs, yielding the empty set.  The
+typed-program model emits:
+\begin{verbatim}
+S = VALUES supplier_name [buyer_name = anchor]
+B = VALUES buyer_name    [supplier_name IN_EXPR S]
+A = B DIFFERENCE VALUES buyer_name [buyer_name = anchor]
+\end{verbatim}
+The deterministic evaluator returns the 17 stored strings in the oracle.  Representative values
+are ``Ards and North Down Borough Council'', ``Leeds City Council'', and ``NI Water and its
+subsidiaries''.  The output also contains organisation-name variants; it must be captioned as 17
+stored buyer-name values, not 17 unique organisations.
+
+\subsection{Unsupported sibling}
+
+A separate F6--L3 control asks, ``What is the average number of buyers per supplier in this
+scope?''  Average is outside the closed algebra.  The specialised model returns an explicit
+abstention object with the reason that the operation is not expressible.  This is an independent
+test item, not a failure branch of the answerable bridge question.
+
+\subsection{Full-runtime figure slot}
+
+The final introduction figure requires one newly exported, current-code trace satisfying all of
+the following conditions:
+\begin{itemize}
+  \item a live structured-understander artifact, including answer signature and source/bridge/
+  target roles;
+  \item the actual router decision and either deterministic compiler output or Step-2 graph
+  planner output (never both as executed branches);
+  \item compiled variables and dependencies; grounded constraints; source, bridge, and target
+  output sizes; and two or three values that can be traced to the same execution;
+  \item evidence identifiers, preflight/postflight checks, answer-sanity and evidence verdict,
+  and the final answer card; and
+  \item a trace ID, model revisions, graph hash, timestamp, and offline oracle result shown only
+  as an evaluation annotation.
+\end{itemize}
+Existing PACS rows do not satisfy these requirements because their protocol is a direct tree
+decode followed by offline scoring.  Existing historical teacher traces may help select a
+question, but they should not be presented as a current full-runtime execution.  Exporting one
+such trace is a lightweight single-case reproducibility task and does not require rerunning a
+batch experiment.

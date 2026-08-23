@@ -1,0 +1,23 @@
+{
+  "figure": "fig03_data_graph",
+  "model_calls": 0,
+  "graph_stats": {
+    "contracts": 215221,
+    "organisations": 131502,
+    "cpv": 3870,
+    "evidence": 535731,
+    "buyer_edges": 215218,
+    "supplier_edges": 334063,
+    "category_edges": 164691,
+    "evidence_edges": 1326240
+  },
+  "sources": [
+    "src/procurement_graph/ingest/loader.py",
+    "src/procurement_graph/er/phase1.py",
+    "src/procurement_graph/er/phase2.py",
+    "scripts/apply_safe_er_merges.py",
+    "src/procurement_graph/kg/build.py",
+    "data/kg/nodes",
+    "data/kg/edges"
+  ]
+}

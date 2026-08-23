@@ -169,24 +169,49 @@ def _cross_ref_fts_aliases(
     resolved = parties_df[parties_df["raw_id"].isin(official_map)].copy()
     resolved["canonical_id"] = resolved["raw_id"].map(official_map)
 
-    # Group by (ocid, norm_name) → set of canonical_ids
-    ocid_name_to_cid: dict[tuple, str] = {}
+    def roles_of(value: object) -> set[str]:
+        """Return normalised party roles from the stored JSON/list representation."""
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except (TypeError, json.JSONDecodeError):
+                return set()
+        if not isinstance(value, (list, tuple, set)):
+            return set()
+        return {str(role).strip().casefold() for role in value if str(role).strip()}
+
+    # A name alone is not enough: the same text can legitimately occur on both
+    # sides of a release.  Keep every candidate per (OCID, name, role), then
+    # accept an FTS alias only when its shared roles identify exactly one
+    # canonical organisation.
+    ocid_name_role_to_cids: dict[tuple[str, str, str], set[str]] = {}
     for _, row in resolved.iterrows():
-        key = (row["ocid"], row["norm_name"])
-        if key not in ocid_name_to_cid:
-            ocid_name_to_cid[key] = row["canonical_id"]
+        if not row["norm_name"]:
+            continue
+        for role in roles_of(row.get("roles_json")):
+            key = (str(row["ocid"]), str(row["norm_name"]), role)
+            ocid_name_role_to_cids.setdefault(key, set()).add(str(row["canonical_id"]))
 
     # Find FTS parties whose (ocid, norm_name) matches a resolved entity
     fts_parties = parties_df[
         parties_df["scheme"].apply(is_fts) & ~parties_df["raw_id"].isin(official_map)
     ]
+    candidates_by_raw_id: dict[str, set[str]] = {}
     for _, row in fts_parties.iterrows():
         if not row["norm_name"]:
             continue
-        key = (row["ocid"], row["norm_name"])
-        cid = ocid_name_to_cid.get(key)
-        if cid and row["raw_id"] not in extra:
-            extra[row["raw_id"]] = cid
+        candidates: set[str] = set()
+        for role in roles_of(row.get("roles_json")):
+            key = (str(row["ocid"]), str(row["norm_name"]), role)
+            candidates.update(ocid_name_role_to_cids.get(key, set()))
+        if candidates:
+            candidates_by_raw_id.setdefault(str(row["raw_id"]), set()).update(candidates)
+
+    # A raw FTS identifier can be observed in more than one release.  Only
+    # alias it when all of those observations agree on one official entity.
+    for raw_id, candidates in candidates_by_raw_id.items():
+        if len(candidates) == 1:
+            extra[raw_id] = next(iter(candidates))
 
     return extra
 

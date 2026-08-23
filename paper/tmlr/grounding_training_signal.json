@@ -1,0 +1,827 @@
+{
+  "scope": {
+    "source_questions": 9267,
+    "all_repair_sft": 1725,
+    "grounding_related_repair_sft": 237,
+    "failure_families": {
+      "semantic_schema_grounding": 216,
+      "runtime_spec_grounding": 17,
+      "entity_grounding": 4
+    }
+  },
+  "training_exposure": {
+    "grounding_repair_rows": 237,
+    "also_in_raw_verified_sft": 237,
+    "repair_sft_train": 230,
+    "repair_sft_val": 7,
+    "also_direct_plan_sft_after_caps": 170,
+    "direct_plan_sft_train": 166,
+    "direct_plan_sft_val": 4,
+    "training_row_exposures": 396,
+    "unique_training_questions": 230,
+    "teacher_dpo_overlap": 17,
+    "interpretation": "Direct plan-SFT trains p(plan|question); repair-SFT trains p(repaired_plan|question,failed_plan,hard_feedback). Counting both as one treatment would conflate first-pass planning with feedback-conditioned replanning."
+  },
+  "target_semantic_fidelity": {
+    "rows_with_evaluable_gold_constraints": 229,
+    "rows_covering_all_evaluable_gold_constraints": 173,
+    "rows_flagged_for_manual_review": 56,
+    "constraint_recall": 0.8585131894484412,
+    "missing_by_slot": {
+      "category": 43,
+      "buyer": 6,
+      "supplier": 3,
+      "has_signed_date": 3,
+      "title": 2,
+      "cpv": 2
+    },
+    "rows_with_category_constraint": 79,
+    "rows_missing_category_literal": 43,
+    "examples": [
+      {
+        "id": "L2::coverage_fixed_0141#L2a#dv",
+        "question": "Under CPV 34144900, how many goods notices were published in 2025, according to the KG?",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "goods"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "count",
+          "operation": "count",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "cpv",
+                  "value": "34144900",
+                  "operator": "eq"
+                },
+                {
+                  "slot": "year",
+                  "value": "2025",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "count",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L2::coverage_fixed_0770#L2a#dv",
+        "question": "Under CPV 75100000, how many services notices recorded in the KG for matching procurement records were there in 2025?",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "services"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "count",
+          "operation": "count",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "cpv",
+                  "value": "75100000",
+                  "operator": "eq"
+                },
+                {
+                  "slot": "year",
+                  "value": "2025",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "count",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L2::coverage_fixed_0289#L2a#dv",
+        "question": "Under CPV 16000000, how many goods notices were published in 2024 in the dataset?",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "goods"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "count",
+          "operation": "count",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "cpv",
+                  "value": "16000000",
+                  "operator": "eq"
+                },
+                {
+                  "slot": "year",
+                  "value": "2024",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "count",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L1::cpv_count_0240#dv",
+        "question": "CPV 98392000 relocation services count contract notices",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "services"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "count",
+          "operation": "count",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "cpv",
+                  "value": "98392000",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "count",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L2::extended_ops_0426#L2a",
+        "question": "Here’s the numbers question: in 2026, did the Regional Business Services Organisation, Procurement and Logistics Service publish any goods contract notices?",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "goods"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "boolean",
+          "operation": "exists",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "buyer",
+                  "value": "Regional Business Services Organisation, Procurement and Logistics Service",
+                  "operator": "eq"
+                },
+                {
+                  "slot": "year",
+                  "value": "2026",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "exists",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L2::extended_ops_0936#L2a",
+        "question": "I’m investigating Shropshire Council’s procurement activity—did it publish any services contract notices in 2025?",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "services"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "boolean",
+          "operation": "exists",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "buyer",
+                  "value": "Shropshire Council",
+                  "operator": "eq"
+                },
+                {
+                  "slot": "year",
+                  "value": "2025",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            },
+            {
+              "var_id": "b1a1",
+              "kind": "entity_set",
+              "role": "category",
+              "filters": [],
+              "depends_on": [
+                "a1"
+              ]
+            }
+          ],
+          "return": {
+            "operation": "exists",
+            "input": "b1a1",
+            "field": "none",
+            "guards": [],
+            "k": 0,
+            "group_by": "none",
+            "metric": "none",
+            "comparator": "none",
+            "left": "",
+            "right": ""
+          }
+        }
+      },
+      {
+        "id": "L2::extended_ops_1203#L2a",
+        "question": "Which contract shows the smallest non-zero value for goods notices under CPV 31682210?",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "goods"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "min_max",
+          "operation": "argmin",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "cpv",
+                  "value": "31682210",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "argmin",
+            "input": "a1",
+            "field": "value",
+            "exclude_zero": true
+          }
+        }
+      },
+      {
+        "id": "L2::extended_ops_1530#L2a",
+        "question": "In 2023, did NHS Supply Chain—operated by the North of England Commercial Procurement Collaborative (hosted by Leeds and York Partnership NHS Foundation Trust) and acting on behalf of Supply Chain Coordination Ltd—publish any goods contract notices?",
+        "missing": [
+          {
+            "field": "buyer_name",
+            "slot": "buyer",
+            "op": "eq",
+            "value": "NHS Supply Chain operated by North of England Commercial Procurement Collaborative (who are hosted by Leeds and York Partnership NHS Foundation Trust) acting on behalf of Supply Chain Coordination Ltd"
+          },
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "goods"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "boolean",
+          "operation": "exists",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "year",
+                  "value": "2023",
+                  "operator": "eq"
+                },
+                {
+                  "slot": "buyer",
+                  "value": "NHS Supply Chain",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "exists",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L2::extended_ops_1752#L2a#dv",
+        "question": "Could you please confirm whether Westmorland and Furness Council published any services contract notices in 2025?",
+        "missing": [
+          {
+            "field": "tender_category",
+            "slot": "category",
+            "op": "eq",
+            "value": "services"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "boolean",
+          "operation": "exists",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "buyer",
+                  "value": "Westmorland and Furness Council",
+                  "operator": "eq"
+                },
+                {
+                  "slot": "year",
+                  "value": "2025",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "exists",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L2::extended_ops_1945#L2a#dv",
+        "question": "PLACE034 On & Off Street Civil Parking Enforcement Services classified under services?",
+        "missing": [
+          {
+            "field": "tender_title",
+            "slot": "title",
+            "op": "eq",
+            "value": "PLACE034 On & Off Street Civil Parking Enforcement Services"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "boolean",
+          "operation": "exists",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [],
+              "depends_on": []
+            },
+            {
+              "var_id": "b1a1",
+              "kind": "record_set",
+              "role": "cpv",
+              "filters": [
+                {
+                  "slot": "category",
+                  "value": "services",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": [
+                "a1"
+              ]
+            }
+          ],
+          "return": {
+            "operation": "exists",
+            "input": "b1a1"
+          }
+        }
+      },
+      {
+        "id": "L2::extended_ops_1597#L2a",
+        "question": "In our contract classification check, was the “Made in North Tyneside (MINT) / Business Factory” contract recorded under services?",
+        "missing": [
+          {
+            "field": "tender_title",
+            "slot": "title",
+            "op": "eq",
+            "value": "Made in North Tyneside (MINT) / Business Factory"
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "boolean",
+          "operation": "exists",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "category",
+                  "value": "services",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            }
+          ],
+          "return": {
+            "operation": "exists",
+            "input": "a1"
+          }
+        }
+      },
+      {
+        "id": "L2::bridge_join_2000#L2a",
+        "question": "Here’s the numbers question: how many notices are under CPV codes that Tai Tarian Ltd has used?",
+        "missing": [
+          {
+            "field": "tender_cpv_id",
+            "slot": "cpv",
+            "op": "in_subquery",
+            "value": {
+              "resolve": "cpvs_of_buyer",
+              "buyer": "Tai Tarian Ltd"
+            }
+          }
+        ],
+        "target_graph_plan": {
+          "question_type": "count",
+          "operation": "count",
+          "variables": [
+            {
+              "var_id": "a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [
+                {
+                  "slot": "supplier",
+                  "value": "Tai Tarian Ltd",
+                  "operator": "eq"
+                }
+              ],
+              "depends_on": []
+            },
+            {
+              "var_id": "b1a1",
+              "kind": "entity_set",
+              "role": "cpv",
+              "filters": [],
+              "depends_on": [
+                "a1"
+              ]
+            },
+            {
+              "var_id": "c1b1a1",
+              "kind": "record_set",
+              "role": "contract_records",
+              "filters": [],
+              "depends_on": [
+                "b1a1"
+              ]
+            }
+          ],
+          "return": {
+            "operation": "count",
+            "input": "c1b1a1",
+            "field": "none"
+          },
+          "relations": [
+            {
+              "from": "a1",
+              "to": "b1a1",
+              "bind_field": "cpv"
+            },
+            {
+              "from": "b1a1",
+              "to": "c1b1a1",
+              "bind_field": "cpv"
+            }
+          ]
+        }
+      }
+    ],
+    "interpretation": "Every target was oracle-matched on the frozen KG, but oracle equality alone does not guarantee intensional plan fidelity. Missing literals can be extensionally redundant on the current data and therefore teach shortcut plans. Flags require review rather than automatic deletion because entity aliases and graph rewrites can be equivalent."
+  },
+  "saved_student_behaviour_on_same_questions": {
+    "qwen_sft": {
+      "label": "qwen_sft",
+      "artifact_dir": "data/qa/rsft_qwen_r1",
+      "present": 237,
+      "initial_success": 54,
+      "still_needed_repair": 162,
+      "eventual_verified": 216,
+      "eventual_oracle_match": 204,
+      "grounding_failure_recurred_then_repaired": 140,
+      "unverified": 21,
+      "gold_constraint_fidelity": {
+        "evaluable": 229,
+        "all_covered": 171,
+        "flagged": 58,
+        "missing_by_slot": {
+          "category": 24,
+          "cpv": 21,
+          "buyer": 7,
+          "has_signed_date": 3,
+          "title": 2,
+          "supplier": 2,
+          "year": 1
+        }
+      }
+    },
+    "llama_sft": {
+      "label": "llama_sft",
+      "artifact_dir": "data/qa/rsft_llama_r1",
+      "present": 237,
+      "initial_success": 54,
+      "still_needed_repair": 173,
+      "eventual_verified": 227,
+      "eventual_oracle_match": 217,
+      "grounding_failure_recurred_then_repaired": 151,
+      "unverified": 10,
+      "gold_constraint_fidelity": {
+        "evaluable": 229,
+        "all_covered": 180,
+        "flagged": 49,
+        "missing_by_slot": {
+          "category": 32,
+          "buyer": 8,
+          "cpv": 7,
+          "has_signed_date": 3,
+          "year": 2,
+          "title": 2,
+          "supplier": 1
+        }
+      }
+    },
+    "qwen_step1_dpo": {
+      "label": "qwen_step1_dpo",
+      "artifact_dir": "data/qa/rsft_qwen_r2",
+      "present": 237,
+      "initial_success": 125,
+      "still_needed_repair": 102,
+      "eventual_verified": 227,
+      "eventual_oracle_match": 207,
+      "grounding_failure_recurred_then_repaired": 102,
+      "unverified": 10,
+      "gold_constraint_fidelity": {
+        "evaluable": 229,
+        "all_covered": 178,
+        "flagged": 51,
+        "missing_by_slot": {
+          "cpv": 20,
+          "category": 16,
+          "buyer": 7,
+          "has_signed_date": 5,
+          "title": 3,
+          "supplier": 2,
+          "year": 1
+        }
+      }
+    }
+  },
+  "heldout_aggregate_checkpoint_results": {
+    "qwen_zeroshot": {
+      "artifact": "outputs/eval/matrix_v2/cicada-qwen3-zeroshot/compare_cicada.summary.json",
+      "overall": {
+        "total": 260,
+        "correct": 183,
+        "accuracy": 0.7038
+      },
+      "bridge_join": {
+        "total": 20,
+        "correct": 2,
+        "accuracy": 0.1
+      },
+      "categorical": {
+        "total": 20,
+        "correct": 8,
+        "accuracy": 0.4
+      },
+      "comparison": {
+        "total": 20,
+        "correct": 7,
+        "accuracy": 0.35
+      },
+      "set": {
+        "total": 20,
+        "correct": 11,
+        "accuracy": 0.55
+      }
+    },
+    "qwen_sft": {
+      "artifact": "outputs/eval/matrix_v2/cicada-qwen3-sft/compare_cicada.summary.json",
+      "overall": {
+        "total": 260,
+        "correct": 211,
+        "accuracy": 0.8115
+      },
+      "bridge_join": {
+        "total": 20,
+        "correct": 8,
+        "accuracy": 0.4
+      },
+      "categorical": {
+        "total": 20,
+        "correct": 11,
+        "accuracy": 0.55
+      },
+      "comparison": {
+        "total": 20,
+        "correct": 13,
+        "accuracy": 0.65
+      },
+      "set": {
+        "total": 20,
+        "correct": 13,
+        "accuracy": 0.65
+      }
+    },
+    "qwen_rsft": {
+      "artifact": "outputs/eval/matrix_v2/cicada-qwen3-rsft/compare_cicada.summary.json",
+      "overall": {
+        "total": 260,
+        "correct": 212,
+        "accuracy": 0.8154
+      },
+      "bridge_join": {
+        "total": 20,
+        "correct": 16,
+        "accuracy": 0.8
+      },
+      "categorical": {
+        "total": 20,
+        "correct": 8,
+        "accuracy": 0.4
+      },
+      "comparison": {
+        "total": 20,
+        "correct": 16,
+        "accuracy": 0.8
+      },
+      "set": {
+        "total": 20,
+        "correct": 15,
+        "accuracy": 0.75
+      }
+    },
+    "qwen_dpo": {
+      "artifact": "outputs/eval/matrix_v2/cicada-qwen3-dpo/compare_cicada.summary.json",
+      "overall": {
+        "total": 260,
+        "correct": 217,
+        "accuracy": 0.8346
+      },
+      "bridge_join": {
+        "total": 20,
+        "correct": 11,
+        "accuracy": 0.55
+      },
+      "categorical": {
+        "total": 20,
+        "correct": 12,
+        "accuracy": 0.6
+      },
+      "comparison": {
+        "total": 20,
+        "correct": 16,
+        "accuracy": 0.8
+      },
+      "set": {
+        "total": 20,
+        "correct": 14,
+        "accuracy": 0.7
+      }
+    }
+  },
+  "heldout_paired_transitions": {
+    "qwen_zeroshot_to_sft": {
+      "before_artifact": "outputs/eval/matrix_v2/cicada-qwen3-zeroshot/compare_cicada.results.jsonl",
+      "after_artifact": "outputs/eval/matrix_v2/cicada-qwen3-sft/compare_cicada.results.jsonl",
+      "n": 260,
+      "before_correct": 183,
+      "after_correct": 211,
+      "wrong_to_right": 31,
+      "right_to_wrong": 3,
+      "net_gain": 28,
+      "exact_mcnemar_p": 7.660128176212311e-07
+    },
+    "qwen_sft_to_rsft": {
+      "before_artifact": "outputs/eval/matrix_v2/cicada-qwen3-sft/compare_cicada.results.jsonl",
+      "after_artifact": "outputs/eval/matrix_v2/cicada-qwen3-rsft/compare_cicada.results.jsonl",
+      "n": 260,
+      "before_correct": 211,
+      "after_correct": 212,
+      "wrong_to_right": 19,
+      "right_to_wrong": 18,
+      "net_gain": 1,
+      "exact_mcnemar_p": 1.0
+    },
+    "qwen_rsft_to_dpo": {
+      "before_artifact": "outputs/eval/matrix_v2/cicada-qwen3-rsft/compare_cicada.results.jsonl",
+      "after_artifact": "outputs/eval/matrix_v2/cicada-qwen3-dpo/compare_cicada.results.jsonl",
+      "n": 260,
+      "before_correct": 212,
+      "after_correct": 217,
+      "wrong_to_right": 20,
+      "right_to_wrong": 15,
+      "net_gain": 5,
+      "exact_mcnemar_p": 0.49955983320251107
+    },
+    "llama_zeroshot_to_sft": {
+      "before_artifact": "outputs/eval/matrix_v2/cicada-llama31-zeroshot/compare_cicada.results.jsonl",
+      "after_artifact": "outputs/eval/matrix_v2/cicada-llama31-sft/compare_cicada.results.jsonl",
+      "n": 260,
+      "before_correct": 156,
+      "after_correct": 216,
+      "wrong_to_right": 63,
+      "right_to_wrong": 3,
+      "net_gain": 60,
+      "exact_mcnemar_p": 1.3002836654618655e-15
+    },
+    "llama_sft_to_rsft": {
+      "before_artifact": "outputs/eval/matrix_v2/cicada-llama31-sft/compare_cicada.results.jsonl",
+      "after_artifact": "outputs/eval/matrix_v2/cicada-llama31-rsft/compare_cicada.results.jsonl",
+      "n": 260,
+      "before_correct": 216,
+      "after_correct": 215,
+      "wrong_to_right": 8,
+      "right_to_wrong": 9,
+      "net_gain": -1,
+      "exact_mcnemar_p": 1.0
+    },
+    "llama_rsft_to_dpo": {
+      "before_artifact": "outputs/eval/matrix_v2/cicada-llama31-rsft/compare_cicada.results.jsonl",
+      "after_artifact": "outputs/eval/matrix_v2/cicada-llama31-dpo/compare_cicada.results.jsonl",
+      "n": 260,
+      "before_correct": 215,
+      "after_correct": 201,
+      "wrong_to_right": 4,
+      "right_to_wrong": 18,
+      "net_gain": -14,
+      "exact_mcnemar_p": 0.004343509674072266
+    }
+  },
+  "causal_boundary": "The same-question student harvest is in-sample and the held-out checkpoints differ in more than grounding data. These artifacts show exposure and behavioural compatibility, not the causal gain from hard-grounding examples. Use matched clean-SFT, non-grounding-repair, grounding-repair, and grounding-DPO arms for attribution."
+}

@@ -1,0 +1,93 @@
+\section{Introduction}
+\label{sec:intro}
+
+Language models increasingly translate questions into programs over structured data, making their
+outputs inspectable and executable.  Parsers, schema linkers, and executors can expose malformed
+syntax, unknown references, empty results, and runtime failures, but none establishes that a
+program expresses the request.  This distinction matters during inference, when diagnostics can
+guide revision, and during training, when false acceptance can turn semantic errors into targets.
+We therefore ask how partial executable verification can provide feedback without obscuring its
+limited authority.
+
+Public procurement makes this boundary concrete.  Its records describe buyers, suppliers, awards,
+values, dates, categories, and source notices.  An auditor may ask which buyers share suppliers
+with a named authority, whether all awards in a period satisfy a condition, or which category has
+the largest complete total.  These questions require joins across buyer and supplier roles, set operations,
+aggregation, and access to the complete matching population in a declared data snapshot.
+Retrieval alone cannot establish this population.  Let $R(q)$ contain the records that satisfy a
+question $q$, and let $\widehat{R}_k(q)$ contain the top $k$ retrieved records.  Even when every
+retrieved row is relevant, $\widehat{R}_k(q)\subset R(q)$ does not imply
+$|\widehat{R}_k(q)|=|R(q)|$, nor does it preserve a sum, ranking, or set difference.  Executing a
+generated program over the full snapshot avoids this finite retrieval limit, but it introduces the
+separate problem of whether the program preserves the roles, constraints, and operation expressed
+by the question.
+
+We study this problem over a frozen graph of UK procurement records.  Open Contracting
+Data Standard releases are reduced to a versioned snapshot, organisations are resolved
+conservatively, and contract, organisation, category, and evidence objects are stored in a property
+graph backed by Parquet.  Learned components propose a typed computation.  Deterministic
+code grounds its fields and values, executes it over the matching population in the snapshot, and
+applies evidence and release checks.  Deterministic execution fixes the result of a proposed
+computation, but the model still chooses its roles, dependencies, and operation.  The design exposes
+those choices to a defined set of checks.
+
+Online checks have no access to the answer oracle.  A repairable failure may be returned to the
+model for one revised proposal, while unsupported, ambiguous, and clean empty states terminate.
+Offline curation adds a hidden typed oracle after execution.  Positive targets must pass the runtime
+contract, satisfy the expected answer shape, and agree with that oracle, which contributes no
+content to the student target.  The online revision changes no parameter or state across questions.
+
+The full runtime contains two learned proposal stages.  A structured understander first predicts an
+answer signature and a typed intent program.  Simple valid intents are compiled directly.  More
+complex or vetoed intents are passed to a graph planner that exposes intermediate sets and their
+dependencies.  Both routes enter the same grounding, execution, evidence, and abstention path.
+The trace records grounded constraints, intermediate population sizes, and a bounded sample of
+contract level provenance.  Figure \ref{fig:overview} summarises this control path.
+
+\begin{figure}[t]
+  \centering
+  \IfFileExists{figs/fig01_system_overview.pdf}{%
+    \includegraphics[width=\linewidth]{fig01_system_overview}%
+  }{%
+    \fbox{\parbox[c][1.45in][c]{0.94\linewidth}{\centering\small
+      \textbf{Figure placeholder.} A procurement question runs from structured understanding to
+      the selected compiler or planner branch, a typed variable graph, grounded intermediate sets,
+      deterministic execution, release checks, and either an answer with evidence or abstention.
+      The displayed values reconstruct a saved Step 1 artifact through deterministic replay on the
+      current frozen backend.}}
+  }
+  \caption{Control path of the full procurement runtime.  The understander is always called.  A
+  valid compilable intent takes the deterministic route, while other intents are passed to the
+  typed graph planner.  Both branches are grounded and executed on the frozen graph before release
+  checks.  Only a structured, repairable failure may trigger one revised proposal.  The displayed
+  counts reconstruct a saved Step 1 artifact through deterministic replay rather than a stored full
+  final test trace.}
+  \label{fig:overview}
+\end{figure}
+
+The evaluation is organised around three questions.
+
+\begin{itemize}
+  \item \textbf{RQ1. Feedback authority.} Which properties can deterministic checks establish
+  without access to the answer, and where do runtime acceptance, oracle agreement, and constraint
+  retention diverge?
+  \item \textbf{RQ2. Learning from checked executions.} How do stored Qwen and Llama checkpoints
+  change across supervised fine tuning, rejection sampling fine tuning (RSFT), and preference
+  optimisation,
+  and do later stages improve monotonically?
+  \item \textbf{RQ3. System effectiveness and portability.} How does the complete procurement
+  runtime compare with direct generation, finite retrieval, cloud, and deterministic controls, and
+  what planning competence transfers under a separate typed algebra protocol?
+\end{itemize}
+
+The main comparison uses the 2,025 questions outside the development subset containing 260
+questions, which supports checkpoint analysis.  Targeted audits examine grounding and constraint
+retention.  The Procurement Analytics Challenge Set (PACS) and WikiTableQuestions evaluate a
+separate algebra planner using one model call without the full runtime.
+
+The paper contributes a layered contract that separates learned proposals, deterministic online
+checks, and offline oracle authority.  It also develops a training path that routes checked
+candidates into direct targets, repairs, preferences, hard negatives, and abstention examples.  The
+resulting systems are evaluated across two model families, targeted audits, and separate
+composition and transfer protocols.  These protocols support different conclusions and are not
+treated as points on one learning curve.

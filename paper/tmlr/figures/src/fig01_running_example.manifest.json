@@ -1,0 +1,21 @@
+{
+  "figure": "fig01_running_example",
+  "example_id": "PACS::F6:L3:f6_other_buyers_via_suppliers:0011#a",
+  "protocol_boundary": "Direct PACS Compose evaluation; no separate Step-1 or ReasoningPipeline.",
+  "question": "Follow DfI Transport and Road Asset Management TRAM's lead suppliers outward: setting DfI Transport and Road Asset Management TRAM itself aside, which buyers do those same suppliers also work for?",
+  "displayed_counts": {
+    "record_universe": 215221,
+    "anchor_records": 35,
+    "supplier_strings": 17,
+    "outward_records": 119,
+    "buyer_strings_before_difference": 18,
+    "final_stored_buyer_name_strings": 17
+  },
+  "base_answer": [],
+  "sources": {
+    "question": "data/qa/pacs_v1/test_channel_a.jsonl:2",
+    "baseline": "data/qa/compose_probe_v1/eval_pacstest_base_a.jsonl:2",
+    "compose_v3": "data/qa/compose_probe_v1/eval_pacstest_v3_a.jsonl:2",
+    "protocol": "scripts/run_compose_probe_eval.py:185-307"
+  }
+}

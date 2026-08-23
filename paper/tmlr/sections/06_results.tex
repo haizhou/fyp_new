@@ -1,0 +1,136 @@
+\section{Results}
+\label{sec:results}
+
+\subsection{Typed-program supervision more than doubles strict accuracy}
+
+Table \ref{tab:pacs-main} answers RQ1.  The untuned Qwen3-8B model solves
+\PacsBaseCorrect/\PacsN cases (\PacsBaseA\%).  The cloud planner improves this to
+\PacsTeacherCorrect/\PacsN (\PacsTeacherA\%).  The typed-program model solves
+\PacsOursCorrectA/\PacsN (\PacsOursA\%), an absolute gain of \PacsGainBase{} percentage points
+over the same base model and \PacsGainTeacher{} points over the cloud planner.  The Wilson
+intervals do not overlap either baseline interval.
+
+\begin{table}[t]
+  \caption{PACS strict execution accuracy.  All Channel-A rows use the same \PacsN{} cases and a
+  single temperature-zero free decode.  ``Valid tree'' is reported for diagnosis only: explicit
+  abstentions do not emit a tree, and validity does not imply correctness.}
+  \label{tab:pacs-main}
+  \centering
+  \small
+  \begin{tabular}{llrrrcc}
+    \toprule
+    System & Surface & Correct & $n$ & Strict acc. & 95\% Wilson CI & Valid tree \\
+    \midrule
+    Untuned Qwen3-8B & A & 332 & 922 & 36.01 & [32.97, 39.16] & 77.77 \\
+    Cloud planner & A & 450 & 922 & 48.81 & [45.59, 52.03] & 52.28 \\
+    \textbf{Typed-program Qwen3-8B} & A & \textbf{687} & 922 & \textbf{74.51}
+      & \textbf{[71.60, 77.22]} & 71.58 \\
+    Typed-program Qwen3-8B & B & 675 & 922 & 73.21 & [70.26, 75.97] & 70.50 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Tree-valid rate alone ranks the untuned base above the specialised model, despite a 38.50-point
+gap in strict accuracy.  This is direct evidence for the distinction in Table
+\ref{tab:guarantee-boundary}: a syntactically and type-valid program may still reverse roles,
+select the wrong field, or express the wrong scope.  Conversely, an explicit abstention is a
+scoreable final action without a tree.
+
+\subsection{Surface naturalisation causes a small aggregate drop}
+
+For RQ2, the specialised model falls from \PacsOursA\% on Channel A to \PacsOursB\% on Channel
+B, a difference of \PacsSurfaceDrop{} percentage points.  Macro-family accuracy falls from
+\PacsMacroA\% to \PacsMacroB\%.  This suggests that the parser is not merely reproducing one
+fixed wording, but the result should not be interpreted as unrestricted linguistic robustness:
+both surfaces preserve the same literals and are generated under explicit logic gates.
+
+The largest A--B family decline is 3.38 points on relational composition (F6); supplier
+concentration (F3) instead improves by 2.96 points.  A paired item-level significance test is
+left out of the present draft because the intended strict Boolean-matching fix must first be
+applied uniformly to every scorer and the paired decisions regenerated from the frozen outputs.
+
+\subsection{Improvements are concentrated in compositional set operations}
+
+Table \ref{tab:pacs-family} answers RQ3.  The specialised parser is strongest on overlap and
+exclusion (F5, 94.49\%) and improves the base by more than 60 points.  It also substantially
+improves cross-buyer comparison (F4) and relational composition (F6).  Supplier concentration
+(F3) and disclosure/compliance (F7) remain near 50\% and 42\%, respectively; on both families the
+cloud model is competitive with or slightly above the specialised model.  These failures are
+obscured by the micro average, particularly because F7 contains only 67 cases.
+
+\begin{table}[t]
+  \caption{Strict accuracy by PACS family.  Exact correct counts are given in parentheses.
+  Surface B is available only for the specialised parser.}
+  \label{tab:pacs-family}
+  \centering
+  \small
+  \begin{tabular}{llrrrr}
+    \toprule
+    & Family ($n$) & Untuned A & Cloud A & Typed A & Typed B \\
+    \midrule
+    F1 & Spending/volume (148) & 41.89 (62) & 62.84 (93) & \textbf{84.46 (125)} & 81.08 (120) \\
+    F2 & Temporal change (149) & 57.72 (86) & 72.48 (108) & \textbf{83.22 (124)} & 81.88 (122) \\
+    F3 & Supplier concentration (135) & 19.26 (26) & 51.85 (70) & 51.11 (69) & \textbf{54.07 (73)} \\
+    F4 & Cross-buyer comparison (147) & 39.46 (58) & 44.22 (65) & \textbf{81.63 (120)} & 79.59 (117) \\
+    F5 & Overlap/exclusion (127) & 32.28 (41) & 33.07 (42) & \textbf{94.49 (120)} & 93.70 (119) \\
+    F6 & Relational composition (149) & 28.19 (42) & 28.86 (43) & \textbf{67.79 (101)} & 65.10 (97) \\
+    F7 & Disclosure/compliance (67) & 25.37 (17) & \textbf{43.28 (29)} & 41.79 (28) & 40.30 (27) \\
+    \midrule
+    & Macro family & 34.88 & 48.09 & \textbf{72.07} & 70.82 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Depth diagnostics are not monotonic.  The typed parser obtains 92.11\% at L1, 61.06\% at L2,
+and 73.36\% at L3.  The lower L2 value is caused by the distribution of families and status
+types rather than proving that two-step programs are intrinsically harder than L3.  Declared
+seen and unseen shapes score 74.01\% and 74.95\%, respectively.  This near equality is
+encouraging, but it is not by itself proof of CFQ-style compositional generalisation because the
+split lacks an atom/compound-divergence construction and its near-duplicate screen is
+subsampled.
+
+\subsection{The full runtime improves on the balanced system snapshot}
+
+Table \ref{tab:runtime-main} answers RQ4 on the separate \RuntimeN{}-item snapshot.  The full local
+runtime solves \RuntimeOursCorrect/\RuntimeN cases (\RuntimeOurs\%), compared with
+\RuntimeBaseCorrect/\RuntimeN (\RuntimeBase\%) for the untuned local system and
+\RuntimeTeacherCorrect/\RuntimeN (\RuntimeTeacher\%) for the stored cloud-teacher run.  The
+largest category differences relative to the untuned system occur on bridge joins (14/20 versus
+2/20), comparisons (17/20 versus 7/20), and categorical questions (13/20 versus 8/20).  All three
+systems score 20/20 on the snapshot's sum category; because the underlying data contain
+unnormalised non-GBP additive rows, we do not interpret that category as evidence of
+currency-correct aggregation.
+
+\begin{table}[t]
+  \caption{Secondary full-runtime result on a balanced frozen artifact (13 categories,
+  20 cases each).  The incomplete external run manifest makes this weaker reproducibility
+  evidence than Table \ref{tab:pacs-main}.}
+  \label{tab:runtime-main}
+  \centering
+  \small
+  \begin{tabular}{lrrrc}
+    \toprule
+    System & Correct & $n$ & Accuracy & 95\% Wilson CI \\
+    \midrule
+    Untuned local runtime & 183 & 260 & 70.38 & [64.57, 75.60] \\
+    Cloud-teacher runtime & 192 & 260 & 73.85 & [68.18, 78.81] \\
+    \textbf{Full local runtime} & \textbf{224} & 260 & \textbf{86.15} & \textbf{[81.43, 89.83]} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Qualitative bridge case}
+
+One PACS F6--L3 case asks for the buyers reached by first finding the lead suppliers of an anchor
+buyer, following those supplier values to other notices, and excluding the exact anchor string.
+The untuned model filters \texttt{supplier\_name} by the buyer literal and projects
+\texttt{contract\_node\_id}; its well-typed set difference executes to the empty set.  The
+specialised parser instead emits Equation \ref{eq:bridge-example} and returns the 17 stored
+buyer-name strings in the oracle.  The output includes surface variants such as
+``EDUCATION AUTHORITY'', ``Education Authority NI'', and ``the Education Authority'', which is
+useful evidence of both the compositional success and the unresolved entity-name limitation.
+
+This case belongs to the direct typed-program protocol.  It demonstrates semantic parsing and
+deterministic set execution, but it is not evidence that the deployment understander,
+conditional planner, or release checks ran for that question.  A Figure-1 end-to-end example
+must therefore be exported from one full runtime trace rather than reusing this PACS row.

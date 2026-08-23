@@ -231,9 +231,12 @@ def _contract_lookup_by_award(release: dict) -> dict[str, dict]:
         if not award_id or award_id in lookup:
             continue
         value = contract.get("value") or {}
+        contract_value_amount = _f(value, "amount")
+        if contract_value_amount is None:
+            contract_value_amount = _f(value, "amountNet")
         lookup[award_id] = {
             "contract_id": _s(contract, "id"),
-            "contract_value_amount": _f(value, "amount") or _f(value, "amountNet"),
+            "contract_value_amount": contract_value_amount,
             "contract_value_currency": _s(value, "currency"),
             "award_date_signed": _s(contract, "dateSigned"),
         }
@@ -271,7 +274,9 @@ def _extract_awards(ocid: str, release: dict) -> list[dict]:
         suppliers = [_s(s, "id") for s in award.get("suppliers") or [] if s.get("id")]
         related_lots = award.get("relatedLots") or []
         award_id = _s(award, "id")
-        award_value_amount = _f(value, "amount") or _f(value, "amountNet")
+        award_value_amount = _f(value, "amount")
+        if award_value_amount is None:
+            award_value_amount = _f(value, "amountNet")
         award_value_currency = _s(value, "currency")
         contract = contract_by_award.get(award_id, {})
         contract_value_amount = contract.get("contract_value_amount")

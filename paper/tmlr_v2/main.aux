@@ -1,0 +1,154 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{ocds-standard}
+\citation{sun-etal-2019-pullnet,jiang2023unikgqa,luo2024rog}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{1}{1}{Introduction}{section.1}{}}
+\newlabel{eq:retrieval-not-aggregation}{{1}{1}{Introduction}{equation.1.1}{}}
+\citation{cao-etal-2022-kqa,wolfson-etal-2020-break}
+\citation{scholak-etal-2021-picard,shu-etal-2022-tiara}
+\citation{chen-etal-2021-retrack,huang-etal-2024-queryagent}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces One bridge question over the frozen procurement graph. Retrieval-augmented reading retrieves 40 records, among them all 23 naming the supplier, and answers 14; an untuned model of the same size emits a program that type checks and executes cleanly but stops after the first hop and returns 23. Our runtime executes the two-hop bridge exhaustively---23 source records, 16 buyer values, 4{,}257 notices---and releases an answer only once execution, evidence, and answer-sanity checks pass. Every value comes from one saved run; its provenance and limits are given in Appendix \ref  {app:examples}.}}{2}{figure.1}\protected@file@percent }
+\newlabel{fig:visual-thesis}{{1}{2}{One bridge question over the frozen procurement graph. Retrieval-augmented reading retrieves 40 records, among them all 23 naming the supplier, and answers 14; an untuned model of the same size emits a program that type checks and executes cleanly but stops after the first hop and returns 23. Our runtime executes the two-hop bridge exhaustively---23 source records, 16 buyer values, 4{,}257 notices---and releases an answer only once execution, evidence, and answer-sanity checks pass. Every value comes from one saved run; its provenance and limits are given in Appendix \ref {app:examples}}{figure.1}{}}
+\citation{liang-etal-2017-nsm}
+\citation{cao-etal-2022-kqa}
+\citation{wolfson-etal-2020-break}
+\citation{scholak-etal-2021-picard}
+\citation{shu-etal-2022-tiara}
+\citation{chen-etal-2021-retrack}
+\citation{wang-etal-2021-learning-executions}
+\citation{guo-etal-2023-parse}
+\citation{huang-etal-2024-queryagent}
+\citation{sun-etal-2018-open,sun-etal-2019-pullnet,jiang2023unikgqa,luo2024rog}
+\citation{jiang-etal-2023-structgpt}
+\citation{wang2024chainoftable}
+\citation{keysers2020cfq}
+\citation{kim-linzen-2020-cogs}
+\citation{oren-etal-2020-compositional}
+\citation{shaw-etal-2021-compositional}
+\citation{patidar-etal-2023-grailqability}
+\citation{distinto2022theybuyforyou}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{3}{section.2}\protected@file@percent }
+\newlabel{sec:related}{{2}{3}{Related Work}{section.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Background and Preliminaries}{3}{section.3}\protected@file@percent }
+\newlabel{sec:problem}{{3}{3}{Background and Preliminaries}{section.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Guarantee boundary. Only oracle match is an offline answer-correctness measurement; none of the first four rows alone establishes real-world truth.}}{4}{table.1}\protected@file@percent }
+\newlabel{tab:guarantee-boundary}{{1}{4}{Guarantee boundary. Only oracle match is an offline answer-correctness measurement; none of the first four rows alone establishes real-world truth}{table.1}{}}
+\newlabel{eq:strict-correctness}{{3}{4}{Background and Preliminaries}{equation.3.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Method}{4}{section.4}\protected@file@percent }
+\newlabel{sec:method}{{4}{4}{Method}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Overview: two connected execution paths}{4}{subsection.4.1}\protected@file@percent }
+\newlabel{sec:overview}{{4.1}{4}{Overview: two connected execution paths}{subsection.4.1}{}}
+\citation{ocds-standard}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces General full-runtime control flow. A directly compilable intent bypasses the graph model; a structured failure may trigger bounded replanning, after which the complete ground--execute--check sequence is repeated. The separate typed-program evaluation omits these deployment stages.}}{5}{figure.2}\protected@file@percent }
+\newlabel{fig:method-overview}{{2}{5}{General full-runtime control flow. A directly compilable intent bypasses the graph model; a structured failure may trigger bounded replanning, after which the complete ground--execute--check sequence is repeated. The separate typed-program evaluation omits these deployment stages}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}From OCDS releases to a queryable graph}{5}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:data-method}{{4.2}{5}{From OCDS releases to a queryable graph}{subsection.4.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Core algebra operators. $P$ is a predicate, $f$ a field, $m$ an aggregate metric, and $\bowtie  _s$ an expression-valued membership predicate.}}{6}{table.2}\protected@file@percent }
+\newlabel{tab:operators}{{2}{6}{Core algebra operators. $P$ is a predicate, $f$ a field, $m$ an aggregate metric, and $\bowtie _s$ an expression-valued membership predicate}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Closed typed algebra and deterministic execution}{6}{subsection.4.3}\protected@file@percent }
+\newlabel{sec:algebra}{{4.3}{6}{Closed typed algebra and deterministic execution}{subsection.4.3}{}}
+\newlabel{eq:bridge-example}{{6}{6}{Closed typed algebra and deterministic execution}{equation.4.6}{}}
+\citation{yang2025qwen3}
+\citation{dettmers2023qlora}
+\newlabel{sec:execution}{{4.3}{7}{Closed typed algebra and deterministic execution}{equation.4.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Program-first supervision}{7}{subsection.4.4}\protected@file@percent }
+\newlabel{sec:program-supervision}{{4.4}{7}{Program-first supervision}{subsection.4.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Understanding, conditional planning, and grounding}{7}{subsection.4.5}\protected@file@percent }
+\newlabel{sec:understanding-planning}{{4.5}{7}{Understanding, conditional planning, and grounding}{subsection.4.5}{}}
+\citation{shaw-etal-2021-compositional}
+\newlabel{sec:grounding}{{4.5}{8}{Understanding, conditional planning, and grounding}{subsection.4.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Release checks and bounded repair}{8}{subsection.4.6}\protected@file@percent }
+\newlabel{sec:verification}{{4.6}{8}{Release checks and bounded repair}{subsection.4.6}{}}
+\newlabel{sec:repair}{{4.6}{8}{Release checks and bounded repair}{subsection.4.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experiments}{8}{section.5}\protected@file@percent }
+\newlabel{sec:experiments}{{5}{8}{Experiments}{section.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Runtime control procedure. Repair changes the plan, never the factual answer directly, and repeats the complete deterministic path.}}{9}{figure.3}\protected@file@percent }
+\newlabel{alg:runtime}{{3}{9}{Runtime control procedure. Repair changes the plan, never the factual answer directly, and repeats the complete deterministic path}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Datasets and metrics}{9}{subsection.5.1}\protected@file@percent }
+\newlabel{sec:pacs-construction}{{5.1}{9}{Datasets and metrics}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Implementation and baselines}{9}{subsection.5.2}\protected@file@percent }
+\newlabel{sec:implementation}{{5.2}{9}{Implementation and baselines}{subsection.5.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces PACS strict execution accuracy. All Channel-A rows use the same 922{} cases and a single temperature-zero free decode. ``Valid tree'' is reported for diagnosis only: explicit abstentions do not emit a tree, and validity does not imply correctness.}}{10}{table.3}\protected@file@percent }
+\newlabel{tab:pacs-main}{{3}{10}{PACS strict execution accuracy. All Channel-A rows use the same \PacsN {} cases and a single temperature-zero free decode. ``Valid tree'' is reported for diagnosis only: explicit abstentions do not emit a tree, and validity does not imply correctness}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Main results}{10}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Results by family and depth}{10}{subsection.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Strict accuracy by PACS family. Exact correct counts are given in parentheses. Surface B is available only for the specialised parser.}}{11}{table.4}\protected@file@percent }
+\newlabel{tab:pacs-family}{{4}{11}{Strict accuracy by PACS family. Exact correct counts are given in parentheses. Surface B is available only for the specialised parser}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Analysis}{11}{subsection.5.5}\protected@file@percent }
+\newlabel{sec:analysis-body}{{5.5}{11}{Analysis}{subsection.5.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion and Limitations}{12}{section.6}\protected@file@percent }
+\newlabel{sec:analysis}{{6}{12}{Discussion and Limitations}{section.6}{}}
+\newlabel{sec:limitations}{{6}{12}{Discussion and Limitations}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Discussion}{12}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Limitations}{12}{subsection.6.2}\protected@file@percent }
+\bibdata{references}
+\bibcite{cao-etal-2022-kqa}{{1}{2022}{{Cao et~al.}}{{Cao, Shi, Pan, Nie, Xiang, Hou, Li, He, and Zhang}}}
+\bibcite{chen-etal-2021-retrack}{{2}{2021}{{Chen et~al.}}{{Chen, Liu, Yu, Lin, Lou, and Jiang}}}
+\bibcite{dettmers2023qlora}{{3}{2023}{{Dettmers et~al.}}{{Dettmers, Pagnoni, Holtzman, and Zettlemoyer}}}
+\bibcite{guo-etal-2023-parse}{{4}{2023}{{Guo et~al.}}{{Guo, Luo, Lai, and Yin}}}
+\bibcite{huang-etal-2024-queryagent}{{5}{2024}{{Huang et~al.}}{{Huang, Cheng, Huang, Shen, Xu, Zhang, and Qu}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Broader impact}{13}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{13}{section.7}\protected@file@percent }
+\bibcite{jiang-etal-2023-structgpt}{{6}{2023{a}}{{Jiang et~al.}}{{Jiang, Zhou, Dong, Ye, Zhao, and Wen}}}
+\bibcite{jiang2023unikgqa}{{7}{2023{b}}{{Jiang et~al.}}{{Jiang, Zhou, Zhao, and Wen}}}
+\bibcite{keysers2020cfq}{{8}{2020}{{Keysers et~al.}}{{Keysers, Sch{"a}rli, Scales, Buisman, Furrer, Kashubin, Momchev, Sinopalnikov, Stafiniak, Tihon, Tsarkov, Wang, van Zee, and Bousquet}}}
+\bibcite{kim-linzen-2020-cogs}{{9}{2020}{{Kim \& Linzen}}{{Kim and Linzen}}}
+\bibcite{liang-etal-2017-nsm}{{10}{2017}{{Liang et~al.}}{{Liang, Berant, Le, Forbus, and Lao}}}
+\bibcite{luo2024rog}{{11}{2024}{{Luo et~al.}}{{Luo, Li, Haffari, and Pan}}}
+\bibcite{ocds-standard}{{12}{2026}{{Open Contracting Partnership}}{{}}}
+\bibcite{oren-etal-2020-compositional}{{13}{2020}{{Oren et~al.}}{{Oren, Herzig, Gupta, Gardner, and Berant}}}
+\bibcite{patidar-etal-2023-grailqability}{{14}{2023}{{Patidar et~al.}}{{Patidar, Faldu, Singh, Vig, Bhattacharya, and Mausam}}}
+\bibcite{scholak-etal-2021-picard}{{15}{2021}{{Scholak et~al.}}{{Scholak, Schucher, and Bahdanau}}}
+\bibcite{shaw-etal-2021-compositional}{{16}{2021}{{Shaw et~al.}}{{Shaw, Chang, Pasupat, and Toutanova}}}
+\bibcite{shu-etal-2022-tiara}{{17}{2022}{{Shu et~al.}}{{Shu, Yu, Li, Karlsson, Ma, Qu, and Lin}}}
+\bibcite{distinto2022theybuyforyou}{{18}{2022}{{Soylu et~al.}}{{Soylu, Corcho, Elves{ae}ter, Badenes-Olmedo, Blount, Yedro~Mart{\'i}nez, Kovacic, Posinkovic, Makgill, Taggart, Simperl, Lech, Roman, and Lehmann}}}
+\bibcite{sun-etal-2018-open}{{19}{2018}{{Sun et~al.}}{{Sun, Dhingra, Zaheer, Mazaitis, Salakhutdinov, and Cohen}}}
+\bibcite{sun-etal-2019-pullnet}{{20}{2019}{{Sun et~al.}}{{Sun, Bedrax-Weiss, and Cohen}}}
+\bibcite{wang-etal-2021-learning-executions}{{21}{2021}{{Wang et~al.}}{{Wang, Lapata, and Titov}}}
+\bibcite{wang2024chainoftable}{{22}{2024}{{Wang et~al.}}{{Wang, Zhang, Li, Eisenschlos, Perot, Wang, Miculicich, Fujii, Shang, Lee, and Pfister}}}
+\bibcite{wolfson-etal-2020-break}{{23}{2020}{{Wolfson et~al.}}{{Wolfson, Geva, Gupta, Gardner, Goldberg, Deutch, and Berant}}}
+\bibcite{yang2025qwen3}{{24}{2025}{{Yang et~al.}}{{Yang, Li, Yang, Zhang, Hui, Zheng, Yu, Gao, Huang, Lv, et~al.}}}
+\bibstyle{tmlr}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Reproducibility Snapshot}{15}{appendix.A}\protected@file@percent }
+\newlabel{app:reproducibility}{{A}{15}{Reproducibility Snapshot}{appendix.A}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Code and artifact state}{15}{subsection.A.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Frozen knowledge-graph snapshot and contract-level edge coverage. Coverage is structural and is not a correctness rate.}}{16}{table.5}\protected@file@percent }
+\newlabel{tab:dataset-stats}{{5}{16}{Frozen knowledge-graph snapshot and contract-level edge coverage. Coverage is structural and is not a correctness rate}{table.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Content hashes for the primary frozen inputs.}}{16}{table.6}\protected@file@percent }
+\newlabel{tab:artifact-hashes}{{6}{16}{Content hashes for the primary frozen inputs}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Pipeline entry points}{16}{subsection.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Checklist before final submission}{17}{subsection.A.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B}Complete Algebra Contract}{17}{appendix.B}\protected@file@percent }
+\newlabel{app:algebra}{{B}{17}{Complete Algebra Contract}{appendix.B}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Complete expression-node inventory in the current validator.}}{17}{table.7}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces PACS capability families and intended composition at each level.}}{18}{table.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C}PACS Construction Details}{18}{appendix.C}\protected@file@percent }
+\newlabel{app:pacs}{{C}{18}{PACS Construction Details}{appendix.C}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {D}Full Diagnostic Results}{18}{appendix.D}\protected@file@percent }
+\newlabel{app:full-results}{{D}{18}{Full Diagnostic Results}{appendix.D}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces PACS outcome summary. Safe accuracy adds faithful multi-answer/empty-result outcomes to strict correctness; it is not a second exact-answer metric.}}{18}{table.9}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Strict accuracy by depth and declared shape exposure.}}{18}{table.10}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Correct cases out of 20 by category in the frozen full-runtime snapshot.}}{19}{table.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {E}Trace and Output Examples}{19}{appendix.E}\protected@file@percent }
+\newlabel{app:examples}{{E}{19}{Trace and Output Examples}{appendix.E}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {E.1}Direct compositional success and base failure}{19}{subsection.E.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {E.2}Unsupported sibling}{20}{subsection.E.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {E.3}Provenance of the introduction figure}{20}{subsection.E.3}\protected@file@percent }
+\gdef \@abspage@last{20}

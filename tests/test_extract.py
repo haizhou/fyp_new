@@ -1,4 +1,5 @@
 """Tests for src/extract.py — rich OCDS field extraction."""
+from copy import deepcopy
 import gzip
 import json
 import sys
@@ -403,6 +404,31 @@ class TestAwards:
         assert award["award_value_best_amount"] == 280000.0
         assert award["award_value_best_currency"] == "GBP"
         assert award["award_value_source"] == "award"
+
+    def test_zero_award_amount_is_not_replaced_by_amount_net(self):
+        release = deepcopy(SAMPLE_RELEASE)
+        release["awards"][0]["value"] = {
+            "amount": 0,
+            "amountNet": 123.0,
+            "currency": "GBP",
+        }
+        award = extract_release(release)["awards"][0]
+        assert award["award_value_amount"] == 0.0
+        assert award["award_value_best_amount"] == 0.0
+        assert award["award_value_source"] == "award"
+
+    def test_zero_contract_amount_is_not_replaced_by_amount_net(self):
+        release = deepcopy(SAMPLE_RELEASE)
+        release["awards"][0]["value"] = {}
+        release["contracts"][0]["value"] = {
+            "amount": 0,
+            "amountNet": 456.0,
+            "currency": "GBP",
+        }
+        award = extract_release(release)["awards"][0]
+        assert award["contract_value_amount"] == 0.0
+        assert award["award_value_best_amount"] == 0.0
+        assert award["award_value_source"] == "contract"
 
     def test_award_signed_date(self):
         award = get_result()["awards"][0]

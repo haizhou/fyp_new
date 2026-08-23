@@ -3,12 +3,10 @@ Pipeline step 02: Deterministic entity resolution → data/entities/
 
 Usage:
     python pipelines/02_er_phase1.py                # full run
-    python pipelines/02_er_phase1.py --limit 5000   # first 5000 releases (fast test)
-    python pipelines/02_er_phase1.py --sample 5000  # random 5000 releases (seed=42)
+    python pipelines/02_er_phase1.py --limit 5000 --output-dir data/smoke/entities
+    python pipelines/02_er_phase1.py --sample 5000 --output-dir data/smoke/entities
 
---limit and --sample affect releases loaded from interim; outputs go to the normal
-entities_dir but are clearly labelled as partial in the header so you don't mistake
-them for a full run.
+Partial runs must use --output-dir so they cannot replace full-data entities.
 
 Run from the project root (fyp_new/).
 """
@@ -21,8 +19,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import yaml
-from ingest import load_interim
-from er_phase1 import resolve_phase1, write_entities, load_canonical_orgs
+from procurement_graph.common.pipeline_paths import resolve_output_target
+from procurement_graph.er.phase1 import resolve_phase1, write_entities
+from procurement_graph.ingest.loader import load_interim
 
 ROOT = Path(__file__).parent.parent
 
@@ -95,12 +94,23 @@ def print_report(canonical_orgs, alias_map) -> None:
     print("─" * 60)
 
 
-def main(limit: int | None = None, sample: int | None = None) -> None:
+def main(
+    limit: int | None = None,
+    sample: int | None = None,
+    output_dir: Path | None = None,
+) -> None:
     cfg = load_settings()
     interim_path = ROOT / cfg["data"]["interim_dir"] / "releases.parquet"
-    entities_dir = ROOT / cfg["data"]["entities_dir"]
+    canonical_entities_dir = ROOT / cfg["data"]["entities_dir"]
 
     is_partial = limit is not None or sample is not None
+    entities_dir = resolve_output_target(
+        canonical_entities_dir,
+        output_dir,
+        project_root=ROOT,
+        partial=is_partial,
+        option_name="--output-dir",
+    )
     mode_label = (
         f"LIMIT {limit:,}" if limit is not None
         else f"SAMPLE {sample:,} (seed=42)" if sample is not None
@@ -154,15 +164,19 @@ if __name__ == "__main__":
         epilog="""
 Examples:
   python pipelines/02_er_phase1.py                # full run (~166K releases)
-  python pipelines/02_er_phase1.py --limit 5000   # first 5000 releases (fast test)
-  python pipelines/02_er_phase1.py --sample 5000  # random 5000 (seed=42)
+  python pipelines/02_er_phase1.py --limit 5000 --output-dir data/smoke/entities
+  python pipelines/02_er_phase1.py --sample 5000 --output-dir data/smoke/entities
         """,
     )
     parser.add_argument("--limit", type=int, default=None,
                         help="Use only the first N releases from interim")
     parser.add_argument("--sample", type=int, default=None,
                         help="Use a random sample of N releases (fixed seed=42)")
+    parser.add_argument(
+        "--output-dir", type=Path, default=None,
+        help="Output directory (required and non-canonical with --limit/--sample)",
+    )
     args = parser.parse_args()
-    if args.limit and args.sample:
+    if args.limit is not None and args.sample is not None:
         parser.error("--limit and --sample are mutually exclusive")
-    main(limit=args.limit, sample=args.sample)
+    main(limit=args.limit, sample=args.sample, output_dir=args.output_dir)

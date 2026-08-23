@@ -1,0 +1,21 @@
+{
+  "figure": "fig02_online_offline",
+  "model_calls": 0,
+  "teacher_counts": {
+    "input_questions": 9267,
+    "answer_and_runtime_pass": 6860,
+    "oracle_match": 5605,
+    "positive_direct_before_caps": 5598,
+    "repair_target_view": 1725,
+    "preference_pair_view": 390,
+    "hard_negative_pool": 1262,
+    "abstention_target_pool": 590
+  },
+  "sources": [
+    "src/procurement_graph/reasoning/typed_planning.py",
+    "src/procurement_graph/reasoning/pipeline.py",
+    "scripts/run_teacher.py",
+    "scripts/export_llamafactory.py",
+    "data/qa/teacher_full_v1"
+  ]
+}

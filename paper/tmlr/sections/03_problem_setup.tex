@@ -1,0 +1,113 @@
+\section{Problem Setup and Guarantee Boundary}
+\label{sec:problem}
+
+\subsection{Data universe}
+
+The input is a finite snapshot of OCDS releases $D$.  A deterministic data pipeline transforms
+$D$ into a knowledge graph $G=(V,E)$ and a query-record projection $U_G$.  Each row
+$r\in U_G$ is keyed by a contract-node identifier and exposes a controlled set of fields,
+including stored buyer and supplier names, release year, procurement category and CPV code,
+selected dates, a monetary value and currency when available, an additivity flag, and provenance
+links.  The word \emph{record} in the remainder of the paper refers to one row of $U_G$, not to
+an arbitrary text passage or to every versioned OCDS release.
+
+The projection deliberately preserves two different notions of identity.  Graph organisation
+nodes use canonical identifiers produced by entity resolution.  Query fields such as
+\texttt{buyer\_name} and \texttt{supplier\_name}, however, are stored strings derived from the
+first-party data.  A set of distinct stored names must therefore not be interpreted as a set of
+perfectly resolved legal entities.  We retain this distinction in result descriptions and
+qualitative examples.
+
+\subsection{Questions, programs, and denotations}
+
+Let $q$ be a natural-language question, $\mathcal{L}$ the closed typed algebra in Section
+\ref{sec:algebra}, and $p\in\mathcal{L}$ a program.  Static validation assigns a root type
+$\tau$ to a program,
+\begin{equation}
+  \Gamma \vdash p : \tau,
+  \quad
+  \tau\in\{\records,\values,\groups,\numbertype,\valuetype,\booltype,\ranking\},
+\end{equation}
+or returns a structured type error.  Deterministic evaluation gives an answer envelope
+\begin{equation}
+  E_G(p) = (s,\tau,y),
+\end{equation}
+where $s$ is an execution status and $y$ is the denotation when $s=\textsc{ok}$.  A surface
+renderer may verbalise $y$, but it may not introduce a factual value not contained in $y$.
+
+The full runtime uses a richer intermediate representation.  A structured intent $i$ describes
+the requested answer signature, source constraints, derived entity sets, target constraints, and
+return operation.  A compiler or conditional planner maps $i$ to a graph plan
+$H=(X,A)$, where each variable $x\in X$ is a typed record or entity set and each directed edge
+in $A$ denotes a dependency whose output is bound into a downstream constraint.  Compilation
+produces executable low-level specifications, which are grounded and evaluated over $U_G$.
+
+\subsection{Answerability}
+
+Each evaluation item has one of three operational statuses:
+\begin{description}
+  \item[Answerable.] A program in $\mathcal{L}$ can express the requested computation and its
+  implemented data preconditions are present in the frozen snapshot.
+  \item[Unsupported.] The question requests an operation outside $\mathcal{L}$, such as a median
+  or mean in the current benchmark grammar.  Correct behaviour is an explicit abstention.
+  \item[No result.] The requested, well-formed scope has an empty denotation in $U_G$.  Depending
+  on the answer signature, correct behaviour is a faithful empty/zero result or an explicit
+  no-result response, not a fabricated alternative.
+\end{description}
+Ambiguity and insufficient evidence are additionally represented in the full runtime.  They are
+not collapsed into the same state: an unsupported operator, a valid empty query, an unresolved
+literal, and a missing evidence precondition require different user-facing explanations.
+
+\subsection{Five non-equivalent notions of success}
+
+Table \ref{tab:guarantee-boundary} defines the terminology used throughout the paper.  The
+distinctions prevent a common but consequential inference: a program can be type valid and
+execute successfully while still expressing the wrong question.
+
+\begin{table}[t]
+  \caption{Guarantee boundary.  Only oracle match is an offline answer-correctness measurement;
+  none of the first four rows alone establishes real-world truth.}
+  \label{tab:guarantee-boundary}
+  \centering
+  \small
+  \begin{tabular}{p{0.18\linewidth}p{0.72\linewidth}}
+    \toprule
+    Term & Meaning in this paper \\
+    \midrule
+    Static validity & The object belongs to the closed grammar and all operator input/output
+    types compose; depth and node limits are respected. \\
+    Executability & The grounded object can be evaluated by the implemented backend without a
+    structural or runtime failure. \\
+    Runtime verified & The implemented compile, preflight, execution, postflight, sanity, and
+    evidence conditions required for release have passed. \\
+    Evidence supported & The answer is associated with the record/evidence identifiers emitted
+    by execution under the implemented provenance policy. \\
+    Oracle match & The typed denotation equals the frozen benchmark oracle under the stated
+    exact, set, Boolean, or numeric comparison rule. \\
+    Real-world truth & A claim about procurement activity outside the finite snapshot; this is
+    not guaranteed by the system or benchmark. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+For an answerable compositional item, strict correctness is
+\begin{equation}
+  \mathbb{1}_{\mathrm{strict}} =
+  \mathbb{1}[\Gamma\vdash p:\tau]
+  \mathbb{1}[E_G(p).s=\textsc{ok}]
+  \mathbb{1}[\operatorname{match}_{\tau}(E_G(p).y,y^*)],
+  \label{eq:strict-correctness}
+\end{equation}
+where $y^*$ is the frozen oracle.  Set-valued answers are compared as sets of strings, rankings
+preserve their defined order and tie semantics, Booleans require Boolean values on both sides,
+and numeric values use the evaluator's documented tolerance.  In particular, Python's
+subtyping of \texttt{bool} under \texttt{int} must not make \texttt{True} equivalent to numeric
+one.  Unsupported cases are correct only when the model explicitly declines the operation;
+no-result cases use their declared empty-result convention.
+
+Runtime verification is measured independently from Equation \ref{eq:strict-correctness}.  When
+both labels are available, the informative diagnostic is the $2\times2$ table of verifier
+acceptance versus oracle correctness: it reveals both accepted errors and rejected correct
+plans.  The present artifacts do not support every cell of this analysis for every experiment,
+so we report it only where trace provenance is complete rather than inferring it from final
+accuracy.

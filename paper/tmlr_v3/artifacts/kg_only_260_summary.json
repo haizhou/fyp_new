@@ -1,0 +1,11 @@
+{
+  "label": "deterministic_kg_only",
+  "input_rows": 260,
+  "correct": 155,
+  "accuracy": 0.5962,
+  "input_sha256": "4188630d94e0bdab33cc85362dc0edc1ea09428fb3e7f1733b917e835b70cc44",
+  "runner_sha256": "5a3c90e74c8e8232e0f40cbc1bbf99b3a32b78bafb9db00b723012f9299b834c",
+  "full_results_sha256": "b19580008b2410a47f2b309d8a83ff431e02ced57cf7169723cbec85c695bc5a",
+  "source_summary_sha256": "5fdca02183e5d4edb489503f4cc71f72d893e23d5f9503595e6f730a09cfb055",
+  "note": "The compact paper artifact records the summary and hashes. The 9 MB per-item file remains outside the paper tree."
+}

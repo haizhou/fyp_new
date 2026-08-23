@@ -1,0 +1,92 @@
+\documentclass{article}
+
+% The dissertation uses the official TMLR layout but is not a TMLR-accepted
+% article.  The preprint option therefore exposes the author block without
+% adding the journal's accepted-paper banner.
+\usepackage[preprint]{tmlr}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[colorlinks=true,citecolor=blue!55!black,linkcolor=blue!55!black,
+            urlcolor=blue!55!black]{hyperref}
+
+\input{results_macros}
+
+\newcommand{\records}{\ensuremath{\mathsf{Records}}}
+\newcommand{\values}{\ensuremath{\mathsf{Values}}}
+\newcommand{\groups}{\ensuremath{\mathsf{Groups}}}
+\newcommand{\numbertype}{\ensuremath{\mathsf{Number}}}
+\newcommand{\valuetype}{\ensuremath{\mathsf{Value}}}
+\newcommand{\booltype}{\ensuremath{\mathsf{Bool}}}
+\newcommand{\ranking}{\ensuremath{\mathsf{Ranking}}}
+\newcommand{\eval}[1]{\llbracket #1 \rrbracket_G}
+\newcommand{\todo}[1]{\textcolor{red!65!black}{[TODO: #1]}}
+
+\newcommand{\figureplaceholder}[2]{%
+  \fbox{\begin{minipage}[c][#1][c]{0.96\linewidth}
+    \centering\small #2
+  \end{minipage}}%
+}
+
+\title{Typed Planning and Deterministic Execution for Verifiable\\
+Public-Procurement Question Answering}
+
+\author{%
+  \name Student Name\thanks{This draft was prepared with language-model assistance for
+  literature search, organisation, and language editing.  The author is responsible for
+  checking every claim, experiment, citation, and final wording.}\\
+  \addr Department and University\\
+  \email student@example.ac.uk
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Public-procurement data can support questions about buyers, suppliers, contract notices,
+and disclosure, but many useful questions require exact set construction, multi-hop joins,
+aggregation, and comparison rather than retrieval of a few relevant passages.  We present a
+question-answering pipeline that maps natural-language questions to programs in a closed,
+typed algebra and delegates factual authority to deterministic execution over a
+provenance-preserving procurement knowledge graph.  Training programs are generated from the
+data and retained only after type checking, non-degeneracy checks, and agreement between two
+execution implementations.  For deployment, a structured understander is followed by either a
+deterministic intent compiler or, when the intent cannot be compiled safely, a typed graph
+planner; grounding, exhaustive execution, evidence checks, and bounded replanning then produce
+an answer or a controlled non-answer.  On the frozen \PacsN{}-item PACS compositional test, an
+8B parameter model trained with typed programs obtains \PacsOursA\% strict execution accuracy
+on the canonical surface and \PacsOursB\% on an independently naturalised surface, compared
+with \PacsBaseA\% for the same untuned base model and \PacsTeacherA\% for a cloud-model
+planner.  On a separate balanced \RuntimeN{}-item end-to-end snapshot, the full local runtime
+scores \RuntimeOurs\%, compared with \RuntimeBase\% for its untuned counterpart.  The results
+support typed execution as a practical way to improve compositional reliability, while audits
+also expose unresolved limitations in currency normalisation, entity aliases, benchmark
+isolation, and artifact portability.
+\end{abstract}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_background}
+\input{sections/04_method}
+\input{sections/05_experiments}
+\input{sections/06_discussion_limitations}
+\input{sections/07_conclusion}
+
+\bibliography{references}
+\bibliographystyle{tmlr}
+
+\appendix
+\input{appendix/a_reproducibility}
+\input{appendix/b_algebra}
+\input{appendix/c_benchmark}
+\input{appendix/d_full_results}
+\input{appendix/e_examples}
+
+\end{document}

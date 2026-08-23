@@ -260,6 +260,68 @@ class TestResolvePhase1CrossRef:
         # Should remain self-aliased (unresolved)
         assert row.iloc[0]["canonical_id"] == "GB-FTS-99999"
 
+    def test_fts_not_aliased_across_different_roles(self):
+        """A same-name buyer and supplier are not evidence of one organisation."""
+        releases = make_releases(
+            [
+                {
+                    "ocid": "ocds-cr-role",
+                    "parties": [
+                        make_party("GB-COH-55555", "Shared Name", ["buyer"], "GB-COH", "55555"),
+                        make_party("GB-FTS-99999", "Shared Name", ["supplier"]),
+                    ],
+                }
+            ]
+        )
+        _, alias_map = resolve_phase1(releases)
+        row = alias_map[alias_map["raw_id"] == "GB-FTS-99999"]
+        assert row.iloc[0]["canonical_id"] == "GB-FTS-99999"
+        assert row.iloc[0]["alias_source"] == "unresolved"
+
+    def test_fts_alias_requires_unambiguous_role_match(self):
+        """Do not choose arbitrarily when same-name/same-role officials disagree."""
+        releases = make_releases(
+            [
+                {
+                    "ocid": "ocds-cr-ambiguous",
+                    "parties": [
+                        make_party("GB-COH-11111", "Shared Buyer", ["buyer"], "GB-COH", "11111"),
+                        make_party("GB-COH-22222", "Shared Buyer", ["buyer"], "GB-COH", "22222"),
+                        make_party("GB-FTS-33333", "Shared Buyer", ["buyer"]),
+                    ],
+                }
+            ]
+        )
+        _, alias_map = resolve_phase1(releases)
+        row = alias_map[alias_map["raw_id"] == "GB-FTS-33333"]
+        assert row.iloc[0]["canonical_id"] == "GB-FTS-33333"
+        assert row.iloc[0]["alias_source"] == "unresolved"
+
+    def test_fts_alias_requires_agreement_across_ocids(self):
+        """Repeated FTS IDs must not pick the first of conflicting official matches."""
+        releases = make_releases(
+            [
+                {
+                    "ocid": "ocds-cr-first",
+                    "parties": [
+                        make_party("GB-COH-11111", "Shared Buyer", ["buyer"], "GB-COH", "11111"),
+                        make_party("GB-FTS-X", "Shared Buyer", ["buyer"]),
+                    ],
+                },
+                {
+                    "ocid": "ocds-cr-second",
+                    "parties": [
+                        make_party("GB-COH-22222", "Shared Buyer", ["buyer"], "GB-COH", "22222"),
+                        make_party("GB-FTS-X", "Shared Buyer", ["buyer"]),
+                    ],
+                },
+            ]
+        )
+        _, alias_map = resolve_phase1(releases)
+        row = alias_map[alias_map["raw_id"] == "GB-FTS-X"]
+        assert row.iloc[0]["canonical_id"] == "GB-FTS-X"
+        assert row.iloc[0]["alias_source"] == "unresolved"
+
 
 # ---------------------------------------------------------------------------
 # resolve_phase1 — alias_map completeness

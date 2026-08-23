@@ -1,0 +1,86 @@
+\section{Full Diagnostic Results}
+\label{app:full-results}
+
+\begin{table}[h]
+  \caption{PACS outcome summary.  Safe accuracy adds faithful multi-answer/empty-result outcomes
+  to strict correctness; it is not a second exact-answer metric.}
+  \centering
+  \scriptsize
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    System/surface & Strict & Safe & Abstain & Answered & Faithful empty & Invalid tree \\
+    \midrule
+    Untuned A & 36.01 & 42.41 & 41 & 603 & 59 & 104 \\
+    Cloud A & 48.81 & 54.99 & 130 & 480 & 57 & 161 \\
+    Typed A & 74.51 & 82.43 & 138 & 655 & 73 & 51 \\
+    Typed B & 73.21 & 81.13 & 138 & 645 & 73 & 60 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The cloud row additionally contains 25 API errors, 57 unparseable outputs, and 10 evaluation
+failures.  The typed-B row contains one evaluation failure.  Outcome categories are mutually
+exclusive within each stored evaluation file, but an outcome such as \emph{answered} can be
+correct or incorrect.
+
+\begin{table}[h]
+  \caption{Strict accuracy by depth and declared shape exposure.}
+  \centering
+  \scriptsize
+  \begin{tabular}{llrrrr}
+    \toprule
+    Slice & $n$ & Untuned A & Cloud A & Typed A & Typed B \\
+    \midrule
+    L1 & 279 & 50.54 & 61.29 & 92.11 & 90.32 \\
+    L2 & 339 & 27.14 & 46.90 & 61.06 & 59.29 \\
+    L3 & 304 & 32.57 & 39.47 & 73.36 & 73.03 \\
+    Seen shape & 431 & 46.64 & 61.48 & 74.01 & 72.39 \\
+    Declared unseen shape & 491 & 26.68 & 37.68 & 74.95 & 73.93 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \caption{Correct cases out of 20 by category in the frozen full-runtime snapshot.}
+  \centering
+  \scriptsize
+  \begin{tabular}{lrrr}
+    \toprule
+    Category & Untuned local & Cloud teacher & Full local \\
+    \midrule
+    Ambiguous abstention & 19 & 19 & 19 \\
+    No-result abstention & 20 & 20 & 20 \\
+    Unsupported abstention & 19 & 19 & 19 \\
+    Boolean & 14 & 13 & 14 \\
+    Bridge join & 2 & 0 & 14 \\
+    Categorical & 8 & 11 & 13 \\
+    Comparison & 7 & 11 & 17 \\
+    Count & 17 & 20 & 20 \\
+    Factoid & 17 & 16 & 15 \\
+    Minimum/maximum & 15 & 16 & 20 \\
+    Set & 11 & 13 & 15 \\
+    Sum & 20 & 20 & 20 \\
+    Top-$k$ & 14 & 14 & 18 \\
+    \midrule
+    Overall & 183 & 192 & 224 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Runtime verification and oracle match are separate labels (Table \ref{tab:guarantee-boundary}),
+and where both exist for the same item the informative diagnostic is their $2\times2$ table,
+which exposes accepted errors and rejected correct plans that a single accuracy figure hides.
+The stored artifacts do not fill every cell for every experiment, and the missing cells cannot be
+recovered from final accuracy, so we report the cross-tabulation only for runs whose trace
+provenance is complete.
+
+Depth and family are separate axes, and neither alone explains difficulty: an L3 set difference
+can be structurally regular and well covered by supervision, while an L2 grouped concentration
+query needs a rarer operator and a harder return type.  The diagnostic these tables support is a
+family-by-depth matrix with cell counts printed beside percentages, not a single curve labelled
+``accuracy versus complexity''.
+
+The repository also contains a 2,285-item final-test summary for several systems.  We do not use
+it as a main result because its summary lacks category/configuration metadata and its adapters
+are not portable from the current machine-specific output store.  Preserving an attractive
+number without a complete protocol would weaken rather than strengthen reproducibility.

@@ -80,7 +80,7 @@ def apply_gov_lookup(
         return pd.DataFrame(columns=unresolved_df.columns), unresolved_df.copy()
 
     df = unresolved_df.copy()
-    df["_norm_name"] = df["canonical_name"].apply(normalise_name)
+    df["_norm_name"] = df["canonical_name"].fillna("").apply(normalise_name)
 
     matched_rows = []
     remaining_rows = []
@@ -129,7 +129,7 @@ def merge_by_name_region(
         return pd.DataFrame(columns=unresolved_df.columns), pd.DataFrame(columns=unresolved_df.columns)
 
     df = unresolved_df.copy()
-    df["_norm_name"] = df["canonical_name"].apply(normalise_name)
+    df["_norm_name"] = df["canonical_name"].fillna("").apply(normalise_name)
     df["_region"] = df["address_region"].fillna("").str.strip()
 
     # Build group key: prefer (norm_name, region) if region exists, else (norm_name, "")
@@ -138,14 +138,16 @@ def merge_by_name_region(
         axis=1,
     )
 
-    # Skip empty names
+    # Empty names cannot be merged safely, but they are still real entities.
+    # Preserve them as singletons instead of dropping them from Phase 2 output.
+    blank_name_rows = [row for _, row in df[df["_norm_name"] == ""].iterrows()]
     df = df[df["_norm_name"] != ""]
 
     group_sizes = df.groupby("_group_key")["canonical_id"].count()
     merge_groups = group_sizes[group_sizes > 1].index
 
     merged_rows = []
-    singleton_rows = []
+    singleton_rows = blank_name_rows
 
     for _, row in df.iterrows():
         key = row["_group_key"]

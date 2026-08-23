@@ -1,0 +1,19 @@
+\section{Conclusion}
+
+This work studies public-procurement question answering as typed semantic parsing followed by
+deterministic execution, rather than as direct factual text generation.  A provenance-preserving
+graph supplies a finite query universe; a closed algebra represents set, bridge, aggregate,
+comparison, and ranking computations; and a full runtime adds structured understanding,
+conditional planning, grounding, evidence checks, bounded replanning, and controlled
+non-answering.  On PACS, typed-program adaptation raises strict accuracy from 36.01\% to 74.51\%
+and retains 73.21\% under independent surface naturalisation.  A separate system snapshot shows
+an improvement from 70.38\% to 86.15\% for the full local runtime.
+
+The audits are as important as the gains.  Type validity is not semantic correctness; runtime
+verification is not an oracle; exhaustive execution is only exhaustive within a frozen snapshot;
+and unresolved aliases and currencies can change what an otherwise correct program denotes.
+The next defensible step is therefore not a larger headline experiment, but a versioned rebuild
+that enforces strict answer types and currency semantics, publishes portable manifests, and
+evaluates routing, verification, and repair with controlled ablations.  This would turn the
+current executable prototype into a reproducible study of when typed, evidence-linked question
+answering succeeds and when it should decline to answer.

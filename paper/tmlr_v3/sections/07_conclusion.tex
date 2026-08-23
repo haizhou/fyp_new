@@ -1,0 +1,18 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This work uses public procurement to study partial executable verification as feedback without
+treating it as semantic proof.  Online checks may release an answer, terminate, or return one
+structured failure for revision.  Offline curation additionally uses a typed oracle before
+accepting positive supervision.
+
+The Qwen system with fully local inference reaches 85.73\% on 2,025 questions outside the
+development subset.  SFT is the only transition that improves both model families, while later
+stages are not monotonic.  Candidates accepted at runtime can still fail the oracle, and plans
+accepted by the oracle can omit question constraints.  PACS evaluates aggregate algebra accuracy
+and surface sensitivity under a narrower protocol, while WTQ tests transfer to tables.  Neither
+evaluates the complete feedback stack.
+
+Checked execution provides structured but incomplete feedback.  It can guide one repair attempt
+and training selection, but it does not prove meaning or constitute autonomous improvement of the
+model itself.

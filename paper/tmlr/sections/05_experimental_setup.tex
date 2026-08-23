@@ -1,0 +1,131 @@
+\section{Experimental Setup}
+\label{sec:experiments}
+
+The experiments address four questions:
+\begin{description}
+  \item[RQ1:] Does typed-program supervision improve strict compositional execution accuracy
+  over the same untuned base model and a strong cloud planner?
+  \item[RQ2:] Does the specialised parser retain its accuracy under an independently generated
+  surface form?
+  \item[RQ3:] Which operator families and composition depths remain difficult?
+  \item[RQ4:] Does the complete understand--plan--ground--execute--check runtime improve over its
+  untuned counterpart on a balanced system snapshot?
+\end{description}
+
+\subsection{Frozen graph snapshot}
+
+All reported executions use the same Parquet knowledge-graph snapshot and query-record
+projection.  Table \ref{tab:dataset-stats} reports graph size and contract-level edge coverage.
+Buyer coverage is \KGBuyerCoverage/\KGContracts (99.999\% after rounding), supplier coverage is
+\KGSupplierCoverage/\KGContracts (94.87\%), category coverage is
+\KGCategoryCoverage/\KGContracts (76.52\%), and at least one evidence edge is available for
+\KGEvidenceCoverage/\KGContracts contracts (99.99\%).  These are structural coverage measures,
+not correctness rates.
+
+\begin{table}[t]
+  \caption{Frozen graph and PACS evaluation statistics.  PACS family counts are intentionally
+  non-uniform, so overall accuracy is a micro average and macro-family accuracy is also reported.}
+  \label{tab:dataset-stats}
+  \centering
+  \small
+  \begin{tabular}{llr}
+    \toprule
+    Block & Item & Count \\
+    \midrule
+    \multirow{4}{*}{Graph nodes}
+      & Contract/notice & \KGContracts \\
+      & Organisation & \KGOrgs \\
+      & CPV & \KGCPV \\
+      & Evidence & \KGEvidence \\
+    \midrule
+    \multirow{4}{*}{Contract coverage}
+      & Buyer edge & \KGBuyerCoverage \\
+      & Supplier edge & \KGSupplierCoverage \\
+      & Category edge & \KGCategoryCoverage \\
+      & At least one evidence edge & \KGEvidenceCoverage \\
+    \midrule
+    \multirow{6}{*}{PACS}
+      & Each surface channel & \PacsN \\
+      & Answerable / unsupported / no result & 694 / 138 / 90 \\
+      & Level L1 / L2 / L3 & 279 / 339 / 304 \\
+      & Seen / declared unseen shapes & 431 / 491 \\
+      & Smallest family (F7) & 67 \\
+      & Largest families (F2 and F6) & 149 each \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{PACS construction}
+\label{sec:pacs-construction}
+
+PACS is designed to test combinations of closed-algebra primitives rather than broad world
+knowledge.  Seven families cover: F1 spending and volume; F2 temporal change; F3 supplier
+concentration; F4 cross-buyer comparison; F5 overlap and exclusion; F6 relational composition;
+and F7 disclosure/compliance.  L1 questions use an atomic or shallow computation, L2 questions
+combine two or three operations, and L3 questions use nested set membership, filtered
+comparisons, set algebra, or group composition.
+
+Construction proceeds as follows.  First, a family template samples anchors from the frozen
+record universe and instantiates a gold tree.  Second, the tree must pass static validation,
+execute successfully in both implementations, produce agreeing answers, and satisfy a
+family-specific non-degeneracy rule.  Third, supported variants are paired with out-of-grammar
+requests and scopes that produce a clean empty denotation.  Fourth, the generator records a
+tree hash and a shape signature that removes literals while preserving operator structure.
+Fifth, whole intent clusters---including their status variants---are assigned to development or
+test with a fixed seed, so closely related variants do not cross the split.
+
+Each test intent has two evaluated surfaces.  Channel A is a deterministic independent rendering
+of the semantics.  Channel B is a separately naturalised question that must preserve required
+literals and pass a logic gate.  The two channels share the gold program and oracle, allowing a
+paired robustness comparison without changing the underlying computation.
+
+The sealing code enforces exact normalised question non-overlap with the training export, gold
+tree-hash non-overlap, and absence of each row labelled \emph{unseen} from the set of training
+shape signatures.  It also screens Channel B for trigram Jaccard similarity of at least 0.7
+against every seventh training trigram set.  The source documentation names five gates, but no
+separate G3 test is implemented and the near-duplicate screen is subsampled.  We therefore call
+PACS a \emph{mechanically screened compositional test}, not an exhaustive zero-leakage or
+maximum-compound-divergence split.  The test-channel SHA-256 hashes and construction commands are
+listed in Appendix \ref{app:reproducibility}.
+
+\subsection{Systems}
+
+The primary PACS comparison uses the same algebra description and one-question prompt for all
+systems:
+\begin{itemize}
+  \item \textbf{Untuned 8B}: Qwen3-8B emits a tree or abstention without task-specific
+  fine-tuning.
+  \item \textbf{Cloud planner}: \texttt{grok-4-1-fast-non-reasoning} uses the same free-decoding
+  interface and algebra contract.
+  \item \textbf{Typed-program 8B}: the Qwen3-8B QLoRA adapter described in Section
+  \ref{sec:program-supervision}.
+\end{itemize}
+The main protocol uses temperature zero, a single free decode, no guided JSON grammar, and no
+reflection/repair.  This preserves comparability with the cloud model.  Only the specialised
+parser was evaluated on Channel B; Channel A therefore provides the fair three-system
+comparison, while A--B measures within-model surface robustness.
+
+The secondary end-to-end comparison contains 13 categories with 20 cases each: ambiguous,
+no-result, and unsupported abstention; Boolean, bridge-join, categorical, comparison, count,
+factoid, minimum/maximum, set, sum, and top-$k$ questions.  We compare the full local runtime,
+the same Qwen3 stack without specialised adaptation, and the stored cloud-teacher run.  These
+results are tied to frozen summaries under the external \texttt{outputs} artifact store; the
+exact model/run manifest is less complete than for PACS, so they are reported as secondary
+system evidence rather than the main benchmark.
+
+\subsection{Metrics and statistical reporting}
+
+The primary metric is strict accuracy from Equation \ref{eq:strict-correctness}.  It credits an
+answerable item only when a valid tree executes and its typed answer matches the oracle; an
+unsupported item requires explicit abstention.  The supplementary \emph{safe accuracy} also
+credits a literal-faithful multi-answer or empty-result execution for eligible non-answerable
+cases.  Because this metric mixes exact answers and operationally safe outcomes, it is relegated
+to Appendix \ref{app:full-results}.  Tree-valid rate measures only static validity and is not a
+correctness metric.
+
+We report exact numerators and denominators.  Parenthesised intervals in the main tables are 95\%
+Wilson score intervals for a binomial proportion; they describe uncertainty on the fixed test
+items, not model-training variation.  All headline model evaluations are single deterministic
+decodes, so they do not estimate sensitivity to checkpoint, prompt, provider, or hardware
+variation.  Family macro accuracy is the unweighted mean across F1--F7; overall accuracy is the
+micro average across all \PacsN{} cases.

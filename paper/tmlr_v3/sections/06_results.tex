@@ -1,0 +1,157 @@
+\section{Results and Analysis}
+\label{sec:results}
+
+\subsection{Procurement QA with the complete runtime}
+
+Table \ref{tab:main-results} reports the main system comparison.  The fully local Qwen pipeline is
+best on the 2,025 questions outside the development subset, with 1,736 correct predictions (85.73\%).
+It exceeds the cloud teacher by 16.54 points and top-40 RAG by 47.31 points.  On paired items, it
+changes 372 teacher errors to correct answers and loses 37 teacher successes
+($p=9.79\times10^{-71}$, exact McNemar).  The stored fully local Qwen arm differs from the stored
+hybrid Qwen arm in its understander and serving stack.  Their paired predictions change 222 errors
+to correct and 60 correct items to wrong ($p=5.01\times10^{-23}$).  The corresponding stored Llama
+comparison also favours the fully local arm, although neither comparison isolates one component.
+
+\begin{table}[t]
+  \centering
+  \caption{Procurement results for complete systems.  The primary column removes all 260 questions used for
+  development and model selection.  Both columns are rescored from the same stored predictions.
+  Accuracy includes exact answers and correct non-release.}
+  \label{tab:main-results}
+  \small
+  \begin{tabular}{lrrrr}
+    \toprule
+    & \multicolumn{2}{c}{Non-development ($n=2{,}025$)} &
+      \multicolumn{2}{c}{Inclusive ($n=2{,}285$)} \\
+    System & Correct & Acc. (\%) & Correct & Acc. (\%) \\
+    \midrule
+    Closed-book LLM & 317 & 15.65 & 380 & 16.63 \\
+    Plan-guided RAG & 496 & 24.49 & 584 & 25.56 \\
+    Top-40 RAG & 778 & 38.42 & 896 & 39.21 \\
+    Cloud teacher runtime & 1,401 & 69.19 & 1,594 & 69.76 \\
+    Hybrid Llama runtime & 1,527 & 75.41 & 1,736 & 75.97 \\
+    Hybrid Qwen runtime & 1,574 & 77.73 & 1,783 & 78.03 \\
+    Fully local Llama runtime & 1,681 & 83.01 & 1,904 & 83.33 \\
+    Fully local Qwen runtime & \textbf{1,736} & \textbf{85.73} & \textbf{1,957} & \textbf{85.65} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The non-development subset contains 1,725 answerable and 300 non-answerable questions.  Fully local
+Qwen answers 1,436 answerable questions correctly (83.25\%) and withholds all 300 non-answerable
+answers.  Closed-book accuracy illustrates why overall accuracy must be decomposed.  Of its 380
+inclusive successes, 360 are abstentions and only 20 are correct answers.  RAG improves answerable
+coverage, but the full structured runtime retains a large advantage over finite retrieval.  This
+comparison evaluates complete systems and does not attribute the gap to execution alone.
+
+\subsection{Checkpoint changes after checked execution curation}
+
+The offline harvest first shows why execution cannot be the final training label.  Each training
+question contributes one trace at question level.  Among 6,860 traces that produce an answer and pass the
+online contract, 5,598 pass both offline gates.  The
+other 1,262 fail the expected answer shape or typed oracle and enter the hard negative pool.  Seven
+of those candidates match the oracle but fail the shape check, which is why the oracle match count
+is 5,605 rather than 5,598.  Runtime checks supply a first gate, but they do not determine which
+traces are eligible for positive supervision.
+
+The development subset containing 260 questions supports paired comparisons because every checkpoint uses the same
+questions and runtime.  It does not isolate one training component because the corpus and objective
+change between stages, and each checkpoint has one training run.  Table \ref{tab:ladder} shows the
+stored checkpoint ladder.  Supervised fine tuning is the only stage that improves both model
+families.  Qwen improves by 10.77 points and Llama by 23.08 points.  The RSFT continuation
+changes almost equal numbers in each direction.  Direct preference optimisation is not significant
+for Qwen and is significantly worse for Llama.  Later curation stages therefore do not produce
+monotonic improvement in these runs.
+
+\begin{table}[t]
+  \centering
+  \caption{Planner checkpoint analysis on the 260-question development set.  Discordant counts and
+  exact McNemar $p$ compare each row with the previous row for the same base.}
+  \label{tab:ladder}
+  \small
+  \begin{tabular}{llrrr}
+    \toprule
+    Base & Checkpoint & Correct / 260 & Acc. (\%) & Gain/loss; $p$ \\
+    \midrule
+    Qwen3-8B & Untuned & 183 & 70.38 & -- \\
+              & SFT & 211 & 81.15 & 31/3; $7.66\times10^{-7}$ \\
+              & RSFT & 212 & 81.54 & 19/18; 1.000 \\
+              & DPO & 217 & 83.46 & 20/15; 0.500 \\
+    \midrule
+    Llama-3.1-8B & Untuned & 156 & 60.00 & -- \\
+              & SFT & 216 & 83.08 & 63/3; $1.30\times10^{-15}$ \\
+              & RSFT & 215 & 82.69 & 8/9; 1.000 \\
+              & DPO & 201 & 77.31 & 4/18; 0.0043 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Development system diagnostic}
+
+The deterministic KG-only planner obtains 155/260 (59.62\%), naive RAG 82/260 (31.54\%), strong
+RAG 75/260 (28.85\%), and the cloud teacher 192/260 (73.85\%).  The best fully local Qwen and Llama
+runtimes obtain 224/260 (86.15\%) and 219/260 (84.23\%).  Qwen reaches 217/260 with the cloud Step
+1 understander and the same Step 2 adapter, so 224/260 belongs to a different system configuration
+rather than another planner checkpoint.  Their paired change is 13 gains and six losses
+($p=0.167$, exact McNemar).
+
+Fully local Qwen corrects 73 KG-only errors and loses four KG-only successes
+($p=1.89\times10^{-17}$).  Appendix Table \ref{tab:bucket-analysis} shows the largest differences
+on bridge and top-$k$ questions.  Fixed rules solve 7/20 and 1/20, while fully local Qwen solves
+14/20 and 18/20.  These comparisons show coverage added by learned planning but do not isolate a
+training source or runtime component.
+
+\subsection{What verification changes and misses}
+
+A fixed plan replay provides a narrow test of hard grounding.  Among 136 saved plans with oracles,
+89 are correct before grounding and 103 after it.  Fourteen plans change from wrong to correct,
+none changes from correct to wrong, and one becomes executable but remains wrong.  All 14 rescues
+come from inserting the additive value guard for sums.  This is direct evidence for one runtime
+intervention, not for the full collection of checks and not for a training effect.
+
+The training target audit gives the complementary limitation.  Among 229 repair targets whose
+question constraints can be mapped mechanically, 173 retain every mapped constraint and 56 are
+flagged.  Of the omissions, 43 concern procurement category constraints.  A missing condition can be
+redundant in the current snapshot, allowing an incomplete plan to agree with the oracle.  The audit
+therefore demonstrates a blind region shared by execution and denotation based filtering.  It does
+not estimate omission prevalence outside this targeted subset.  The checkpoint gains in Table
+\ref{tab:ladder} also cannot be attributed specifically to grounding derived rows because the
+training corpus changes task language, reader programs, ordinary plans, repairs, and abstention
+examples together.
+
+\subsection{Portability of the typed algebra}
+
+Table \ref{tab:composition-transfer} reports the two single-call protocols.  Under the corrected
+PACS manifest, Compose-v3 obtains 78.31\% on channel A and 77.11\% on channel B.  The 1.20-point
+surface gap is small relative to the improvement over the base and teacher.  The result isolates
+question-to-program generation; it does not include the full runtime's understanding, grounding,
+evidence, or repair stages.
+
+On WTQ, accuracy rises from 22.51\% for the base model to 27.33\% for Compose-v3, 44.43\% after
+a self harvest filtered by answer agreement, and 51.80\% with translated gold programs.  All paired transitions are
+significant at $p<10^{-18}$.  Because these checkpoints also differ in training data and exposure
+to the output format, the comparisons do not isolate the source of each gain.
+
+\begin{table}[t]
+  \centering
+  \caption{Single-call typed-algebra results.  PACS uses the corrected v1.1 status manifest and
+  deterministic re-execution of saved trees; WTQ uses the official evaluator.  Scores across the
+  two panels are not directly comparable.}
+  \label{tab:composition-transfer}
+  \small
+  \begin{tabular}{llrr}
+    \toprule
+    Evaluation & Planner / supervision & Correct & Accuracy (\%) \\
+    \midrule
+    PACS A & Untuned Qwen3-8B & 312 / 922 & 33.84 \\
+    PACS A & Cloud teacher & 470 / 922 & 50.98 \\
+    PACS A & Compose-v3 & \textbf{722 / 922} & \textbf{78.31} \\
+    PACS B & Compose-v3 & 711 / 922 & 77.11 \\
+    \midrule
+    WTQ & Untuned Qwen3-8B & 978 / 4,344 & 22.51 \\
+    WTQ & Procurement Compose-v3 & 1,187 / 4,344 & 27.33 \\
+    WTQ & Answer-only self-harvest (A) & 1,930 / 4,344 & 44.43 \\
+    WTQ & Translated gold programs (C) & \textbf{2,250 / 4,344} & \textbf{51.80} \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -1,0 +1,78 @@
+\documentclass{article}
+
+\usepackage[preprint]{tmlr}
+% \usepackage{tmlr}            % anonymized submission
+% \usepackage[accepted]{tmlr}  % camera-ready
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{url}
+\hypersetup{hidelinks}
+\graphicspath{{./}{figs/}}
+
+\newcommand{\records}{\ensuremath{\mathsf{Records}}}
+\newcommand{\values}{\ensuremath{\mathsf{Values}}}
+\newcommand{\groups}{\ensuremath{\mathsf{Groups}}}
+\newcommand{\numbertype}{\ensuremath{\mathsf{Number}}}
+\newcommand{\valuetype}{\ensuremath{\mathsf{Value}}}
+\newcommand{\booltype}{\ensuremath{\mathsf{Bool}}}
+\newcommand{\ranking}{\ensuremath{\mathsf{Ranking}}}
+
+\title{Verification as a Learning Interface for Executable Reasoning in Public Procurement}
+
+\author{\name Hai Zhou \email uceeh01@ucl.ac.uk \\
+ \addr University College London}
+
+\def\month{08}
+\def\year{2026}
+\def\openreview{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Language models can propose executable computations, but execution and agreement with a reference
+answer do not prove that a computation preserves the meaning of a question.  We study partial
+executable verification as feedback for inference and training in public procurement, where
+questions require joins over buyer and supplier roles, complete populations, and exact aggregation.
+Our system combines a graph of 215,221 contract awards that preserves provenance with learned typed
+planning and deterministic grounding, execution, and release checks.  Online, a structured failure
+may prompt one revised proposal without access to the answer.  Offline, positive training
+candidates must also pass answer shape and hidden oracle checks.
+
+The Qwen system with fully local inference reaches 85.73\% on 2,025 questions outside the
+development subset, compared with 69.19\% for its cloud teacher and 38.42\% for retrieval
+augmentation.  On the development subset containing 260 questions, supervised fine tuning is the
+only transition that improves both model families, while later continuation and preference
+optimisation are not uniformly beneficial.  The training harvest includes 1,262 candidates
+accepted online but rejected by an offline gate, and a targeted audit finds missing constraints in
+56 of 229 repair targets.  Checked execution can guide one repair attempt and training selection,
+but it neither certifies semantic faithfulness nor guarantees monotonic improvement.
+\end{abstract}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_background}
+\input{sections/04_method}
+\input{sections/05_experiments}
+\input{sections/06_results}
+\input{sections/06_discussion_limitations}
+\input{sections/07_conclusion}
+
+\clearpage
+\bibliography{references}
+\bibliographystyle{tmlr}
+
+\appendix
+\input{appendix_src}
+\input{appendix_prompts}
+
+\end{document}

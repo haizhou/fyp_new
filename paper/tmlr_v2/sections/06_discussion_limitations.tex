@@ -1,0 +1,74 @@
+\section{Discussion and Limitations}
+\label{sec:analysis}
+\label{sec:limitations}
+
+\subsection{Discussion}
+
+The \RuntimeOurs\% system result is consistent with the intended benefit of specialised planning
+inside an execute-and-check runtime, and its category gains on bridge, comparison, and set
+questions line up with the PACS families.  The comparison still cannot separate the understander,
+router, deterministic compiler, graph planner, verifier, and repair loop, so we report the
+full-stack difference without assigning it to any component.  The runtime's more durable property
+is inspectability: a failure localises to an unparseable intent, a routing veto, graph
+inconsistency, a grounding error, a preflight failure, an empty intermediate set, a postflight
+defect, or an evidence decision.  That is worth having even where final accuracy is unchanged, and
+it is best called \emph{auditable} rather than interpretable, since the learned understander and
+planner still do not explain their own decisions.
+
+One pattern cuts across every result above.  The bridge case study projects 16 stored buyer
+strings rather than 16 resolved organisations, and a correct program over the unnormalised
+currency column can return a reproducible total whose label is wrong.  Both pass the benchmark,
+because the benchmark inherits its denotation from the same projection the model is trained on.
+Entity and currency semantics are not downstream data-engineering chores; they set the target the
+model is scored against, which is where the limitations begin.
+
+\subsection{Limitations}
+
+The data are a 2022--2026 snapshot of published OCDS releases, so exhaustive execution is
+exhaustive over the declared record universe and not over all procurement activity: late,
+incorrect, or absent disclosures stay absent, and keeping one release per OCID discards event
+history.  Conservative entity resolution leaves unresolved aliases in the stored query fields, so
+a value-set answer is a set of strings.  The source code now handles role-safe
+publication-system aliases, blank-name singletons, and globally ambiguous candidates, but the
+frozen graph predates those patches, and results stay bound to its hash until the pipeline is
+rebuilt and the benchmark reversioned.
+
+Monetary semantics are weaker still.  Of 176,002 rows marked additive, 1,059 carry a non-GBP
+currency, and neither the algebra nor the runtime converts currency or hard-enforces a currency
+filter while some prompts describe totals as GBP.  Monetary results can therefore mix currencies,
+and no sum-related number in this paper is currency-correct financial analysis.
+
+On the supervision and evaluation side, the training export contains exact duplicates and two
+exact train/validation overlaps, which is why its validation loss is only an optimisation
+diagnostic.  PACS removes exact question and tree-hash collisions and controls declared shape
+exposure, but a subsampled near-duplicate screen and one unimplemented gate make it a
+mechanically screened holdout rather than proven zero leakage.  Several generation and scoring
+helpers also used Boolean coercion that can equate a Boolean with a truthy non-Boolean; a strict
+audit cleared the stored PACS typed-program A run and we exclude the affected legacy result sets,
+but one shared type-strict comparator should reach every scorer before any new headline number.
+
+Every headline evaluation is a single temperature-zero decode, and Wilson intervals cover
+test-item uncertainty alone, not training seeds, checkpoints, prompts, providers, or serving
+stacks.  There is also no same-budget ablation over compiler-only, always-planner, conditional
+routing, verification, and repair.  This is the sharpest gap in the present evidence, since the
+result supports the full configuration and can attribute nothing to a single module, and closing
+it needs no new data: the same frozen snapshot, run once under each variant, would settle it.
+
+Finally, the checks reject invalid objects, unsupported fields, malformed executions, and
+insufficient evidence, and that is all they do.  They cannot show that a valid program represents
+the question asked, or that an accepted answer is complete in the world, so runtime-verified rate
+is never hallucination-free correctness.  Several end-to-end adapters and summaries also resolve
+through a machine-specific absolute link (Appendix \ref{app:reproducibility}), which is why PACS
+carries the primary claims.  The study is English-language and UK-specific, and exact program
+accuracy says nothing about whether practitioners trust the evidence returned, which would take a
+user study of task completion, error detection, and abstention explanations.
+
+\subsection{Broader impact}
+
+The source records describe public contracting activity, but even simple system outputs can
+affect the reputation of named organisations.  The pipeline is built for data exploration and
+audit support, not for automated allegations, supplier scoring, or procurement decisions.  An
+answer should travel with its data scope, provenance, and limitations, and missing records,
+unresolved aliases, and unnormalised currencies must never be converted silently into claims
+about misconduct.  A record being public also does not remove the need to review licensing,
+personal-data fields, and downstream use before redistribution.

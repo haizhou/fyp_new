@@ -1,0 +1,71 @@
+\section{Limitations}
+\label{sec:limitations}
+
+\paragraph{Finite and publisher-dependent data.}
+The graph is a 2022--2026 snapshot selected from published OCDS releases.  Exhaustive execution
+means exhaustive over the declared query-record universe, not exhaustive over all procurement
+activity.  Late, incorrect, or absent disclosures remain absent from the answer.  Keeping only
+the latest release per OCID also discards event-history detail.
+
+\paragraph{Entity identity.}
+Entity resolution is conservative and stored query fields can contain unresolved aliases.  A
+value-set answer is therefore a set of strings, not necessarily a set of unique legal entities.
+The current source code includes corrective handling for role-safe publication-system aliases,
+blank-name singletons, and globally ambiguous alias candidates, but the frozen graph used for
+the reported experiments was built before all of these patches.  Results must remain bound to
+the old graph hash until the pipeline is rebuilt and the benchmark is versioned; silently
+substituting a new graph would change the task.
+
+\paragraph{Currencies and monetary semantics.}
+Of 176,002 rows marked additive in the frozen record universe, 1,059 have a non-GBP currency.
+The algebra and full runtime require an additivity guard for intended sums, but neither performs
+currency conversion and the generic algebra executor does not hard-enforce a currency filter.
+Some prompts nevertheless describe totals as GBP.  Monetary results can thus mix currencies,
+and the sum-related benchmark results should not be interpreted as currency-correct financial
+analysis.  A new benchmark version should add currency to the value type or reject mixed scopes.
+
+\paragraph{Synthetic supervision and split isolation.}
+Program supervision is generated from templates and sampled anchors.  The current training
+export contains exact duplicates and two exact train/validation overlaps, so its validation loss
+is not independent evidence.  PACS removes exact question and tree-hash collisions and controls
+declared shape exposure, but its near-duplicate screen compares Channel B against only every
+seventh training trigram set, and the documented G3 gate is not separately implemented.  PACS
+therefore measures a useful, mechanically screened structural holdout, not a proof of zero
+leakage or natural user distribution.
+
+\paragraph{Historical comparison semantics.}
+Several data-generation and scoring helpers used Boolean coercion that can equate a Boolean with
+a non-Boolean truthy or falsy value.  A strict audit found no such mismatch in the stored PACS
+typed-program A run, but the helper remains a risk for legacy datasets and future generation.
+Every scorer should use a shared type-strict comparator before paired significance tests or new
+headline results are produced.  We exclude legacy result sets known to be affected.
+
+\paragraph{Single runs and incomplete ablations.}
+The headline evaluations use one temperature-zero decode per item.  Wilson intervals quantify
+test-item uncertainty but not training-seed, checkpoint, prompt, provider, or serving
+variability.  We also lack a complete same-budget ablation of compiler-only, always-planner,
+conditional routing, verification, and bounded repair.  Consequently, the end-to-end result
+supports the full configuration but not a causal contribution for each module.
+
+\paragraph{Verifier scope.}
+Static and runtime checks can reject invalid objects, unsupported fields, malformed executions,
+and insufficient implemented evidence.  They cannot prove that a valid program represents the
+question, that an accepted answer is complete in the world, or that a cited record is itself
+correct.  Runtime-verified rate must therefore remain separate from oracle match and should not
+be described as hallucination-free or guaranteed semantic correctness.
+
+\paragraph{Artifact portability.}
+The PACS inputs and per-item outputs are stored in the repository, but several end-to-end model
+adapters and evaluation summaries are reached through a machine-specific absolute
+\texttt{outputs} link.  The large 2,285-item final summaries also omit category/configuration
+metadata.  We consequently use the self-contained PACS artifacts as the primary evidence and
+label the 260-item runtime result as a frozen artifact.  A release should replace the absolute
+link with content-addressed manifests and publish model, prompt, environment, and evaluator
+hashes.
+
+\paragraph{Domain and user evaluation.}
+The study is English-language and UK-procurement specific.  It does not establish transfer to
+other jurisdictions, schemas, or open-domain KGQA.  Nor does exact program accuracy measure
+whether procurement practitioners understand or trust the returned evidence.  A future study
+should evaluate task completion, error detection, and the usefulness of abstention explanations
+with domain users.

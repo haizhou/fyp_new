@@ -1,0 +1,25 @@
+{
+  "figure": "fig01_system_overview",
+  "claim_boundary": {
+    "full_runtime": "Code-audited deployed CICADA control flow; not the PACS example trace.",
+    "pacs_example": "Direct Compose evaluation; no Step-1 understanding or ReasoningPipeline."
+  },
+  "example_id": "PACS::F6:L3:f6_other_buyers_via_suppliers:0011#a",
+  "question": "Follow DfI Transport and Road Asset Management TRAM's lead suppliers outward: setting DfI Transport and Road Asset Management TRAM itself aside, which buyers do those same suppliers also work for?",
+  "base_answer": [],
+  "compose_v3_answer_count": 17,
+  "oracle_answer_count": 17,
+  "intermediate_supplier_count": 17,
+  "intermediate_buyer_count_before_difference": 18,
+  "displayed_graph_is_subset": true,
+  "sources": {
+    "question": "data/qa/pacs_v1/test_channel_a.jsonl:2",
+    "base_result": "data/qa/compose_probe_v1/eval_pacstest_base_a.jsonl:2",
+    "compose_v3_result": "data/qa/compose_probe_v1/eval_pacstest_v3_a.jsonl:2",
+    "compose_eval_protocol": "scripts/run_compose_probe_eval.py:185-307",
+    "full_runtime": [
+      "src/procurement_graph/reasoning/typed_planning.py:2583-2702",
+      "src/procurement_graph/reasoning/pipeline.py:318-623"
+    ]
+  }
+}

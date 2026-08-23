@@ -2,7 +2,8 @@
 Pipeline step 01: Ingest raw OCDS data → data/interim/releases.parquet
 
 Usage:
-    python pipelines/01_ingest.py [--years 2022 2023 2024 2025 2026]
+    python pipelines/01_ingest.py
+    python pipelines/01_ingest.py --years 2025 --output-path data/smoke/2025.parquet
 
 Run from the project root (fyp_new/).
 """
@@ -16,7 +17,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import yaml
-from ingest import flatten_all_years, write_interim
+from procurement_graph.common.pipeline_paths import resolve_output_target
+from procurement_graph.ingest.loader import flatten_all_years, write_interim
 
 ROOT = Path(__file__).parent.parent
 
@@ -27,10 +29,20 @@ def load_settings() -> dict:
         return yaml.safe_load(f)
 
 
-def main(years: list[int] | None = None) -> None:
+def main(
+    years: list[int] | None = None,
+    output_path: Path | None = None,
+) -> None:
     cfg = load_settings()
     raw_dir = ROOT / cfg["data"]["raw_dir"]
-    interim_path = ROOT / cfg["data"]["interim_dir"] / "releases.parquet"
+    canonical_path = ROOT / cfg["data"]["interim_dir"] / "releases.parquet"
+    interim_path = resolve_output_target(
+        canonical_path,
+        output_path,
+        project_root=ROOT,
+        partial=bool(years),
+        option_name="--output-path",
+    )
 
     print("=" * 60)
     print("PIPELINE 01 — INGEST")
@@ -55,14 +67,18 @@ def main(years: list[int] | None = None) -> None:
     print(f"  Records with contracts: {df['contracts_json'].ne('[]').sum():,}")
     print(f"  Elapsed              : {elapsed:.1f}s")
     print()
-    print("DONE — data/interim/releases.parquet written.")
+    print(f"DONE — {interim_path} written.")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Ingest OCDS JSONL.gz files")
     parser.add_argument(
-        "--years", nargs="*", type=int, default=None,
+        "--years", nargs="+", type=int, default=None,
         help="Limit to specific years (e.g. --years 2022 2023)"
     )
+    parser.add_argument(
+        "--output-path", type=Path, default=None,
+        help="Output parquet path (required and non-canonical with --years)",
+    )
     args = parser.parse_args()
-    main(years=args.years)
+    main(years=args.years, output_path=args.output_path)

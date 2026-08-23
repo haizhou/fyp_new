@@ -1,0 +1,105 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Public procurement records describe how public buyers solicit work, select suppliers, and
+publish awards and contracts.  The Open Contracting Data Standard (OCDS) provides a common
+release and record model for these disclosures, including parties, tenders, awards, contracts,
+and linked documents \citep{ocds-standard}.  The resulting data can support questions such as
+which suppliers serve multiple buyers, whether disclosure is complete for a class of notices,
+or how activity changes across years.  These are not, however, ordinary document lookup
+questions.  Their answers may depend on the role of an organisation in one record, a set of
+organisations derived from that record, a second retrieval bound by the derived set, and a final
+set, count, comparison, or ranking operation.
+
+This distinction matters because retrieving \emph{relevant} evidence is not equivalent to
+retrieving the \emph{complete} denotation required by an aggregate.  Let $R(q)$ be the complete
+set of contract records satisfying question $q$, and let a top-$k$ retriever return
+$\widehat{R}(q)\subset R(q)$.  Even when $\widehat{R}(q)$ contains convincing examples, it does
+not in general follow that
+\begin{equation}
+ |\widehat{R}(q)|=|R(q)|, \qquad
+ \sum_{r\in\widehat{R}(q)}v(r)=\sum_{r\in R(q)}v(r),
+ \label{eq:retrieval-not-aggregation}
+\end{equation}
+or that a ranking computed from the retrieved subset has the same maximum.  Retrieval-centred
+KGQA systems are effective at finding answer-bearing subgraphs \citep{sun-etal-2019-pullnet,
+jiang2023unikgqa,luo2024rog}, but exact counts and compositional set operations additionally
+need explicit scope, typed intermediate values, and exhaustive execution within the declared
+data universe.
+
+Direct language-model generation introduces a different failure mode.  A model can produce a
+well-formed query that reverses buyer and supplier roles, projects a contract identifier when
+the question requests an organisation name, or aggregates a non-additive monetary field.  Such
+answers can remain fluent and superficially plausible.  Prior work therefore represents complex
+questions with executable programs \citep{cao-etal-2022-kqa,wolfson-etal-2020-break}, constrains
+formal generation \citep{scholak-etal-2021-picard,shu-etal-2022-tiara}, or uses execution and
+environment feedback \citep{chen-etal-2021-retrack,huang-etal-2024-queryagent}.  These ideas
+motivate our central design choice: the language model proposes a typed computation, while the
+data system---not the model's prose---has final authority over factual values.
+
+We implement this idea at two connected levels.  First, a compact model is trained to translate
+procurement questions into a closed algebra containing record filters, distinct projections,
+semi- and anti-joins, set operations, grouping, aggregation, comparison, and ranking.  Every
+program is type checked and executed deterministically over a frozen record universe.  Second,
+the deployment runtime adds a structured understanding stage and a conditional planner.  A
+valid intent is compiled deterministically when possible; otherwise a graph planner produces a
+typed variable-dependency plan.  The plan is grounded against allowed schema fields, executed
+exhaustively, and passed through preflight, postflight, answer-sanity, and evidence checks.
+Structured defects may trigger bounded replanning, but a clean empty result is terminal so that
+the system cannot search repeatedly until it finds a preferred answer.
+
+\begin{figure}[t]
+  \centering
+  \figureplaceholder{2.05in}{\textbf{Author-drawn Figure 1: visual thesis and running example.}\\
+  Show one real procurement bridge question, the structured intent produced by the
+  understander, the actually taken compiler/planner branch, the source-record set, emitted
+  bridge values, bound target-record set, deterministic result, and release checks.  Every
+  displayed value must come from one saved end-to-end trace; unused branches are grey.}
+  \caption{Intended content for the introduction figure.  The final artwork will instantiate a
+  single saved end-to-end trace rather than combine artifacts from the separate compositional
+  evaluation protocol.  Runtime verification denotes structural, execution, and evidence
+  checks; oracle equality is an offline evaluation criterion.}
+  \label{fig:visual-thesis}
+\end{figure}
+
+The distinction between the two levels is methodological rather than cosmetic.  Our primary
+compositional evaluation asks whether a single model call emits a valid algebra tree or an
+appropriate abstention, after which a deterministic evaluator computes the answer and an
+offline scorer compares it with a frozen oracle.  It does not invoke the deployment
+understander, graph planner, evidence bundle, or repair loop.  A separate system evaluation
+measures the complete runtime.  Keeping these protocols separate prevents an offline oracle
+check from being mislabeled as an inference-time verifier and prevents a component that was not
+called for a test item from receiving credit for that item.
+
+Experiments use a provenance-preserving graph constructed from UK procurement releases from
+2022--2026 and a frozen \PacsN{}-question compositional test.  The typed-program model attains
+\PacsOursA\% strict accuracy on the canonical question surface, a gain of \PacsGainBase{}
+percentage points over the same untuned 8B base model and \PacsGainTeacher{} points over a cloud
+planner.  Accuracy is \PacsOursB\% after independent surface naturalisation, a drop of only
+\PacsSurfaceDrop{} points.  The strongest gains occur on overlap/exclusion and relational
+composition, whereas supplier-concentration and disclosure/compliance remain substantially
+harder.  A separate balanced \RuntimeN{}-item artifact evaluates the complete runtime and records
+\RuntimeOurs\% accuracy, compared with \RuntimeBase\% for the untuned system.  We treat the
+latter as secondary evidence because its stored outputs are less portable than the PACS
+artifacts.
+
+The contributions of this work are therefore:
+\begin{itemize}
+  \item a provenance-preserving procurement graph and a deterministic query-record projection,
+  with explicit entity-resolution, additivity, and coverage checks;
+  \item a closed typed algebra and program-first supervision pipeline for exact set, join,
+  aggregation, comparison, and ranking questions;
+  \item a full question-answering runtime that separates learned understanding and planning
+  from grounding, exhaustive execution, evidence checks, bounded repair, and controlled
+  non-answering; and
+  \item PACS, a frozen compositional evaluation with two surface channels, operator-family and
+  depth diagnostics, answerability controls, and an audit of the limitations of its isolation
+  and scoring procedures.
+\end{itemize}
+
+The contribution is deliberately narrower than open-domain question answering.  The pipeline
+does not guarantee that the source data are complete in the world, that stored organisation
+names are unique legal entities, or that passing an execution check proves semantic correctness.
+It instead makes a more testable claim: within a declared frozen data universe, the model's
+proposed computation can be type checked, executed, traced, and rejected when its implemented
+preconditions fail.

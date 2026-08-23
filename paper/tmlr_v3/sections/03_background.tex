@@ -1,0 +1,83 @@
+\section{Task, Data and Layered Verification Contract}
+\label{sec:task}
+
+\subsection{Task definition}
+
+Let $K$ be a frozen procurement snapshot and $q$ a natural-language question.  An answerable item
+has a typed oracle $y$ and an executable specification $z^\star$.  A system predicts either an
+answer $\hat{y}$ or no answer.  Exact correctness is defined by answer type.  Booleans must be
+Booleans, numbers use decimal equality, and set or list answers compare normalised members without
+order unless ranking is requested.  A non-answerable item is correct only when the runtime releases
+no answer.
+
+The procurement benchmark distinguishes three non-answer states.  \emph{Unsupported} questions
+request an operation outside the runtime contract.  \emph{Ambiguous} questions have more than one
+valid interpretation or factoid.  \emph{No-result} questions are well formed but have an empty
+denotation in $K$.  These labels test failure detection; they do not assert that the public record outside $K$ has
+no answer.
+
+\subsection{Graph and benchmark snapshot}
+
+The source is a set of yearly Open Contracting Data Standard releases for 2022--2026
+\citep{ocds}.  The build retains the latest dated release for each OCID and records all source years.
+It produces a Parquet-backed property graph rather than an RDF or SPARQL service.  Contract nodes
+are keyed by OCID and award identifier.  Organisation, CPV, and evidence nodes are linked through
+buyer, supplier, category, and provenance edges.  Table \ref{tab:data-stats} gives the sizes used by
+the experiments.
+
+\begin{table}[t]
+  \centering
+  \caption{Frozen data and benchmark artifacts.  Coverage counts refer to contract nodes with at
+  least one corresponding edge.}
+  \label{tab:data-stats}
+  \small
+  \begin{tabular}{lrr@{\qquad}lrr}
+    \toprule
+    Graph object & Count & Coverage & Benchmark split & Count & Status \\
+    \midrule
+    Contract nodes & 215,221 & -- & Train & 9,267 & mixed \\
+    Organisation nodes & 131,502 & -- & Dev-select & 671 & mixed \\
+    CPV nodes & 3,870 & -- & Dev-tune & 556 & mixed \\
+    Evidence nodes & 535,731 & -- & Dev-smoke & 49 & mixed \\
+    Contracts with buyer & 215,218 & 100.00\% & Frozen final partition & 2,285 & 1,925/360 \\
+    Contracts with supplier & 204,186 & 94.87\% & Main test after dev removal & 2,025 & 1,725/300 \\
+    Contracts with evidence & 215,202 & 99.99\% & Total & 12,828 & -- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The query view flattens this graph to one record per contract-award while retaining stable node and
+provenance identifiers.  Counts deduplicate contract identifiers.  Value projections return
+distinct stored strings, which may still contain unresolved aliases and are not guaranteed to be
+distinct legal organisations.  Amounts record their source and currency.  Award- and
+contract-derived values may be marked additive; tender-level fallback values are not.  No currency
+conversion is performed, so cross-currency totals are excluded from the paper's main claims.
+
+\subsection{Verification dimensions}
+
+The online runtime applies four successive checks.
+\begin{equation}
+  \text{valid}\;\longrightarrow\;\text{grounded}\;\longrightarrow\;
+  \text{executable}\;\longrightarrow\;\text{runtime accepted}.
+  \label{eq:online-checks}
+\end{equation}
+A valid program has compositional operators and types.  A grounded program maps its fields, values,
+roles, guards, and dependencies to the backend contract.  An executable program reaches an allowed
+state under deterministic evaluation.  A runtime accepted result also passes preflight, postflight,
+answer sanity, and release checks without access to the gold answer.  The arrows describe the order
+of checks.  The online sanity check is relative to the signature declared by the proposal, not the
+benchmark expectation or answer oracle.  The arrows do not claim semantic equivalence.
+
+Offline analysis adds two separate judgements.  \emph{Oracle correctness} asks whether the executed
+result matches the typed answer $y$.  \emph{Constraint faithfulness} asks whether the plan retains
+the explicit conditions and roles expressed by the question.  Neither judgement entails the other.
+A plan can match $y$ after omitting a condition that is redundant on the current snapshot, while a
+faithful plan can still choose the wrong operation.  Every judgement is conditional on the frozen
+snapshot $K$ and does not establish completeness of the underlying public record.
+
+The interface does not collapse these judgements into one verified label.  Online checking returns
+a terminal status, an execution trace, and an optional failure code.  The status controls release,
+while a repairable code may condition one further proposal.  Offline curation can additionally use
+the typed oracle and expected answer shape to route traces into positive targets, repairs,
+preferences, hard negatives, or abstention examples.  Constraint faithfulness remains a separate
+audit because neither runtime acceptance nor oracle agreement establishes it.

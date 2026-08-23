@@ -52,6 +52,9 @@ def run_ours(rows, args):
         from procurement_graph.reasoning.llm_planner import LLMReasoningPlanner
         planner = HybridPlanner(rule=DecompositionAwarePlanner(org_resolver=resolver),
                                 llm=LLMReasoningPlanner.from_env(args.model, org_resolver=resolver))
+    elif args.planner == "llm":
+        from procurement_graph.reasoning.llm_planner import LLMReasoningPlanner
+        planner = LLMReasoningPlanner.from_env(args.model, org_resolver=resolver)
     else:
         planner = RuleBasedDryRunPlanner()
     trace_reflector = None

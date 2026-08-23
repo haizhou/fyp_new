@@ -112,3 +112,13 @@ outputs/
 
 # Misc
 *.log
+
+# Training data
+data/training/
+
+# Logs
+train_logs/
+
+# Python cache
+__pycache__/
+*.pyc

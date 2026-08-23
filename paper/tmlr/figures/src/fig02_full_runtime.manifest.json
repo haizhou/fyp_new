@@ -1,0 +1,19 @@
+{
+  "figure": "fig02_full_runtime",
+  "system_name": null,
+  "trace_id": "L2::bridge_join_0502#L2a",
+  "question": "Record check: how many contract notices were published by buyers that have awarded a contract to Dodd Group (Midlands) Limited?",
+  "current_code_branch": "deterministic intent compiler; Step-2 planner bypassed",
+  "verified": true,
+  "oracle_match": true,
+  "answer": 1940,
+  "repair_attempts": 0,
+  "sources": {
+    "trace": "data/qa/teacher_full_v1/traces.jsonl:6528",
+    "sft": "data/qa/teacher_full_v1/verified_sft.jsonl:3389",
+    "runtime_control_flow": [
+      "src/procurement_graph/reasoning/typed_planning.py:2583-2702",
+      "src/procurement_graph/reasoning/pipeline.py:318-623"
+    ]
+  }
+}

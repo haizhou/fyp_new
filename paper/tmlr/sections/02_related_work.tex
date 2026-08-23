@@ -1,0 +1,82 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Executable semantic parsing}
+
+Neural-symbolic question answering separates a learned programmer from a symbolic executor,
+making the answer a denotation of an explicit program rather than unconstrained generated text
+\citep{liang-etal-2017-nsm}.  KQA Pro develops this idea into KoPL, a compositional language
+whose programs expose multi-hop, qualifier, comparison, logical, and counting operations
+\citep{cao-etal-2022-kqa}.  Question decomposition similarly represents a complex utterance as
+smaller executable or answerable units \citep{wolfson-etal-2020-break}.  Our algebra follows the
+same high-level principle but is specialised to a contract-record universe: it distinguishes
+record sets from sets of scalar field values, and includes semi-joins, anti-joins, set
+difference, grouped aggregation, and deterministic ranking.
+
+Formal output alone does not make generation reliable.  PICARD rejects inadmissible SQL tokens
+during decoding \citep{scholak-etal-2021-picard}; TIARA combines multi-grained KB retrieval with
+constrained logical-form generation \citep{shu-etal-2022-tiara}; and ReTraCk applies syntactic,
+ontology, real-execution, and virtual-execution checks in a modular KBQA framework
+\citep{chen-etal-2021-retrack}.  Our implementation does not perform PICARD-style token-level
+constrained decoding.  It instead validates the completed typed object, compiles and grounds it,
+and applies execution- and evidence-stage checks.  This difference is important because each
+mechanism rejects a different class of errors.
+
+Execution is also an imperfect correctness signal.  Incorrect programs often execute without a
+runtime error, and executability has accordingly been treated as weak supervision rather than a
+semantic certificate \citep{wang-etal-2021-learning-executions}.  Execution-guided refinement
+can improve complex KBQA \citep{guo-etal-2023-parse}, while QueryAgent uses environmental
+feedback to correct action sequences \citep{huang-etal-2024-queryagent}.  Our bounded repair
+uses structured failures to request a new plan and then repeats grounding, execution, and
+verification.  It never permits a language model to replace the executor's factual answer.
+
+\subsection{Retrieval and reasoning over structured data}
+
+Graph-based QA methods retrieve or construct question-specific subgraphs before selecting an
+answer.  GRAFT-Net fuses knowledge-base and text nodes in a heterogeneous graph
+\citep{sun-etal-2018-open}; PullNet learns which nodes to expand during iterative retrieval
+\citep{sun-etal-2019-pullnet}; UniKGQA unifies retrieval and reasoning with a shared matching
+function \citep{jiang2023unikgqa}; and RoG uses an LLM-generated relation path to retrieve
+faithful reasoning paths \citep{luo2024rog}.  StructGPT instead exposes specialised interfaces
+through which an LLM incrementally reads structured data \citep{jiang-etal-2023-structgpt}.
+These systems show the value of schema and graph structure, but their core objective is usually
+answer-entity or answer-bearing-path retrieval.  For exact procurement counts, set differences,
+and group comparisons, our objective is the complete denotation of an explicitly scoped program
+within a frozen backend, not a small relevant subgraph.
+
+Table-reasoning work provides a complementary perspective.  Chain-of-Table makes intermediate
+tables part of the reasoning state \citep{wang2024chainoftable}, illustrating why visible state
+transformations can be more auditable than free-form chains of thought.  Our execution trace
+similarly records typed intermediate sets, but operations are evaluated by code over a fixed
+record universe rather than by an LLM that edits a displayed table.
+
+\subsection{Compositional generalisation and answerability}
+
+Compositional benchmarks ask whether known primitives can be recombined in unseen structures.
+CFQ formalises this through atom and compound divergence \citep{keysers2020cfq}; COGS separates
+lexical and structural generalisation cases \citep{kim-linzen-2020-cogs}; and semantic-parsing
+studies show that improvements on out-of-distribution compositions can coexist with a large
+remaining gap \citep{oren-etal-2020-compositional}.  Hybrid systems can use a high-precision
+grammar path and fall back to a neural parser when the grammar does not cover an utterance
+\citep{shaw-etal-2021-compositional}.  This is closely related to our conditional routing from a
+deterministic intent compiler to a learned graph planner.  We do not claim the formal
+maximum-compound-divergence guarantee of CFQ: PACS controls exact questions, tree hashes, and
+declared unseen shapes, while its near-duplicate check is approximate (Section
+\ref{sec:pacs-construction}).
+
+Real KBs also make some questions unanswerable.  GrailQAbility distinguishes missing schema,
+entity, and fact conditions and evaluates both answerable and unanswerable cases
+\citep{patidar-etal-2023-grailqability}.  Our evaluation similarly includes unsupported
+operations and clean no-result cases, but the semantics are local to the implemented algebra and
+frozen procurement graph.  A no-result outcome can be the correct denotation; it is not treated
+as an invitation to search for a different answer.
+
+\subsection{Public-procurement knowledge graphs}
+
+The TheyBuyForYou platform demonstrates how procurement releases, company data, ontologies,
+entity reconciliation, and document services can be integrated into a public-procurement
+knowledge graph \citep{distinto2022theybuyforyou}.  Our work shares the data-integration
+motivation but studies a different research question: how a language model can propose a typed,
+auditable computation whose denotation is obtained from such structured data.  The graph itself
+is therefore infrastructure and an evaluated data contribution, not evidence that the QA method
+is correct.

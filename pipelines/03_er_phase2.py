@@ -13,16 +13,15 @@ Writes: data/entities/canonical_orgs.parquet  (updated in-place)
 Usage:
     python pipelines/03_er_phase2.py                  # full run
     python pipelines/03_er_phase2.py --no-candidates  # skip fuzzy report (much faster)
-    python pipelines/03_er_phase2.py --limit 2000     # first 2000 entities (quick test)
-    python pipelines/03_er_phase2.py --sample 2000    # random 2000 entities (seed=42)
+    python pipelines/03_er_phase2.py --limit 2000 --output-dir data/smoke/entities
+    python pipelines/03_er_phase2.py --sample 2000 --output-dir data/smoke/entities
 
 Notes:
   --no-candidates skips the pairwise Jaro-Winkler comparison which is O(n^2) within each
   3-char name-prefix block. For full data this may take several minutes. Skip it on test runs.
 
-  --limit / --sample restrict the canonical_orgs loaded from Phase 1 output. Use these to
-  quickly verify Phase 2 logic without waiting for a full entity set. Outputs are written to
-  the normal entities_dir but labelled PARTIAL in the header.
+  --limit / --sample restrict the canonical_orgs loaded from Phase 1 output. Partial
+  outputs require a separate --output-dir and never replace the full entity tables.
 
   Fuzzy candidate report (er_candidates.csv) is for human review only — no automatic merges.
 
@@ -38,9 +37,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import pandas as pd
 import yaml
-from er_phase1 import load_canonical_orgs, load_alias_map
-from er_phase2 import resolve_phase2, write_phase2_outputs
-from er_candidates import generate_candidates, write_candidates, describe_limits
+from procurement_graph.common.pipeline_paths import resolve_output_target
+from procurement_graph.er.candidates import generate_candidates, write_candidates, describe_limits
+from procurement_graph.er.phase1 import load_canonical_orgs, load_alias_map
+from procurement_graph.er.phase2 import resolve_phase2, write_phase2_outputs
 
 ROOT = Path(__file__).parent.parent
 
@@ -124,13 +124,21 @@ def main(
     fuzzy_max_pairs_total: int = 10_000,
     fuzzy_max_pairs_per_block: int = 500,
     fuzzy_max_block_size: int = 50,
+    output_dir: Path | None = None,
 ) -> None:
     cfg = load_settings()
-    entities_dir = ROOT / cfg["data"]["entities_dir"]
+    source_entities_dir = ROOT / cfg["data"]["entities_dir"]
     gov_lookup_path = ROOT / cfg["entity_resolution"]["gov_lookup_path"]
     fuzzy_threshold = cfg["entity_resolution"]["fuzzy_threshold"]
 
     is_partial = limit is not None or sample is not None
+    entities_dir = resolve_output_target(
+        source_entities_dir,
+        output_dir,
+        project_root=ROOT,
+        partial=is_partial,
+        option_name="--output-dir",
+    )
     mode_label = (
         f"LIMIT {limit:,}" if limit is not None
         else f"SAMPLE {sample:,} (seed=42)" if sample is not None
@@ -140,8 +148,8 @@ def main(
     print("=" * 60)
     print(f"PIPELINE 03 — ENTITY RESOLUTION PHASE 2 (Heuristic) [{mode_label}]")
     print("=" * 60)
-    print(f"  Input    : {entities_dir}/canonical_orgs.parquet")
-    print(f"             {entities_dir}/alias_map.parquet")
+    print(f"  Input    : {source_entities_dir}/canonical_orgs.parquet")
+    print(f"             {source_entities_dir}/alias_map.parquet")
     print(f"  Gov lookup: {gov_lookup_path}  ({_count_gov_entries(gov_lookup_path)} entries)")
     print(f"  Outputs  : {entities_dir}/canonical_orgs.parquet  (updated)")
     print(f"             {entities_dir}/alias_map.parquet        (updated)")
@@ -160,8 +168,8 @@ def main(
 
     # --- Load ---
     t_load = time.time()
-    canonical_orgs = load_canonical_orgs(entities_dir)
-    alias_map = load_alias_map(entities_dir)
+    canonical_orgs = load_canonical_orgs(source_entities_dir)
+    alias_map = load_alias_map(source_entities_dir)
     total_available = len(canonical_orgs)
     if limit is not None:
         canonical_orgs = canonical_orgs.head(limit)
@@ -237,8 +245,8 @@ if __name__ == "__main__":
 Examples:
   python pipelines/03_er_phase2.py                          # full run
   python pipelines/03_er_phase2.py --no-candidates          # skip fuzzy report (fast)
-  python pipelines/03_er_phase2.py --limit 2000             # first 2000 entities
-  python pipelines/03_er_phase2.py --sample 2000 --no-candidates  # quick smoke test
+  python pipelines/03_er_phase2.py --limit 2000 --output-dir data/smoke/entities
+  python pipelines/03_er_phase2.py --sample 2000 --no-candidates --output-dir data/smoke/entities
         """,
     )
     parser.add_argument(
@@ -249,6 +257,10 @@ Examples:
                         help="Use only the first N entities from Phase 1 output")
     parser.add_argument("--sample", type=int, default=None,
                         help="Use a random sample of N entities (fixed seed=42)")
+    parser.add_argument(
+        "--output-dir", type=Path, default=None,
+        help="Output directory (required and non-canonical with --limit/--sample)",
+    )
     parser.add_argument("--fuzzy-max-pairs", type=int, default=10_000,
                         help="Global cap on total fuzzy candidate pairs (default 10000)")
     parser.add_argument("--fuzzy-max-block-size", type=int, default=50,
@@ -256,7 +268,7 @@ Examples:
     parser.add_argument("--fuzzy-max-pairs-per-block", type=int, default=500,
                         help="Cap on pairs from a single prefix block (default 500)")
     args = parser.parse_args()
-    if args.limit and args.sample:
+    if args.limit is not None and args.sample is not None:
         parser.error("--limit and --sample are mutually exclusive")
     main(
         run_candidates=not args.no_candidates,
@@ -265,4 +277,5 @@ Examples:
         fuzzy_max_pairs_total=args.fuzzy_max_pairs,
         fuzzy_max_pairs_per_block=args.fuzzy_max_pairs_per_block,
         fuzzy_max_block_size=args.fuzzy_max_block_size,
+        output_dir=args.output_dir,
     )

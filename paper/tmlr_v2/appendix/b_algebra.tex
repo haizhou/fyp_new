@@ -1,0 +1,60 @@
+\section{Complete Algebra Contract}
+\label{app:algebra}
+
+\begin{table}[h]
+  \caption{Complete expression-node inventory in the current validator.}
+  \centering
+  \scriptsize
+  \begin{tabular}{lll}
+    \toprule
+    Node & Input type(s) & Output \\
+    \midrule
+    \texttt{filter} & predicates over $U_G$ & \records \\
+    \texttt{values} & \records, field & \values \\
+    \texttt{count} & \records & \numbertype \\
+    \texttt{size} & \values & \numbertype \\
+    \texttt{sum} & \records, field & \numbertype \\
+    \texttt{exists} & \records & \booltype \\
+    \texttt{select} & \records, field & \valuetype \\
+    \texttt{extreme\_rows} & \records, field, argmin/argmax & \records \\
+    \texttt{extreme} & \records, field, argmin/argmax & \valuetype \\
+    \texttt{groupby} & \records, key, count/sum metric & \groups \\
+    \texttt{argext} & \groups, argmin/argmax & \valuetype \\
+    \texttt{top} & \groups, $1\leq k\leq50$ & \ranking \\
+    \texttt{num} & numeric non-Boolean literal & \numbertype \\
+    \texttt{combine} & \numbertype, \numbertype & \numbertype or \booltype \\
+    \texttt{vcompare} & \valuetype, literal & \booltype \\
+    \texttt{setop} & \values, \values & \values \\
+    \texttt{gcombine} & \groups, \groups & \groups \\
+    \texttt{keys\_where} & \groups, comparator, threshold & \values \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Base predicates are \texttt{eq}, \texttt{in}, \texttt{contains}, \texttt{exists},
+\texttt{gte}, and \texttt{lte}.  \texttt{not} negates one predicate, \texttt{any} disjoins two
+or more predicates, and \texttt{in\_expr} evaluates a \values child and applies membership or
+negated membership to a field.  Numeric \texttt{combine} operators are \texttt{diff},
+\texttt{ratio}, and \texttt{add}; Boolean comparisons are \texttt{gt}, \texttt{lt},
+\texttt{ge}, \texttt{le}, and \texttt{eq}.  Set operators are union, intersection, and
+difference.
+
+The validator enforces compositional types, required arguments, a maximum depth of 16, a maximum
+of 64 nodes, and $k\leq50$.  It does not restrict every field to the runtime schema and it does
+not make the additivity or currency guard intrinsic to \texttt{sum}.  Those are separate domain
+contracts.  Runtime failure modes include unknown fields, non-finite/non-numeric sums, no result,
+and multiple distinct values for a scalar selection.  For \texttt{extreme\_rows}, all tied rows
+at the extremum are retained; downstream scalar selection therefore fails on unresolved ties
+instead of choosing an arbitrary row.
+
+The comparator used by Equation \ref{eq:strict-correctness} is type strict.  Set-valued answers
+compare as sets of strings; rankings preserve their defined order and tie semantics; Booleans
+require Boolean values on both sides, so Python's subtyping of \texttt{bool} under \texttt{int}
+must never make \texttt{True} equivalent to numeric one; numeric answers use the evaluator's
+documented tolerance.  Section \ref{sec:limitations} records where legacy helpers violated the
+Boolean rule and which result sets are excluded as a consequence.
+
+Counts and grouped counts deduplicate contract identifiers.  Projections return sorted distinct
+non-empty strings.  Grouped keys exclude null and empty strings.  Numeric sums use decimal
+accumulation before conversion to the JSON answer representation.  Ranking ties are broken
+deterministically by the key string after the numeric score.

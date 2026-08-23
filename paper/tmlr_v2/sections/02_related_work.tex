@@ -1,0 +1,40 @@
+\section{Related Work}
+\label{sec:related}
+
+Neural-symbolic question answering makes an answer the denotation of an explicit program rather
+than free text \citep{liang-etal-2017-nsm}, an idea KoPL develops into multi-hop, comparison, and
+counting operations \citep{cao-etal-2022-kqa} and question decomposition into smaller answerable
+units \citep{wolfson-etal-2020-break}.  Our algebra specialises it to contract records,
+separating record sets from sets of scalar values and adding semi-joins, anti-joins, set
+difference, grouped aggregation, and ranking.  Reliability is then pursued at different points of
+the pipeline: token-level constrained decoding \citep{scholak-etal-2021-picard}, retrieval paired
+with constrained logical-form generation \citep{shu-etal-2022-tiara}, and layered syntactic,
+ontology, and execution checks \citep{chen-etal-2021-retrack}.  We instead validate the completed
+typed object, then compile, ground, and re-check it at execution time.  Execution by itself
+remains weak, since wrong programs often run cleanly
+\citep{wang-etal-2021-learning-executions}; execution-guided refinement
+\citep{guo-etal-2023-parse} and environment feedback \citep{huang-etal-2024-queryagent} use that
+signal without trusting it, and so does our bounded repair.
+
+Graph-based QA approaches the problem from the other side, retrieving or building a
+question-specific subgraph \citep{sun-etal-2018-open, sun-etal-2019-pullnet, jiang2023unikgqa,
+luo2024rog} or reading structured data through fixed interfaces
+\citep{jiang-etal-2023-structgpt}, with an answer entity or path as the target.  Exact counts and
+set differences instead need the complete denotation of an explicitly scoped program over a
+frozen backend, which is what turns ranking evidence into executing a query.  Chain-of-Table is
+nearer to us, making intermediate tables part of the reasoning state
+\citep{wang2024chainoftable}; our traces do the same with typed sets, computed by a fixed
+evaluator rather than by the model.
+
+How far such a parser generalises is what CFQ \citep{keysers2020cfq} and COGS
+\citep{kim-linzen-2020-cogs} were built to measure, and reported gains on unseen compositions
+still leave a wide gap \citep{oren-etal-2020-compositional}.  PACS controls exact questions, tree
+hashes, and declared unseen shapes but has no divergence construction, so we make no CFQ-style
+claim for it.  Our routing from a deterministic compiler to a learned planner follows
+grammar-plus-neural-fallback designs \citep{shaw-etal-2021-compositional}, and our unsupported
+and empty-result controls follow work that separates unanswerable conditions from answerable ones
+\citep{patidar-etal-2023-grailqability}.  On the data side, TheyBuyForYou integrates procurement
+releases, company data, and reconciliation into a public-procurement knowledge graph
+\citep{distinto2022theybuyforyou}; we share that motivation but ask how a model can propose a
+typed, auditable computation over such data, which leaves our graph as infrastructure rather than
+as evidence that the QA method is correct.
